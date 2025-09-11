@@ -13,6 +13,12 @@ export class CharityController {
   }
 
   @Public()
+  @Get('verified')
+  async findVerified() {
+    return this.charityService.findVerified();
+  }
+
+  @Public()
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const charity = await this.charityService.findOne(id);

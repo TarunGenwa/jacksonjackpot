@@ -9,6 +9,39 @@ export class CharityService {
     return this.prisma.charity.findMany({
       where: {
         isActive: true,
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        logoUrl: true,
+        website: true,
+        email: true,
+        phone: true,
+        address: true,
+        isVerified: true,
+        createdAt: true,
+        updatedAt: true,
+        _count: {
+          select: {
+            competitions: {
+              where: {
+                isActive: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        name: 'asc',
+      },
+    });
+  }
+
+  async findVerified() {
+    return this.prisma.charity.findMany({
+      where: {
+        isActive: true,
         isVerified: true,
       },
       select: {
