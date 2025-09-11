@@ -1,103 +1,257 @@
-import Image from "next/image";
+'use client';
+
+import { useEffect, useState } from 'react';
+import { 
+  Box, 
+  Container, 
+  VStack, 
+  HStack, 
+  Text, 
+  Heading, 
+  Button, 
+  SimpleGrid, 
+  Card, 
+  CardBody, 
+  Spinner, 
+  Alert, 
+  AlertIcon, 
+  Center,
+  Stat,
+  StatLabel,
+  StatNumber,
+  StatHelpText,
+  Flex,
+  Icon,
+  Circle
+} from '@chakra-ui/react';
+import { FaTrophy, FaHeart, FaShieldAlt, FaInfoCircle, FaUsers, FaGift } from 'react-icons/fa';
+import CompetitionCard from '@/components/CompetitionCard';
+import { Competition } from '@/types/api';
+import { competitionsService } from '@/services/competitions';
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [competitions, setCompetitions] = useState<Competition[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+  useEffect(() => {
+    const fetchCompetitions = async () => {
+      try {
+        setLoading(true);
+        const activeCompetitions = await competitionsService.getActive();
+        setCompetitions(activeCompetitions);
+        setError(null);
+      } catch (err) {
+        console.error('Failed to fetch competitions:', err);
+        setError('Failed to load competitions. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCompetitions();
+  }, []);
+
+  if (loading) {
+    return (
+      <Box minH="100vh" bg="gray.50">
+        <Container maxW="container.xl" py={8}>
+          <Center minH="50vh">
+            <VStack spacing={4}>
+              <Spinner size="xl" color="blue.500" />
+              <Text color="gray.600">Loading competitions...</Text>
+            </VStack>
+          </Center>
+        </Container>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box minH="100vh" bg="gray.50">
+        <Container maxW="container.xl" py={8}>
+          <Center minH="50vh">
+            <VStack spacing={4}>
+              <Alert status="error" maxW="md" borderRadius="md">
+                <AlertIcon />
+                {error}
+              </Alert>
+              <Button 
+                colorScheme="blue" 
+                onClick={() => window.location.reload()}
+              >
+                Try Again
+              </Button>
+            </VStack>
+          </Center>
+        </Container>
+      </Box>
+    );
+  }
+
+  return (
+    <Box minH="100vh" bg="gray.50">
+      {/* Hero Section */}
+      <Box
+        bgGradient="linear(to-r, blue.500, purple.600)"
+        color="white"
+        py={20}
+        textAlign="center"
+      >
+        <Container maxW="container.xl">
+          <VStack spacing={6} maxW="4xl" mx="auto">
+            <Heading 
+              as="h1" 
+              size={{ base: "3xl", md: "4xl" }} 
+              fontWeight="bold"
+            >
+              Jackson Jackpot
+            </Heading>
+            <Text 
+              fontSize={{ base: "xl", md: "2xl" }} 
+              opacity={0.9}
+            >
+              Win amazing prizes while supporting great causes
+            </Text>
+            <Text 
+              fontSize="lg" 
+              opacity={0.8} 
+              maxW="2xl"
+            >
+              Enter charity competitions and lotteries to win incredible prizes while making a difference. 
+              100% transparent, verified charities, and life-changing rewards await.
+            </Text>
+            <HStack spacing={4} pt={4}>
+              <Button colorScheme="green" size="lg">
+                Browse Competitions
+              </Button>
+              <Button variant="outline" size="lg" color="white" borderColor="white">
+                How It Works
+              </Button>
+            </HStack>
+          </VStack>
+        </Container>
+      </Box>
+
+      {/* Main Content */}
+      <Container maxW="container.xl" py={12}>
+        {/* Active Competitions Section */}
+        <VStack spacing={12}>
+          <VStack spacing={8} w="full">
+            <VStack spacing={4} textAlign="center">
+              <Heading as="h2" size="2xl" color="gray.800">
+                Active Competitions
+              </Heading>
+              <Text fontSize="lg" color="gray.600" maxW="2xl">
+                Enter now for your chance to win amazing prizes and support worthy causes
+              </Text>
+            </VStack>
+
+            {competitions.length === 0 ? (
+              <Card maxW="2xl" w="full" shadow="xl">
+                <CardBody py={16} textAlign="center">
+                  <VStack spacing={4}>
+                    <Text fontSize="6xl">🎲</Text>
+                    <Heading size="xl" color="gray.700">
+                      No Active Competitions
+                    </Heading>
+                    <Text color="gray.600">
+                      Check back soon for new competitions and amazing prizes!
+                    </Text>
+                    <Button colorScheme="blue" mt={4}>
+                      Notify Me
+                    </Button>
+                  </VStack>
+                </CardBody>
+              </Card>
+            ) : (
+              <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6} w="full">
+                {competitions.map((competition) => (
+                  <CompetitionCard 
+                    key={competition.id} 
+                    competition={competition} 
+                  />
+                ))}
+              </SimpleGrid>
+            )}
+          </VStack>
+
+          {/* Features Section */}
+          <Card w="full" shadow="xl">
+            <CardBody p={8}>
+              <VStack spacing={8}>
+                <Heading size="xl" textAlign="center" color="gray.800">
+                  Why Choose Jackson Jackpot?
+                </Heading>
+                <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8} w="full">
+                  <VStack spacing={4} textAlign="center">
+                    <Circle size="16" bg="blue.100" color="blue.500">
+                      <Icon as={FaTrophy} boxSize={8} />
+                    </Circle>
+                    <Heading size="md">Amazing Prizes</Heading>
+                    <Text color="gray.600">
+                      Win holidays, cash, cars, and more incredible prizes
+                    </Text>
+                  </VStack>
+                  <VStack spacing={4} textAlign="center">
+                    <Circle size="16" bg="green.100" color="green.500">
+                      <Icon as={FaHeart} boxSize={8} />
+                    </Circle>
+                    <Heading size="md">Support Charities</Heading>
+                    <Text color="gray.600">
+                      Every ticket supports verified charitable causes
+                    </Text>
+                  </VStack>
+                  <VStack spacing={4} textAlign="center">
+                    <Circle size="16" bg="purple.100" color="purple.500">
+                      <Icon as={FaShieldAlt} boxSize={8} />
+                    </Circle>
+                    <Heading size="md">100% Transparent</Heading>
+                    <Text color="gray.600">
+                      Fair draws, verified charities, secure payments
+                    </Text>
+                  </VStack>
+                </SimpleGrid>
+              </VStack>
+            </CardBody>
+          </Card>
+
+          {/* Stats Section */}
+          <Card w="full" shadow="xl">
+            <CardBody p={8}>
+              <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8}>
+                <Stat textAlign="center">
+                  <Flex justify="center" mb={2}>
+                    <Icon as={FaInfoCircle} boxSize={8} color="blue.500" />
+                  </Flex>
+                  <StatLabel fontSize="lg">Total Raised</StatLabel>
+                  <StatNumber fontSize="3xl" color="blue.500">£1.2M</StatNumber>
+                  <StatHelpText>For charities this year</StatHelpText>
+                </Stat>
+
+                <Stat textAlign="center">
+                  <Flex justify="center" mb={2}>
+                    <Icon as={FaUsers} boxSize={8} color="green.500" />
+                  </Flex>
+                  <StatLabel fontSize="lg">Happy Winners</StatLabel>
+                  <StatNumber fontSize="3xl" color="green.500">2,450</StatNumber>
+                  <StatHelpText>Life-changing prizes</StatHelpText>
+                </Stat>
+
+                <Stat textAlign="center">
+                  <Flex justify="center" mb={2}>
+                    <Icon as={FaGift} boxSize={8} color="purple.500" />
+                  </Flex>
+                  <StatLabel fontSize="lg">Active Competitions</StatLabel>
+                  <StatNumber fontSize="3xl" color="purple.500">{competitions.length}</StatNumber>
+                  <StatHelpText>Ready to enter</StatHelpText>
+                </Stat>
+              </SimpleGrid>
+            </CardBody>
+          </Card>
+        </VStack>
+      </Container>
+    </Box>
   );
 }
