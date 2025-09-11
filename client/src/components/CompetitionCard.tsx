@@ -34,6 +34,11 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
     return `£${parseFloat(price).toFixed(2)}`;
   };
 
+  const formatPrizePool = (price: string) => {
+    const amount = parseFloat(price);
+    return `£${amount % 1 === 0 ? amount.toString() : amount.toFixed(2)}`;
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-GB', {
       day: 'numeric',
@@ -42,9 +47,30 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
     });
   };
 
+  const getRemainingTime = () => {
+    const now = new Date();
+    const drawDate = new Date(localCompetition.drawDate);
+    const diffMs = drawDate.getTime() - now.getTime();
+    
+    if (diffMs <= 0) return 'Draw closed';
+    
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    
+    if (days > 0) return `${days}d ${hours}h left`;
+    return `${hours}h left`;
+  };
+
   const getProgressPercentage = () => {
     if (localCompetition.maxTickets === 0) return 0;
     return Math.round((localCompetition.ticketsSold / localCompetition.maxTickets) * 100);
+  };
+
+  const getPrizePool = () => {
+    const ticketPrice = parseFloat(localCompetition.ticketPrice);
+    const ticketsSold = localCompetition.ticketsSold;
+    const prizePool = ticketPrice * ticketsSold;
+    return formatPrizePool(prizePool.toString());
   };
 
   const handlePurchaseSuccess = () => {
@@ -124,37 +150,36 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
           </Box>
         )}
         
-        {/* Status Badge */}
+        {/* Time Remaining Badge */}
+        <Badge
+          position="absolute"
+          top={3}
+          left={3}
+          colorScheme="orange"
+          variant="solid"
+          borderRadius="md"
+        >
+          {getRemainingTime()}
+        </Badge>
+        
+        {/* Ticket Price Badge */}
         <Badge
           position="absolute"
           top={3}
           right={3}
-          colorScheme={getStatusColor(localCompetition.status)}
+          colorScheme="green"
           variant="solid"
           borderRadius="md"
+          fontSize="sm"
+          px={3}
+          py={1}
         >
-          {localCompetition.status.replace('_', ' ')}
+          {formatPrice(localCompetition.ticketPrice)}
         </Badge>
       </Box>
 
       <CardBody p={6}>
         <VStack spacing={4} align="stretch">
-          {/* Charity Info */}
-          <HStack spacing={2}>
-            <Avatar
-              size="xs"
-              src={localCompetition.charity.logoUrl}
-              name={localCompetition.charity.name}
-            />
-            <Text fontSize="sm" color="gray.600" fontWeight="medium">
-              {localCompetition.charity.name}
-              {localCompetition.charity.isVerified && (
-                <Badge ml={1} colorScheme="blue" variant="solid" fontSize="xs">
-                  ✓
-                </Badge>
-              )}
-            </Text>
-          </HStack>
 
           {/* Title */}
           <Heading 
@@ -166,78 +191,29 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
             {localCompetition.title}
           </Heading>
 
-          {/* Description */}
-          <Text 
-            fontSize="sm" 
-            color="gray.600" 
-            noOfLines={3}
-          >
-            {localCompetition.description}
-          </Text>
 
           {/* Progress Bar */}
           <Box>
-            <Flex justify="space-between" fontSize="sm" color="gray.600" mb={2}>
-              <Text>{localCompetition.ticketsSold} tickets sold</Text>
-              <Text>{localCompetition.maxTickets} max</Text>
-            </Flex>
             <Progress 
               value={getProgressPercentage()} 
               colorScheme="blue" 
-              size="md" 
+              size="lg" 
               borderRadius="md"
+              bg="gray.100"
             />
             <Text 
               textAlign="center" 
-              fontSize="xs" 
-              color="gray.500" 
-              mt={1}
+              fontSize="md" 
+              color="green.600" 
+              mt={2}
+              fontWeight="bold"
             >
-              {getProgressPercentage()}% sold
+              {getPrizePool()} to win
             </Text>
           </Box>
 
-          {/* Prizes Info */}
-          <Alert status="info" borderRadius="md" py={2}>
-            <AlertIcon boxSize={4} />
-            <Box fontSize="xs">
-              <Text fontWeight="semibold">
-                {localCompetition._count.prizes} prize{localCompetition._count.prizes !== 1 ? 's' : ''}
-              </Text>
-              {localCompetition.prizes.length > 0 && (
-                <Text>
-                  Top: {localCompetition.prizes[0].name} ({formatPrice(localCompetition.prizes[0].value)})
-                </Text>
-              )}
-            </Box>
-          </Alert>
 
-          {/* Ticket Price & Draw Date */}
-          <Flex justify="space-between" align="center">
-            <Badge 
-              colorScheme="green" 
-              variant="solid" 
-              fontSize="sm" 
-              px={3} 
-              py={1}
-              borderRadius="md"
-            >
-              {formatPrice(localCompetition.ticketPrice)} per ticket
-            </Badge>
-            <Text fontSize="sm" color="gray.600">
-              Draw: {formatDate(localCompetition.drawDate)}
-            </Text>
-          </Flex>
 
-          {/* Action Button */}
-          <Button 
-            {...getButtonProps()}
-            w="full"
-            size="md"
-            onClick={localCompetition.status === 'ACTIVE' ? handlePurchaseClick : undefined}
-          >
-            {getButtonText()}
-          </Button>
         </VStack>
       </CardBody>
 

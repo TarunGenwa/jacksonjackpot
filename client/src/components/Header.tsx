@@ -82,22 +82,6 @@ export default function Header() {
     }).format(amount);
   };
 
-  const NavLinks = () => (
-    <>
-      <Link href="/">
-        <Button variant="ghost">Home</Button>
-      </Link>
-      <Link href="/competitions">
-        <Button variant="ghost">Competitions</Button>
-      </Link>
-      <Link href="/charities">
-        <Button variant="ghost">Charities</Button>
-      </Link>
-      <Link href="/how-it-works">
-        <Button variant="ghost">How It Works</Button>
-      </Link>
-    </>
-  );
 
   return (
     <>
@@ -117,12 +101,6 @@ export default function Header() {
               </Text>
             </Link>
 
-            {/* Desktop Navigation */}
-            {!isMobile && (
-              <HStack spacing={4}>
-                <NavLinks />
-              </HStack>
-            )}
 
             {/* Right Side */}
             <HStack spacing={4}>
@@ -258,27 +236,6 @@ export default function Header() {
           </DrawerHeader>
           <DrawerBody>
             <VStack spacing={4} align="stretch" pt={4}>
-              <Link href="/" onClick={onClose}>
-                <Button variant="ghost" w="full" justifyContent="flex-start">
-                  🏠 Home
-                </Button>
-              </Link>
-              <Link href="/competitions" onClick={onClose}>
-                <Button variant="ghost" w="full" justifyContent="flex-start">
-                  🎲 Competitions
-                </Button>
-              </Link>
-              <Link href="/charities" onClick={onClose}>
-                <Button variant="ghost" w="full" justifyContent="flex-start">
-                  💚 Charities
-                </Button>
-              </Link>
-              <Link href="/how-it-works" onClick={onClose}>
-                <Button variant="ghost" w="full" justifyContent="flex-start">
-                  ❓ How It Works
-                </Button>
-              </Link>
-              
               {/* Mobile Auth Links */}
               {!user && (
                 <>
