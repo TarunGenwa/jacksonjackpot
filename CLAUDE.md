@@ -30,6 +30,12 @@ npm run start:prod   # Start production server
 npm run build        # Build for production
 npm run lint         # Run ESLint with auto-fix
 npm run format       # Format code with Prettier
+
+# Prisma commands
+npm run prisma:generate      # Generate Prisma Client
+npm run prisma:migrate       # Create new migration
+npm run prisma:migrate:deploy # Deploy migrations to production
+npm run prisma:studio        # Open Prisma Studio GUI
 ```
 
 ### Testing Commands
@@ -54,10 +60,27 @@ npm run test:e2e     # Run e2e tests
 
 ### Backend (NestJS)
 - Modular architecture with controllers, services, and modules
-- Main entry point: `server/src/main.ts`
+- Main entry point: `server/src/main.ts` (default port: 8080)
+- PostgreSQL database using Prisma ORM with Neon DB
+- Configuration management using @nestjs/config
 - Test files colocated with source files (`.spec.ts`)
 - E2E tests in `server/test/` directory
 - Jest configured for unit and e2e testing
+
+### Database Configuration
+- Uses PostgreSQL hosted on Neon
+- Prisma ORM for database access and migrations
+- Environment-based configuration via `.env` file
+- Schema defined in `server/prisma/schema.prisma`
+- Generated Prisma Client in `server/generated/prisma/`
+- SSL enabled for secure connections
+
+### Database Schema
+Current models:
+- **User**: Core user model with fields for authentication and profile
+  - `id` (UUID), `email`, `username`, `firstName`, `lastName`
+  - `password` (hashed), `isActive`, `role` (USER/ADMIN/MODERATOR)
+  - Timestamps: `createdAt`, `updatedAt`
 
 ## Key Configuration Files
 
@@ -72,10 +95,23 @@ npm run test:e2e     # Run e2e tests
   - `server/tsconfig.json` - TypeScript configuration
   - `server/eslint.config.mjs` - ESLint configuration
   - `server/.prettierrc` - Prettier configuration
+  - `server/.env` - Environment variables (database URL, port)
+  - `server/.env.example` - Template for environment variables
+  - `server/prisma/schema.prisma` - Prisma database schema
+  - `server/prisma/migrations/` - Database migration files
 
 ## Running the Full Stack
 
-To run both frontend and backend simultaneously, open two terminal windows:
+### Prerequisites
+1. Copy `server/.env.example` to `server/.env` and configure your database URL
+2. Install dependencies in both directories:
+   ```bash
+   cd server && npm install
+   cd ../client && npm install
+   ```
+
+### Start Development Servers
+Open two terminal windows:
 
 1. Terminal 1 - Backend:
    ```bash
