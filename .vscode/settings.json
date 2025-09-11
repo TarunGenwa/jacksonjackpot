@@ -1,0 +1,10 @@
+{
+  "nextjs.server.disable": true,
+  "nestjs.server.disable": true,
+  "npm.autoStart": false,
+  "debug.javascript.autoAttachFilter": "disabled",
+  "liveServer.settings.donotShowInfoMsg": true,
+  "liveServer.settings.donotVerifyTags": true,
+  "typescript.tsserver.experimental.enableProjectDiagnostics": false,
+  "task.autoDetect": "off"
+}

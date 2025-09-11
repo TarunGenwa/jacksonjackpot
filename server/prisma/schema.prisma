@@ -26,11 +26,239 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  wallet       Wallet?
+  tickets      Ticket[]
+  transactions Transaction[]
+  winners      Winner[]
+
   @@map("users")
+}
+
+model Charity {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  logoUrl     String?
+  website     String?
+  email       String
+  phone       String?
+  address     String?
+  isVerified  Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  taxId       String?  @unique
+  bankDetails Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  competitions Competition[]
+  donations    Donation[]
+
+  @@map("charities")
+}
+
+model Competition {
+  id                String             @id @default(uuid())
+  title             String
+  description       String
+  charityId         String
+  startDate         DateTime
+  endDate           DateTime
+  drawDate          DateTime
+  ticketPrice       Decimal            @db.Decimal(10, 2)
+  maxTickets        Int
+  ticketsSold       Int                @default(0)
+  minTickets        Int                @default(1)
+  status            CompetitionStatus  @default(DRAFT)
+  isActive          Boolean            @default(true)
+  imageUrl          String?
+  termsAndConditions String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  charity  Charity  @relation(fields: [charityId], references: [id])
+  prizes   Prize[]
+  tickets  Ticket[]
+  winners  Winner[]
+
+  @@index([status, isActive])
+  @@index([charityId])
+  @@map("competitions")
+}
+
+model Prize {
+  id            String      @id @default(uuid())
+  competitionId String
+  name          String
+  description   String
+  value         Decimal     @db.Decimal(10, 2)
+  position      Int
+  imageUrl      String?
+  quantity      Int         @default(1)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  competition Competition @relation(fields: [competitionId], references: [id])
+  winners     Winner[]
+
+  @@unique([competitionId, position])
+  @@map("prizes")
+}
+
+model Wallet {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  balance   Decimal  @default(0) @db.Decimal(10, 2)
+  currency  String   @default("GBP")
+  isLocked  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id])
+  transactions Transaction[]
+
+  @@map("wallets")
+}
+
+model Transaction {
+  id              String            @id @default(uuid())
+  walletId        String
+  userId          String
+  type            TransactionType
+  status          TransactionStatus @default(PENDING)
+  amount          Decimal           @db.Decimal(10, 2)
+  currency        String            @default("GBP")
+  description     String?
+  referenceId     String?           @unique
+  paymentMethod   String?
+  paymentProvider String?
+  metadata        Json?
+  processedAt     DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  wallet Wallet @relation(fields: [walletId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([userId, status])
+  @@index([walletId])
+  @@map("transactions")
+}
+
+model Ticket {
+  id            String       @id @default(uuid())
+  ticketNumber  String       @unique
+  competitionId String
+  userId        String
+  purchasePrice Decimal      @db.Decimal(10, 2)
+  status        TicketStatus @default(ACTIVE)
+  purchasedAt   DateTime     @default(now())
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  competition Competition @relation(fields: [competitionId], references: [id])
+  user        User        @relation(fields: [userId], references: [id])
+  winner      Winner?
+
+  @@index([competitionId, status])
+  @@index([userId])
+  @@map("tickets")
+}
+
+model Winner {
+  id            String       @id @default(uuid())
+  competitionId String
+  userId        String
+  ticketId      String       @unique
+  prizeId       String
+  status        WinnerStatus @default(PENDING)
+  claimedAt     DateTime?
+  paidOutAt     DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  competition Competition @relation(fields: [competitionId], references: [id])
+  user        User        @relation(fields: [userId], references: [id])
+  ticket      Ticket      @relation(fields: [ticketId], references: [id])
+  prize       Prize       @relation(fields: [prizeId], references: [id])
+
+  @@index([competitionId])
+  @@index([userId])
+  @@map("winners")
+}
+
+model Donation {
+  id        String         @id @default(uuid())
+  charityId String
+  amount    Decimal        @db.Decimal(10, 2)
+  currency  String         @default("GBP")
+  donorName String?
+  donorEmail String?
+  status    DonationStatus @default(PENDING)
+  message   String?
+  isAnonymous Boolean      @default(false)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  charity Charity @relation(fields: [charityId], references: [id])
+
+  @@index([charityId, status])
+  @@map("donations")
 }
 
 enum UserRole {
   USER
   ADMIN
   MODERATOR
+}
+
+enum CompetitionStatus {
+  DRAFT
+  UPCOMING
+  ACTIVE
+  SOLD_OUT
+  DRAWING
+  COMPLETED
+  CANCELLED
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  TICKET_PURCHASE
+  PRIZE_PAYOUT
+  REFUND
+  BONUS
+  FEE
+}
+
+enum TransactionStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum TicketStatus {
+  ACTIVE
+  WINNER
+  EXPIRED
+  CANCELLED
+  REFUNDED
+}
+
+enum WinnerStatus {
+  PENDING
+  NOTIFIED
+  CLAIMED
+  PAID
+  EXPIRED
+}
+
+enum DonationStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
 }

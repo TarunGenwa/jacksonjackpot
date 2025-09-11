@@ -77,10 +77,52 @@ npm run test:e2e     # Run e2e tests
 
 ### Database Schema
 Current models:
-- **User**: Core user model with fields for authentication and profile
-  - `id` (UUID), `email`, `username`, `firstName`, `lastName`
-  - `password` (hashed), `isActive`, `role` (USER/ADMIN/MODERATOR)
-  - Timestamps: `createdAt`, `updatedAt`
+
+#### Core Models
+- **User**: Core user model with authentication and profile
+  - Fields: `id`, `email`, `username`, `firstName`, `lastName`, `password`, `isActive`
+  - Role-based access: USER, ADMIN, MODERATOR
+  - Relations: wallet, tickets, transactions, winners
+
+- **Charity**: Registered charities that host competitions
+  - Fields: `name`, `description`, `logoUrl`, `website`, `email`, `taxId`
+  - Verification status and bank details for payouts
+  - Relations: competitions, donations
+
+- **Competition**: Lottery/raffle competitions for charities
+  - Fields: `title`, `description`, `ticketPrice`, `maxTickets`, `ticketsSold`
+  - Date management: `startDate`, `endDate`, `drawDate`
+  - Status tracking: DRAFT, UPCOMING, ACTIVE, SOLD_OUT, DRAWING, COMPLETED, CANCELLED
+  - Relations: charity, prizes, tickets, winners
+
+#### Financial Models
+- **Wallet**: User's digital wallet for transactions
+  - Fields: `balance`, `currency` (default GBP), `isLocked`
+  - One-to-one relation with User
+
+- **Transaction**: All financial transactions
+  - Types: DEPOSIT, WITHDRAWAL, TICKET_PURCHASE, PRIZE_PAYOUT, REFUND, BONUS, FEE
+  - Status: PENDING, PROCESSING, COMPLETED, FAILED, CANCELLED, REFUNDED
+  - Payment provider integration fields
+
+#### Lottery Models
+- **Ticket**: Purchased lottery tickets
+  - Fields: `ticketNumber` (unique), `purchasePrice`, `status`
+  - Status: ACTIVE, WINNER, EXPIRED, CANCELLED, REFUNDED
+  - Relations: competition, user, potential winner
+
+- **Prize**: Competition prizes
+  - Fields: `name`, `description`, `value`, `position`, `quantity`
+  - Unique constraint on competition + position
+
+- **Winner**: Competition winners and prize allocation
+  - Fields: `status`, `claimedAt`, `paidOutAt`
+  - Status: PENDING, NOTIFIED, CLAIMED, PAID, EXPIRED
+  - Relations: competition, user, ticket, prize
+
+- **Donation**: Direct charity donations
+  - Fields: `amount`, `currency`, `donorName`, `donorEmail`, `isAnonymous`
+  - Status tracking for payment processing
 
 ## Key Configuration Files
 
@@ -111,6 +153,8 @@ Current models:
    ```
 
 ### Start Development Servers
+**Note**: Auto-start is disabled in VS Code settings. Manually run servers when needed.
+
 Open two terminal windows:
 
 1. Terminal 1 - Backend:
