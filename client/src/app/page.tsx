@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { 
   Box, 
   Container, 
@@ -126,12 +127,16 @@ export default function Home() {
                 100% transparent, verified charities, and life-changing rewards await.
               </Text>
               <HStack spacing={4} pt={4}>
-                <Button colorScheme="green" size="lg">
-                  Browse Competitions
-                </Button>
-                <Button variant="outline" size="lg" color="white" borderColor="white">
-                  How It Works
-                </Button>
+                <Link href="/competitions">
+                  <Button colorScheme="green" size="lg">
+                    Browse Competitions
+                  </Button>
+                </Link>
+                <Link href="/how-it-works">
+                  <Button variant="outline" size="lg" color="white" borderColor="white">
+                    How It Works
+                  </Button>
+                </Link>
               </HStack>
             </VStack>
 
