@@ -178,6 +178,276 @@ Authorization: Bearer <jwt-token>
 
 ---
 
+### Charities
+
+#### GET /charities
+Get all verified and active charities.
+
+**Request:**
+```http
+GET /charities
+```
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "name": "Cancer Research UK",
+    "description": "The world's leading cancer charity dedicated to saving lives through research.",
+    "logoUrl": "https://example.com/logo.jpg",
+    "website": "https://www.cancerresearchuk.org",
+    "email": "info@cancerresearchuk.org",
+    "phone": "+44 20 7242 0200",
+    "address": "2 Redman Place, London E20 1JQ, UK",
+    "isVerified": true,
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z",
+    "_count": {
+      "competitions": 3
+    }
+  }
+]
+```
+
+**Status Codes:**
+- `200 OK` - List retrieved successfully
+
+---
+
+#### GET /charities/:id
+Get detailed information about a specific charity.
+
+**Request:**
+```http
+GET /charities/550e8400-e29b-41d4-a716-446655440000
+```
+
+**Response:**
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "name": "Cancer Research UK",
+  "description": "The world's leading cancer charity dedicated to saving lives through research.",
+  "logoUrl": "https://example.com/logo.jpg",
+  "website": "https://www.cancerresearchuk.org",
+  "email": "info@cancerresearchuk.org",
+  "phone": "+44 20 7242 0200",
+  "address": "2 Redman Place, London E20 1JQ, UK",
+  "isVerified": true,
+  "createdAt": "2025-01-01T00:00:00.000Z",
+  "updatedAt": "2025-01-01T00:00:00.000Z",
+  "competitions": [
+    {
+      "id": "competition-uuid",
+      "title": "Win a Dream Holiday to the Maldives",
+      "description": "Enter our amazing competition...",
+      "ticketPrice": "5.00",
+      "maxTickets": 10000,
+      "ticketsSold": 3247,
+      "startDate": "2025-01-01T00:00:00.000Z",
+      "endDate": "2025-01-15T00:00:00.000Z",
+      "drawDate": "2025-01-16T00:00:00.000Z",
+      "status": "ACTIVE",
+      "imageUrl": "https://example.com/competition.jpg",
+      "_count": {
+        "prizes": 2
+      }
+    }
+  ],
+  "donations": [
+    {
+      "amount": "50.00",
+      "currency": "GBP",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    }
+  ]
+}
+```
+
+**Status Codes:**
+- `200 OK` - Charity retrieved successfully
+- `404 Not Found` - Charity not found
+
+---
+
+### Competitions
+
+#### GET /competitions
+Get all active competitions with optional filtering.
+
+**Request:**
+```http
+GET /competitions?status=ACTIVE&charityId=550e8400-e29b-41d4-a716-446655440000
+```
+
+**Query Parameters:**
+- `status` (optional, string) - Filter by competition status (`ACTIVE`, `UPCOMING`, `COMPLETED`, etc.)
+- `charityId` (optional, string) - Filter by charity ID
+
+**Response:**
+```json
+[
+  {
+    "id": "competition-uuid",
+    "title": "Win a Dream Holiday to the Maldives",
+    "description": "Enter our amazing competition to win a 7-night all-inclusive holiday for 2 to the beautiful Maldives.",
+    "ticketPrice": "5.00",
+    "maxTickets": 10000,
+    "ticketsSold": 3247,
+    "minTickets": 100,
+    "startDate": "2025-01-01T00:00:00.000Z",
+    "endDate": "2025-01-15T00:00:00.000Z",
+    "drawDate": "2025-01-16T00:00:00.000Z",
+    "status": "ACTIVE",
+    "imageUrl": "https://example.com/competition.jpg",
+    "termsAndConditions": "Competition open to UK residents aged 18+...",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z",
+    "charity": {
+      "id": "charity-uuid",
+      "name": "Cancer Research UK",
+      "logoUrl": "https://example.com/logo.jpg",
+      "isVerified": true
+    },
+    "prizes": [
+      {
+        "id": "prize-uuid",
+        "name": "Maldives Holiday for 2",
+        "description": "7 nights all-inclusive luxury resort accommodation for 2 people including return flights",
+        "value": "8000.00",
+        "position": 1,
+        "quantity": 1,
+        "imageUrl": "https://example.com/prize.jpg"
+      }
+    ],
+    "_count": {
+      "tickets": 3247,
+      "prizes": 2
+    }
+  }
+]
+```
+
+**Status Codes:**
+- `200 OK` - List retrieved successfully
+
+---
+
+#### GET /competitions/active
+Get all currently active competitions.
+
+**Request:**
+```http
+GET /competitions/active
+```
+
+**Response:**
+Same format as `/competitions` but filtered to only show `ACTIVE` status competitions.
+
+**Status Codes:**
+- `200 OK` - List retrieved successfully
+
+---
+
+#### GET /competitions/upcoming
+Get all upcoming competitions.
+
+**Request:**
+```http
+GET /competitions/upcoming
+```
+
+**Response:**
+Same format as `/competitions` but filtered to only show `UPCOMING` status competitions.
+
+**Status Codes:**
+- `200 OK` - List retrieved successfully
+
+---
+
+#### GET /competitions/:id
+Get detailed information about a specific competition.
+
+**Request:**
+```http
+GET /competitions/550e8400-e29b-41d4-a716-446655440000
+```
+
+**Response:**
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "title": "Win a Dream Holiday to the Maldives",
+  "description": "Enter our amazing competition to win a 7-night all-inclusive holiday for 2 to the beautiful Maldives.",
+  "ticketPrice": "5.00",
+  "maxTickets": 10000,
+  "ticketsSold": 3247,
+  "minTickets": 100,
+  "startDate": "2025-01-01T00:00:00.000Z",
+  "endDate": "2025-01-15T00:00:00.000Z",
+  "drawDate": "2025-01-16T00:00:00.000Z",
+  "status": "ACTIVE",
+  "imageUrl": "https://example.com/competition.jpg",
+  "termsAndConditions": "Competition open to UK residents aged 18+. Draw will be conducted by independent adjudicator.",
+  "createdAt": "2025-01-01T00:00:00.000Z",
+  "updatedAt": "2025-01-01T00:00:00.000Z",
+  "charity": {
+    "id": "charity-uuid",
+    "name": "Cancer Research UK",
+    "description": "The world's leading cancer charity dedicated to saving lives through research.",
+    "logoUrl": "https://example.com/logo.jpg",
+    "website": "https://www.cancerresearchuk.org",
+    "email": "info@cancerresearchuk.org",
+    "isVerified": true
+  },
+  "prizes": [
+    {
+      "id": "prize-uuid",
+      "name": "Maldives Holiday for 2",
+      "description": "7 nights all-inclusive luxury resort accommodation for 2 people including return flights",
+      "value": "8000.00",
+      "position": 1,
+      "quantity": 1,
+      "imageUrl": "https://example.com/prize.jpg"
+    },
+    {
+      "id": "prize-uuid-2",
+      "name": "£500 Travel Voucher",
+      "description": "Holiday voucher to use with any major travel company",
+      "value": "500.00",
+      "position": 2,
+      "quantity": 1,
+      "imageUrl": "https://example.com/voucher.jpg"
+    }
+  ],
+  "tickets": [
+    {
+      "id": "ticket-uuid",
+      "ticketNumber": "TKT-2025-001234",
+      "status": "ACTIVE",
+      "purchasedAt": "2025-01-01T00:00:00.000Z",
+      "user": {
+        "id": "user-uuid",
+        "username": "johndoe",
+        "firstName": "John",
+        "lastName": "Doe"
+      }
+    }
+  ],
+  "_count": {
+    "tickets": 3247,
+    "prizes": 2
+  }
+}
+```
+
+**Status Codes:**
+- `200 OK` - Competition retrieved successfully
+- `404 Not Found` - Competition not found
+
+---
+
 ## Data Models
 
 ### User

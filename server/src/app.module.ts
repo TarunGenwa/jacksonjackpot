@@ -6,6 +6,8 @@ import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { WalletModule } from './wallet/wallet.module';
+import { CharityModule } from './charity/charity.module';
+import { CompetitionModule } from './competition/competition.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 
 @Module({
@@ -16,6 +18,8 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
     PrismaModule,
     AuthModule,
     WalletModule,
+    CharityModule,
+    CompetitionModule,
   ],
   controllers: [AppController],
   providers: [

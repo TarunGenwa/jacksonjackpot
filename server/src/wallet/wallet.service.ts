@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma } from '../../generated/prisma';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class WalletService {
@@ -11,7 +11,7 @@ export class WalletService {
       data: {
         userId,
         currency,
-        balance: new Prisma.Decimal(0),
+        balance: 0,
       },
     });
   }
@@ -30,7 +30,7 @@ export class WalletService {
 
   async updateBalance(
     walletId: string,
-    amount: Prisma.Decimal,
+    amount: number,
     operation: 'add' | 'subtract',
   ) {
     const wallet = await this.prisma.wallet.findUnique({
@@ -41,14 +41,14 @@ export class WalletService {
       throw new Error('Wallet not found');
     }
 
-    const currentBalance = new Prisma.Decimal(wallet.balance);
-    let newBalance: Prisma.Decimal;
+    const currentBalance = Number(wallet.balance);
+    let newBalance: number;
 
     if (operation === 'add') {
-      newBalance = currentBalance.add(amount);
+      newBalance = currentBalance + amount;
     } else {
-      newBalance = currentBalance.sub(amount);
-      if (newBalance.lessThan(0)) {
+      newBalance = currentBalance - amount;
+      if (newBalance < 0) {
         throw new Error('Insufficient balance');
       }
     }
