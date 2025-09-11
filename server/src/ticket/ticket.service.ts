@@ -84,12 +84,13 @@ export class TicketService {
       const transaction = await tx.transaction.create({
         data: {
           walletId: wallet.id,
+          userId: userId,
           type: 'TICKET_PURCHASE',
           amount: totalCost.neg(), // Negative for deduction
           currency: wallet.currency,
           status: 'COMPLETED',
           description: `Purchased ${quantity} ticket(s) for ${competition.title}`,
-          reference: `TKT-${Date.now()}-${userId.slice(-6)}`,
+          referenceId: `TKT-${Date.now()}-${userId.slice(-6)}`,
           metadata: {
             competitionId,
             quantity,
@@ -100,7 +101,7 @@ export class TicketService {
       });
 
       // 5. Generate ticket numbers and create tickets
-      const tickets = [];
+      const tickets: any[] = [];
       const ticketNumbers = await this.generateTicketNumbers(competitionId, quantity, tx);
       
       for (let i = 0; i < quantity; i++) {
@@ -108,10 +109,9 @@ export class TicketService {
           data: {
             ticketNumber: ticketNumbers[i],
             competitionId,
-            userId,
+            userId: userId,
             purchasePrice: competition.ticketPrice,
             status: 'ACTIVE',
-            transactionId: transaction.id,
           },
           include: {
             competition: {
@@ -143,7 +143,7 @@ export class TicketService {
         select: { ticketsSold: true, maxTickets: true },
       });
 
-      if (updatedCompetition.ticketsSold >= updatedCompetition.maxTickets) {
+      if (updatedCompetition && updatedCompetition.ticketsSold >= updatedCompetition.maxTickets) {
         await tx.competition.update({
           where: { id: competitionId },
           data: { status: 'SOLD_OUT' },
@@ -154,7 +154,7 @@ export class TicketService {
         success: true,
         transaction: {
           id: transaction.id,
-          reference: transaction.reference,
+          reference: transaction.referenceId,
           amount: totalCost.toString(),
           status: transaction.status,
         },

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Flex,
@@ -24,16 +25,39 @@ import {
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
-  useBreakpointValue
+  useBreakpointValue,
+  Spinner
 } from '@chakra-ui/react';
 import { HamburgerIcon } from '@chakra-ui/icons';
-import { FaUser, FaTicketAlt, FaWallet, FaHistory, FaSignOutAlt } from 'react-icons/fa';
+import { FaUser, FaTicketAlt, FaWallet, FaHistory, FaSignOutAlt, FaPoundSign } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
+import { walletService } from '@/services/wallet';
 
 export default function Header() {
   const { user, logout } = useAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const isMobile = useBreakpointValue({ base: true, lg: false });
+  const [walletBalance, setWalletBalance] = useState<string | null>(null);
+  const [walletLoading, setWalletLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchWalletBalance = async () => {
+      if (!user) return;
+      
+      try {
+        setWalletLoading(true);
+        const balanceData = await walletService.getBalance();
+        setWalletBalance(balanceData.balance);
+      } catch (error) {
+        console.error('Failed to fetch wallet balance:', error);
+        setWalletBalance('0.00');
+      } finally {
+        setWalletLoading(false);
+      }
+    };
+
+    fetchWalletBalance();
+  }, [user]);
 
   const getUserDisplayName = () => {
     if (user?.firstName && user?.lastName) {
@@ -47,6 +71,15 @@ export default function Header() {
       return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
     }
     return user?.username?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U';
+  };
+
+  const formatBalance = (balance: string) => {
+    const amount = parseFloat(balance);
+    return new Intl.NumberFormat('en-GB', {
+      style: 'currency',
+      currency: 'GBP',
+      minimumFractionDigits: 2
+    }).format(amount);
   };
 
   const NavLinks = () => (
@@ -105,25 +138,68 @@ export default function Header() {
 
               {user ? (
                 /* Authenticated User Menu */
-                <Menu>
-                  <MenuButton>
-                    <Avatar
-                      size="sm"
-                      name={getUserDisplayName()}
-                      bg="blue.500"
-                      color="white"
-                    >
-                      {getUserInitials()}
-                    </Avatar>
-                  </MenuButton>
-                  <MenuList minW="250px" p={2}>
-                    <Box px={3} py={2} borderBottom="1px" borderColor="gray.200" mb={2}>
-                      <Text fontWeight="semibold">{getUserDisplayName()}</Text>
-                      <Text fontSize="sm" color="gray.600">{user.email}</Text>
-                      <Badge colorScheme="blue" variant="solid" fontSize="xs" mt={1}>
-                        {user.role}
+                <HStack spacing={3}>
+                  {/* Wallet Balance */}
+                  {!isMobile && (
+                    <Link href="/wallet">
+                      <Badge
+                        colorScheme="green"
+                        variant="solid"
+                        px={3}
+                        py={1}
+                        borderRadius="full"
+                        fontSize="sm"
+                        cursor="pointer"
+                        _hover={{ bg: 'green.600' }}
+                        transition="all 0.2s"
+                      >
+                        <HStack spacing={1}>
+                          <FaPoundSign size={10} />
+                          <Text>
+                            {walletLoading ? (
+                              <Spinner size="xs" />
+                            ) : (
+                              walletBalance ? formatBalance(walletBalance) : '£0.00'
+                            )}
+                          </Text>
+                        </HStack>
                       </Badge>
-                    </Box>
+                    </Link>
+                  )}
+                  
+                  <Menu>
+                    <MenuButton>
+                      <Avatar
+                        size="sm"
+                        name={getUserDisplayName()}
+                        bg="blue.500"
+                        color="white"
+                      >
+                        {getUserInitials()}
+                      </Avatar>
+                    </MenuButton>
+                    <MenuList minW="250px" p={2}>
+                      <Box px={3} py={2} borderBottom="1px" borderColor="gray.200" mb={2}>
+                        <Text fontWeight="semibold">{getUserDisplayName()}</Text>
+                        <Text fontSize="sm" color="gray.600">{user.email}</Text>
+                        <HStack justify="space-between" mt={2}>
+                          <Badge colorScheme="blue" variant="solid" fontSize="xs">
+                            {user.role}
+                          </Badge>
+                          <Badge colorScheme="green" variant="solid" fontSize="xs">
+                            <HStack spacing={1}>
+                              <FaPoundSign size={8} />
+                              <Text>
+                                {walletLoading ? (
+                                  <Spinner size="xs" />
+                                ) : (
+                                  walletBalance ? formatBalance(walletBalance) : '£0.00'
+                                )}
+                              </Text>
+                            </HStack>
+                          </Badge>
+                        </HStack>
+                      </Box>
                     
                     <Link href="/profile">
                       <MenuItem icon={<FaUser />}>Profile Settings</MenuItem>
@@ -147,8 +223,9 @@ export default function Header() {
                     >
                       Sign Out
                     </MenuItem>
-                  </MenuList>
-                </Menu>
+                    </MenuList>
+                  </Menu>
+                </HStack>
               ) : (
                 /* Guest User Buttons */
                 <HStack spacing={2}>
