@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import {
   Box,
@@ -30,13 +29,9 @@ import {
 import { HamburgerIcon } from '@chakra-ui/icons';
 import { FaUser, FaTicketAlt, FaWallet, FaHistory, FaSignOutAlt } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
-import LoginModal from './LoginModal';
-import SignupModal from './SignupModal';
 
 export default function Header() {
   const { user, logout } = useAuth();
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showSignupModal, setShowSignupModal] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const isMobile = useBreakpointValue({ base: true, lg: false });
 
@@ -157,18 +152,16 @@ export default function Header() {
               ) : (
                 /* Guest User Buttons */
                 <HStack spacing={2}>
-                  <Button
-                    variant="ghost"
-                    onClick={() => setShowLoginModal(true)}
-                  >
-                    Log In
-                  </Button>
-                  <Button
-                    colorScheme="blue"
-                    onClick={() => setShowSignupModal(true)}
-                  >
-                    Sign Up
-                  </Button>
+                  <Link href="/login">
+                    <Button variant="ghost">
+                      Log In
+                    </Button>
+                  </Link>
+                  <Link href="/signup">
+                    <Button colorScheme="blue">
+                      Sign Up
+                    </Button>
+                  </Link>
                 </HStack>
               )}
             </HStack>
@@ -208,29 +201,30 @@ export default function Header() {
                   ❓ How It Works
                 </Button>
               </Link>
+              
+              {/* Mobile Auth Links */}
+              {!user && (
+                <>
+                  <Box borderTop="1px" borderColor="gray.200" pt={4} mt={4}>
+                    <VStack spacing={2}>
+                      <Link href="/login" onClick={onClose}>
+                        <Button variant="ghost" w="full">
+                          🔑 Log In
+                        </Button>
+                      </Link>
+                      <Link href="/signup" onClick={onClose}>
+                        <Button colorScheme="blue" w="full">
+                          ✨ Sign Up
+                        </Button>
+                      </Link>
+                    </VStack>
+                  </Box>
+                </>
+              )}
             </VStack>
           </DrawerBody>
         </DrawerContent>
       </Drawer>
-
-      {/* Modals */}
-      <LoginModal 
-        isOpen={showLoginModal} 
-        onClose={() => setShowLoginModal(false)}
-        onSwitchToSignup={() => {
-          setShowLoginModal(false);
-          setShowSignupModal(true);
-        }}
-      />
-      
-      <SignupModal 
-        isOpen={showSignupModal} 
-        onClose={() => setShowSignupModal(false)}
-        onSwitchToLogin={() => {
-          setShowSignupModal(false);
-          setShowLoginModal(true);
-        }}
-      />
     </>
   );
 }
