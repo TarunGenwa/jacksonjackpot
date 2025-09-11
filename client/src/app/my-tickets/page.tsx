@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -30,6 +30,7 @@ import {
 import { SearchIcon, CalendarIcon } from '@chakra-ui/icons';
 import { FaTicketAlt, FaTrophy, FaClock } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
+import { ticketsService, UserTicket } from '@/services/tickets';
 
 interface Ticket {
   id: string;
@@ -53,76 +54,40 @@ export default function MyTicketsPage() {
   const { user } = useAuth();
   const isMobile = useBreakpointValue({ base: true, md: false });
   
+  const [tickets, setTickets] = useState<UserTicket[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [sortBy, setSortBy] = useState('purchasedAt');
 
-  // Mock ticket data - replace with actual API call
-  const tickets: Ticket[] = [
-    {
-      id: '1',
-      ticketNumber: 'TKT-001234',
-      competitionId: 'comp-1',
-      competitionTitle: 'Summer Prize Draw 2025',
-      competitionDescription: 'Win amazing summer prizes including holidays and tech gadgets',
-      competitionImageUrl: 'https://example.com/summer.jpg',
-      charityName: 'Cancer Research UK',
-      ticketPrice: 5.00,
-      purchasePrice: 5.00,
-      status: 'ACTIVE',
-      purchasedAt: '2025-01-10T12:15:00Z',
-      drawDate: '2025-02-15T20:00:00Z'
-    },
-    {
-      id: '2',
-      ticketNumber: 'TKT-005678',
-      competitionId: 'comp-2',
-      competitionTitle: 'Winter Wonderland Competition',
-      competitionDescription: 'Festive prizes to warm your winter',
-      competitionImageUrl: 'https://example.com/winter.jpg',
-      charityName: 'British Heart Foundation',
-      ticketPrice: 10.00,
-      purchasePrice: 10.00,
-      status: 'ACTIVE',
-      purchasedAt: '2025-01-09T14:20:00Z',
-      drawDate: '2025-01-25T19:00:00Z'
-    },
-    {
-      id: '3',
-      ticketNumber: 'TKT-009876',
-      competitionId: 'comp-3',
-      competitionTitle: 'Christmas Mega Draw',
-      competitionDescription: 'The biggest prizes of the year',
-      competitionImageUrl: 'https://example.com/christmas.jpg',
-      charityName: 'Save the Children',
-      ticketPrice: 15.00,
-      purchasePrice: 15.00,
-      status: 'WINNER',
-      purchasedAt: '2024-12-01T10:30:00Z',
-      drawDate: '2024-12-25T18:00:00Z',
-      isWinner: true,
-      prizeWon: 'iPad Pro 12.9"',
-      prizeValue: 1099.00
-    },
-    {
-      id: '4',
-      ticketNumber: 'TKT-012345',
-      competitionId: 'comp-4',
-      competitionTitle: 'Autumn Tech Giveaway',
-      competitionDescription: 'Latest tech gadgets up for grabs',
-      charityName: 'RSPCA',
-      ticketPrice: 8.00,
-      purchasePrice: 8.00,
-      status: 'EXPIRED',
-      purchasedAt: '2024-10-15T16:45:00Z',
-      drawDate: '2024-11-30T20:00:00Z'
-    }
-  ];
+  useEffect(() => {
+    const fetchTickets = async () => {
+      if (!user) return;
+      
+      try {
+        setLoading(true);
+        const userTickets = await ticketsService.getMyTickets();
+        setTickets(userTickets);
+        setError(null);
+      } catch (err) {
+        console.error('Failed to fetch tickets:', err);
+        setError('Failed to load tickets. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const filteredTickets = tickets.filter(ticket => {
-    const matchesSearch = ticket.competitionTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    fetchTickets();
+  }, [user]);
+
+  // Use real tickets or fallback to empty array
+  const displayTickets = tickets.length > 0 ? tickets : [];
+
+  const filteredTickets = displayTickets.filter(ticket => {
+    const matchesSearch = ticket.competition.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          ticket.ticketNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         ticket.charityName.toLowerCase().includes(searchTerm.toLowerCase());
+                         ticket.competition.charity.name.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = statusFilter === 'ALL' || ticket.status === statusFilter;
     
@@ -132,13 +97,13 @@ export default function MyTicketsPage() {
   const sortedTickets = [...filteredTickets].sort((a, b) => {
     switch (sortBy) {
       case 'purchasedAt':
-        return new Date(b.purchasedAt).getTime() - new Date(a.purchasedAt).getTime();
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       case 'drawDate':
-        return new Date(a.drawDate).getTime() - new Date(b.drawDate).getTime();
+        return new Date(a.competition.drawDate).getTime() - new Date(b.competition.drawDate).getTime();
       case 'competitionTitle':
-        return a.competitionTitle.localeCompare(b.competitionTitle);
+        return a.competition.title.localeCompare(b.competition.title);
       case 'ticketPrice':
-        return b.ticketPrice - a.ticketPrice;
+        return parseFloat(b.purchasePrice) - parseFloat(a.purchasePrice);
       default:
         return 0;
     }
@@ -146,10 +111,10 @@ export default function MyTicketsPage() {
 
   const getStatusCounts = () => {
     return {
-      ALL: tickets.length,
-      ACTIVE: tickets.filter(t => t.status === 'ACTIVE').length,
-      WINNER: tickets.filter(t => t.status === 'WINNER').length,
-      EXPIRED: tickets.filter(t => t.status === 'EXPIRED').length,
+      ALL: displayTickets.length,
+      ACTIVE: displayTickets.filter(t => t.status === 'ACTIVE').length,
+      WINNER: displayTickets.filter(t => t.status === 'WINNER').length,
+      EXPIRED: displayTickets.filter(t => t.status === 'EXPIRED').length,
     };
   };
 
@@ -210,6 +175,40 @@ export default function MyTicketsPage() {
     );
   }
 
+  if (loading) {
+    return (
+      <Box minH="100vh" bg="gray.50">
+        <Container maxW="container.lg" py={12}>
+          <VStack spacing={4} justify="center" minH="50vh">
+            <Spinner size="xl" color="blue.500" />
+            <Text color="gray.600">Loading your tickets...</Text>
+          </VStack>
+        </Container>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box minH="100vh" bg="gray.50">
+        <Container maxW="container.lg" py={12}>
+          <VStack spacing={4} justify="center" minH="50vh">
+            <Alert status="error" maxW="md" borderRadius="md">
+              <AlertIcon />
+              {error}
+            </Alert>
+            <Button 
+              colorScheme="blue" 
+              onClick={() => window.location.reload()}
+            >
+              Try Again
+            </Button>
+          </VStack>
+        </Container>
+      </Box>
+    );
+  }
+
   const statusCounts = getStatusCounts();
 
   return (
@@ -233,7 +232,7 @@ export default function MyTicketsPage() {
               <CardBody p={6}>
                 <VStack spacing={2}>
                   <Text fontSize="3xl" fontWeight="bold" color="blue.600">
-                    {tickets.length}
+                    {displayTickets.length}
                   </Text>
                   <Text fontSize="sm" color="gray.600">
                     Total Tickets
@@ -272,7 +271,7 @@ export default function MyTicketsPage() {
               <CardBody p={6}>
                 <VStack spacing={2}>
                   <Text fontSize="3xl" fontWeight="bold" color="orange.600">
-                    {formatAmount(tickets.reduce((sum, ticket) => sum + ticket.purchasePrice, 0))}
+                    {formatAmount(displayTickets.reduce((sum, ticket) => sum + parseFloat(ticket.purchasePrice), 0))}
                   </Text>
                   <Text fontSize="sm" color="gray.600">
                     Total Spent
@@ -350,7 +349,7 @@ export default function MyTicketsPage() {
           {/* Results Summary */}
           <Flex justify="space-between" align="center">
             <Text color="gray.600">
-              Showing {sortedTickets.length} of {tickets.length} tickets
+              Showing {sortedTickets.length} of {displayTickets.length} tickets
             </Text>
             {searchTerm && (
               <Badge colorScheme="blue" variant="subtle" px={3} py={1}>
@@ -407,7 +406,7 @@ export default function MyTicketsPage() {
                   )}
 
                   {/* Draw Soon Badge */}
-                  {ticket.status === 'ACTIVE' && isDrawSoon(ticket.drawDate) && (
+                  {ticket.status === 'ACTIVE' && isDrawSoon(ticket.competition.drawDate) && (
                     <Badge
                       position="absolute"
                       top={3}
@@ -426,10 +425,10 @@ export default function MyTicketsPage() {
 
                   {/* Competition Image */}
                   <Box position="relative" h="150px" bg="gray.100">
-                    {ticket.competitionImageUrl ? (
+                    {ticket.competition.imageUrl ? (
                       <Image
-                        src={ticket.competitionImageUrl}
-                        alt={ticket.competitionTitle}
+                        src={ticket.competition.imageUrl}
+                        alt={ticket.competition.title}
                         objectFit="cover"
                         w="full"
                         h="full"
@@ -468,25 +467,25 @@ export default function MyTicketsPage() {
                       {/* Competition Info */}
                       <VStack align="start" spacing={2}>
                         <Heading as="h3" size="sm" noOfLines={2} color="gray.800">
-                          {ticket.competitionTitle}
+                          {ticket.competition.title}
                         </Heading>
                         <Text fontSize="sm" color="gray.600" noOfLines={2}>
-                          {ticket.competitionDescription}
+                          {ticket.competition.description}
                         </Text>
                         <Text fontSize="sm" color="blue.600" fontWeight="medium">
-                          {ticket.charityName}
+                          {ticket.competition.charity.name}
                         </Text>
                       </VStack>
 
                       {/* Prize Info (for winners) */}
-                      {ticket.isWinner && ticket.prizeWon && (
+                      {ticket.status === 'WINNER' && (
                         <Alert status="success" borderRadius="md" p={3}>
                           <VStack align="start" spacing={1} w="full">
                             <Text fontWeight="bold" fontSize="sm">
-                              Prize Won: {ticket.prizeWon}
+                              🎉 Congratulations! You won!
                             </Text>
                             <Text fontSize="sm">
-                              Value: {formatAmount(ticket.prizeValue || 0)}
+                              Check your email for prize details.
                             </Text>
                           </VStack>
                         </Alert>
@@ -496,12 +495,12 @@ export default function MyTicketsPage() {
                       <VStack spacing={2} align="stretch">
                         <Flex justify="space-between" fontSize="sm">
                           <Text color="gray.600">Purchased:</Text>
-                          <Text>{formatDate(ticket.purchasedAt)}</Text>
+                          <Text>{formatDate(ticket.createdAt)}</Text>
                         </Flex>
                         <Flex justify="space-between" fontSize="sm">
                           <Text color="gray.600">Draw Date:</Text>
                           <Text fontWeight="medium">
-                            {formatDate(ticket.drawDate)}
+                            {formatDate(ticket.competition.drawDate)}
                           </Text>
                         </Flex>
                         <Divider />
@@ -510,7 +509,7 @@ export default function MyTicketsPage() {
                             Ticket Price:
                           </Text>
                           <Text fontWeight="bold" color="green.600">
-                            {formatAmount(ticket.purchasePrice)}
+                            {formatAmount(parseFloat(ticket.purchasePrice))}
                           </Text>
                         </Flex>
                       </VStack>

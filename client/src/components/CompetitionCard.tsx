@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { useState } from 'react';
 import { 
   Box, 
   Card, 
@@ -14,15 +15,21 @@ import {
   Alert, 
   AlertIcon, 
   Flex,
-  Spacer
+  Spacer,
+  useDisclosure
 } from '@chakra-ui/react';
 import { Competition } from '@/types/api';
+import TicketPurchaseModal from './TicketPurchaseModal';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface CompetitionCardProps {
   competition: Competition;
 }
 
 export default function CompetitionCard({ competition }: CompetitionCardProps) {
+  const { user } = useAuth();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [localCompetition, setLocalCompetition] = useState(competition);
   const formatPrice = (price: string) => {
     return `£${parseFloat(price).toFixed(2)}`;
   };
@@ -36,8 +43,24 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
   };
 
   const getProgressPercentage = () => {
-    if (competition.maxTickets === 0) return 0;
-    return Math.round((competition.ticketsSold / competition.maxTickets) * 100);
+    if (localCompetition.maxTickets === 0) return 0;
+    return Math.round((localCompetition.ticketsSold / localCompetition.maxTickets) * 100);
+  };
+
+  const handlePurchaseSuccess = () => {
+    // Refresh competition data or update local state
+    // In a real app, you might want to refetch the competition data
+    // For now, we'll just show the modal closed
+    console.log('Purchase successful');
+  };
+
+  const handlePurchaseClick = () => {
+    if (!user) {
+      // Could redirect to login or show login modal
+      alert('Please log in to purchase tickets');
+      return;
+    }
+    onOpen();
   };
 
   const getStatusColor = (status: string) => {
@@ -51,17 +74,17 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
   };
 
   const getButtonProps = () => {
-    if (competition.status === 'SOLD_OUT') 
+    if (localCompetition.status === 'SOLD_OUT') 
       return { colorScheme: 'red', isDisabled: true };
-    if (competition.status === 'COMPLETED') 
+    if (localCompetition.status === 'COMPLETED') 
       return { colorScheme: 'gray', isDisabled: true };
-    if (competition.status === 'UPCOMING') 
+    if (localCompetition.status === 'UPCOMING') 
       return { colorScheme: 'blue', isDisabled: true };
     return { colorScheme: 'blue', isDisabled: false };
   };
 
   const getButtonText = () => {
-    switch (competition.status) {
+    switch (localCompetition.status) {
       case 'SOLD_OUT': return 'Sold Out';
       case 'COMPLETED': return 'Completed';
       case 'UPCOMING': return 'Coming Soon';
@@ -79,10 +102,10 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
     >
       {/* Competition Image */}
       <Box position="relative" h="200px">
-        {competition.imageUrl ? (
+        {localCompetition.imageUrl ? (
           <Image
-            src={competition.imageUrl}
-            alt={competition.title}
+            src={localCompetition.imageUrl}
+            alt={localCompetition.title}
             fill
             style={{ objectFit: 'cover' }}
           />
@@ -106,11 +129,11 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
           position="absolute"
           top={3}
           right={3}
-          colorScheme={getStatusColor(competition.status)}
+          colorScheme={getStatusColor(localCompetition.status)}
           variant="solid"
           borderRadius="md"
         >
-          {competition.status.replace('_', ' ')}
+          {localCompetition.status.replace('_', ' ')}
         </Badge>
       </Box>
 
@@ -120,12 +143,12 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
           <HStack spacing={2}>
             <Avatar
               size="xs"
-              src={competition.charity.logoUrl}
-              name={competition.charity.name}
+              src={localCompetition.charity.logoUrl}
+              name={localCompetition.charity.name}
             />
             <Text fontSize="sm" color="gray.600" fontWeight="medium">
-              {competition.charity.name}
-              {competition.charity.isVerified && (
+              {localCompetition.charity.name}
+              {localCompetition.charity.isVerified && (
                 <Badge ml={1} colorScheme="blue" variant="solid" fontSize="xs">
                   ✓
                 </Badge>
@@ -140,7 +163,7 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
             noOfLines={2}
             color="gray.800"
           >
-            {competition.title}
+            {localCompetition.title}
           </Heading>
 
           {/* Description */}
@@ -149,14 +172,14 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
             color="gray.600" 
             noOfLines={3}
           >
-            {competition.description}
+            {localCompetition.description}
           </Text>
 
           {/* Progress Bar */}
           <Box>
             <Flex justify="space-between" fontSize="sm" color="gray.600" mb={2}>
-              <Text>{competition.ticketsSold} tickets sold</Text>
-              <Text>{competition.maxTickets} max</Text>
+              <Text>{localCompetition.ticketsSold} tickets sold</Text>
+              <Text>{localCompetition.maxTickets} max</Text>
             </Flex>
             <Progress 
               value={getProgressPercentage()} 
@@ -179,11 +202,11 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
             <AlertIcon boxSize={4} />
             <Box fontSize="xs">
               <Text fontWeight="semibold">
-                {competition._count.prizes} prize{competition._count.prizes !== 1 ? 's' : ''}
+                {localCompetition._count.prizes} prize{localCompetition._count.prizes !== 1 ? 's' : ''}
               </Text>
-              {competition.prizes.length > 0 && (
+              {localCompetition.prizes.length > 0 && (
                 <Text>
-                  Top: {competition.prizes[0].name} ({formatPrice(competition.prizes[0].value)})
+                  Top: {localCompetition.prizes[0].name} ({formatPrice(localCompetition.prizes[0].value)})
                 </Text>
               )}
             </Box>
@@ -199,10 +222,10 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
               py={1}
               borderRadius="md"
             >
-              {formatPrice(competition.ticketPrice)} per ticket
+              {formatPrice(localCompetition.ticketPrice)} per ticket
             </Badge>
             <Text fontSize="sm" color="gray.600">
-              Draw: {formatDate(competition.drawDate)}
+              Draw: {formatDate(localCompetition.drawDate)}
             </Text>
           </Flex>
 
@@ -211,11 +234,20 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
             {...getButtonProps()}
             w="full"
             size="md"
+            onClick={localCompetition.status === 'ACTIVE' ? handlePurchaseClick : undefined}
           >
             {getButtonText()}
           </Button>
         </VStack>
       </CardBody>
+
+      {/* Purchase Modal */}
+      <TicketPurchaseModal
+        isOpen={isOpen}
+        onClose={onClose}
+        competition={localCompetition}
+        onPurchaseSuccess={handlePurchaseSuccess}
+      />
     </Card>
   );
 }
