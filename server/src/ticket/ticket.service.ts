@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { PurchaseTicketDto } from './dto';
 import { Prisma } from '@prisma/client';
@@ -11,7 +16,9 @@ export class TicketService {
     const { competitionId, quantity, paymentMethod } = purchaseDto;
 
     // Start transaction to ensure data consistency
-    return this.prisma.$transaction(async (tx) => {
+    // Increase timeout to 20 seconds for complex ticket purchase operations
+    return this.prisma.$transaction(
+      async (tx) => {
       // 1. Get competition details and validate
       const competition = await tx.competition.findUnique({
         where: { id: competitionId },
@@ -33,7 +40,9 @@ export class TicketService {
       }
 
       if (!competition.isActive || competition.status !== 'ACTIVE') {
-        throw new BadRequestException('Competition is not available for ticket purchases');
+        throw new BadRequestException(
+          'Competition is not available for ticket purchases',
+        );
       }
 
       // Check if competition has started and not ended
@@ -49,7 +58,9 @@ export class TicketService {
       // Check if enough tickets are available
       const availableTickets = competition.maxTickets - competition.ticketsSold;
       if (quantity > availableTickets) {
-        throw new BadRequestException(`Only ${availableTickets} tickets available`);
+        throw new BadRequestException(
+          `Only ${availableTickets} tickets available`,
+        );
       }
 
       // 2. Get user wallet and validate balance
@@ -66,9 +77,11 @@ export class TicketService {
       }
 
       const totalCost = competition.ticketPrice.mul(quantity);
-      
+
       if (wallet.balance.lt(totalCost)) {
-        throw new BadRequestException(`Insufficient balance. Required: £${totalCost}, Available: £${wallet.balance}`);
+        throw new BadRequestException(
+          `Insufficient balance. Required: £${totalCost.toString()}, Available: £${wallet.balance.toString()}`,
+        );
       }
 
       // 3. Update wallet balance
@@ -101,30 +114,50 @@ export class TicketService {
       });
 
       // 5. Generate ticket numbers and create tickets
-      const tickets: any[] = [];
-      const ticketNumbers = await this.generateTicketNumbers(competitionId, quantity, tx);
-      
-      for (let i = 0; i < quantity; i++) {
-        const ticket = await tx.ticket.create({
-          data: {
-            ticketNumber: ticketNumbers[i],
-            competitionId,
-            userId: userId,
-            purchasePrice: competition.ticketPrice,
-            status: 'ACTIVE',
-          },
-          include: {
-            competition: {
-              select: {
-                id: true,
-                title: true,
-                drawDate: true,
-              },
+      const tickets: Array<{
+        id: string;
+        ticketNumber: string;
+        competition: { title: string; drawDate: Date };
+        purchasePrice: any;
+        status: string;
+      }> = [];
+      const ticketNumbers = await this.generateTicketNumbers(
+        competitionId,
+        quantity,
+        tx,
+      );
+
+      // Create all tickets in batch for better performance
+      const ticketData = ticketNumbers.map(ticketNumber => ({
+        ticketNumber,
+        competitionId,
+        userId: userId,
+        purchasePrice: competition.ticketPrice,
+        status: 'ACTIVE' as const,
+      }));
+
+      await tx.ticket.createMany({
+        data: ticketData,
+      });
+
+      // Fetch created tickets with competition details
+      const createdTickets = await tx.ticket.findMany({
+        where: {
+          ticketNumber: { in: ticketNumbers },
+          userId: userId,
+        },
+        include: {
+          competition: {
+            select: {
+              id: true,
+              title: true,
+              drawDate: true,
             },
           },
-        });
-        tickets.push(ticket);
-      }
+        },
+      });
+      
+      tickets.push(...createdTickets);
 
       // 6. Update competition tickets sold
       await tx.competition.update({
@@ -143,7 +176,10 @@ export class TicketService {
         select: { ticketsSold: true, maxTickets: true },
       });
 
-      if (updatedCompetition && updatedCompetition.ticketsSold >= updatedCompetition.maxTickets) {
+      if (
+        updatedCompetition &&
+        updatedCompetition.ticketsSold >= updatedCompetition.maxTickets
+      ) {
         await tx.competition.update({
           where: { id: competitionId },
           data: { status: 'SOLD_OUT' },
@@ -158,7 +194,7 @@ export class TicketService {
           amount: totalCost.toString(),
           status: transaction.status,
         },
-        tickets: tickets.map(ticket => ({
+        tickets: tickets.map((ticket) => ({
           id: ticket.id,
           ticketNumber: ticket.ticketNumber,
           competitionTitle: ticket.competition.title,
@@ -170,10 +206,17 @@ export class TicketService {
           newBalance: wallet.balance.sub(totalCost).toString(),
         },
       };
+    },
+    {
+      maxWait: 20000, // Maximum time to wait for a transaction slot (20 seconds)
+      timeout: 20000, // Maximum time the transaction can run (20 seconds)
     });
   }
 
-  async getUserTickets(userId: string, filters?: { competitionId?: string; status?: string }) {
+  async getUserTickets(
+    userId: string,
+    filters?: { competitionId?: string; status?: string },
+  ) {
     const where: Prisma.TicketWhereInput = {
       userId,
       ...(filters?.competitionId && { competitionId: filters.competitionId }),
@@ -232,10 +275,14 @@ export class TicketService {
     return ticket;
   }
 
-  private async generateTicketNumbers(competitionId: string, quantity: number, tx: any): Promise<string[]> {
+  private async generateTicketNumbers(
+    competitionId: string,
+    quantity: number,
+    tx: Prisma.TransactionClient,
+  ): Promise<string[]> {
     const ticketNumbers: string[] = [];
     const year = new Date().getFullYear();
-    
+
     // Get the last ticket number for this competition
     const lastTicket = await tx.ticket.findFirst({
       where: { competitionId },

@@ -9,6 +9,30 @@ export interface Wallet {
   updatedAt: string;
 }
 
+export interface Transaction {
+  id: string;
+  walletId: string;
+  amount: number;
+  currency: string;
+  type: string;
+  status: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AddFundsDto {
+  amount: number;
+  currency?: string;
+  description?: string;
+}
+
+export interface AddFundsResponse {
+  success: boolean;
+  message: string;
+  wallet: Wallet;
+}
+
 export const walletService = {
   getWallet: async (): Promise<Wallet> => {
     return apiClient.get<Wallet>('/wallet');
@@ -20,5 +44,13 @@ export const walletService = {
       balance: wallet.balance,
       currency: wallet.currency
     };
+  },
+
+  addFunds: async (data: AddFundsDto): Promise<AddFundsResponse> => {
+    return apiClient.post<AddFundsResponse>('/wallet/add-funds', data);
+  },
+
+  getTransactions: async (): Promise<Transaction[]> => {
+    return apiClient.get<Transaction[]>('/wallet/transactions');
   },
 };

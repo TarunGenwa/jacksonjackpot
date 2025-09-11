@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -37,6 +37,7 @@ import {
 } from '@chakra-ui/react';
 import { FaWallet, FaCreditCard, FaPlus, FaMinus, FaPoundSign } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
+import { walletService, Wallet, Transaction } from '@/services/wallet';
 
 export default function WalletPage() {
   const { user } = useAuth();
@@ -48,44 +49,78 @@ export default function WalletPage() {
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [isLoading, setIsLoading] = useState(false);
-  
-  // Mock wallet data - replace with actual API call
-  const walletData = {
-    balance: 127.50,
-    currency: 'GBP',
-    isLocked: false,
-    lastTransaction: '2025-01-10T14:30:00Z'
+  const [walletData, setWalletData] = useState<Wallet | null>(null);
+  const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
+  const [isLoadingWallet, setIsLoadingWallet] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      fetchWalletData();
+      fetchTransactions();
+    }
+  }, [user]);
+
+  const fetchWalletData = async () => {
+    try {
+      setIsLoadingWallet(true);
+      const wallet = await walletService.getWallet();
+      setWalletData(wallet);
+    } catch (error) {
+      console.error('Failed to fetch wallet:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load wallet data',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoadingWallet(false);
+    }
   };
 
-  const recentTransactions = [
-    {
-      id: '1',
-      type: 'DEPOSIT',
-      amount: 50.00,
-      currency: 'GBP',
-      status: 'COMPLETED',
-      createdAt: '2025-01-10T14:30:00Z',
-      description: 'Card deposit'
-    },
-    {
-      id: '2',
-      type: 'TICKET_PURCHASE',
-      amount: -5.00,
-      currency: 'GBP',
-      status: 'COMPLETED',
-      createdAt: '2025-01-10T12:15:00Z',
-      description: 'Ticket for Summer Prize Draw'
-    },
-    {
-      id: '3',
-      type: 'DEPOSIT',
-      amount: 25.00,
-      currency: 'GBP',
-      status: 'COMPLETED',
-      createdAt: '2025-01-09T16:45:00Z',
-      description: 'Bank transfer'
+  const fetchTransactions = async () => {
+    try {
+      const transactions = await walletService.getTransactions();
+      setRecentTransactions(transactions.slice(0, 5));
+    } catch (error) {
+      console.error('Failed to fetch transactions:', error);
     }
-  ];
+  };
+
+  const handleQuickDeposit = async (amount: number) => {
+    setIsLoading(true);
+    try {
+      const response = await walletService.addFunds({
+        amount: amount,
+        currency: 'GBP',
+        description: 'Quick deposit'
+      });
+      
+      if (response.success) {
+        toast({
+          title: 'Deposit successful',
+          description: response.message,
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+        
+        setWalletData(response.wallet);
+        await fetchTransactions();
+      }
+    } catch (error) {
+      toast({
+        title: 'Deposit failed',
+        description: 'Failed to process deposit. Please try again.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleDeposit = async () => {
     if (!depositAmount || parseFloat(depositAmount) <= 0) {
@@ -101,19 +136,26 @@ export default function WalletPage() {
 
     setIsLoading(true);
     try {
-      // TODO: Implement actual deposit API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      toast({
-        title: 'Deposit successful',
-        description: `£${depositAmount} has been added to your wallet.`,
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
+      const response = await walletService.addFunds({
+        amount: parseFloat(depositAmount),
+        currency: 'GBP',
+        description: `${paymentMethod === 'card' ? 'Card' : paymentMethod === 'bank' ? 'Bank transfer' : 'PayPal'} deposit`
       });
       
-      setDepositAmount('');
-      onDepositClose();
+      if (response.success) {
+        toast({
+          title: 'Deposit successful',
+          description: response.message,
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+        
+        setWalletData(response.wallet);
+        await fetchTransactions();
+        setDepositAmount('');
+        onDepositClose();
+      }
     } catch (error) {
       toast({
         title: 'Deposit failed',
@@ -139,7 +181,7 @@ export default function WalletPage() {
       return;
     }
 
-    if (parseFloat(withdrawAmount) > walletData.balance) {
+    if (!walletData || parseFloat(withdrawAmount) > parseFloat(walletData.balance)) {
       toast({
         title: 'Insufficient funds',
         description: 'You cannot withdraw more than your current balance.',
@@ -201,6 +243,9 @@ export default function WalletPage() {
       case 'TICKET_PURCHASE': return 'blue';
       case 'WITHDRAWAL': return 'orange';
       case 'PRIZE_PAYOUT': return 'purple';
+      case 'REFUND': return 'cyan';
+      case 'BONUS': return 'pink';
+      case 'FEE': return 'red';
       default: return 'gray';
     }
   };
@@ -213,6 +258,18 @@ export default function WalletPage() {
             <AlertIcon />
             Please log in to view your wallet.
           </Alert>
+        </Container>
+      </Box>
+    );
+  }
+
+  if (isLoadingWallet) {
+    return (
+      <Box minH="100vh" bg="gray.50">
+        <Container maxW="container.lg" py={12}>
+          <VStack spacing={8}>
+            <Text>Loading wallet...</Text>
+          </VStack>
         </Container>
       </Box>
     );
@@ -241,16 +298,16 @@ export default function WalletPage() {
                   Current Balance
                 </Text>
                 <Text fontSize="5xl" fontWeight="bold">
-                  {formatAmount(walletData.balance)}
+                  {walletData ? formatAmount(parseFloat(walletData.balance)) : '£0.00'}
                 </Text>
                 <Badge 
-                  colorScheme={walletData.isLocked ? 'red' : 'green'} 
+                  colorScheme={walletData?.isLocked ? 'red' : 'green'} 
                   variant="solid" 
                   px={4} 
                   py={2}
                   borderRadius="md"
                 >
-                  {walletData.isLocked ? 'Account Locked' : 'Active'}
+                  {walletData?.isLocked ? 'Account Locked' : 'Active'}
                 </Badge>
                 
                 <HStack spacing={4} pt={4}>
@@ -259,7 +316,7 @@ export default function WalletPage() {
                     colorScheme="green"
                     size="lg"
                     onClick={onDepositOpen}
-                    disabled={walletData.isLocked}
+                    disabled={walletData?.isLocked}
                   >
                     Add Funds
                   </Button>
@@ -270,7 +327,7 @@ export default function WalletPage() {
                     borderColor="white"
                     size="lg"
                     onClick={onWithdrawOpen}
-                    disabled={walletData.isLocked || walletData.balance <= 0}
+                    disabled={walletData?.isLocked || !walletData || parseFloat(walletData.balance) <= 0}
                     _hover={{ bg: 'whiteAlpha.200' }}
                   >
                     Withdraw
@@ -291,9 +348,33 @@ export default function WalletPage() {
                     Add £10, £25, or £50 instantly
                   </Text>
                   <HStack spacing={2}>
-                    <Button size="sm" colorScheme="blue" variant="outline">£10</Button>
-                    <Button size="sm" colorScheme="blue" variant="outline">£25</Button>
-                    <Button size="sm" colorScheme="blue" variant="outline">£50</Button>
+                    <Button 
+                      size="sm" 
+                      colorScheme="blue" 
+                      variant="outline"
+                      onClick={() => handleQuickDeposit(10)}
+                      isLoading={isLoading}
+                    >
+                      £10
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      colorScheme="blue" 
+                      variant="outline"
+                      onClick={() => handleQuickDeposit(25)}
+                      isLoading={isLoading}
+                    >
+                      £25
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      colorScheme="blue" 
+                      variant="outline"
+                      onClick={() => handleQuickDeposit(50)}
+                      isLoading={isLoading}
+                    >
+                      £50
+                    </Button>
                   </HStack>
                 </VStack>
               </CardBody>
@@ -344,7 +425,7 @@ export default function WalletPage() {
             </CardHeader>
             <CardBody>
               <VStack spacing={4} align="stretch">
-                {recentTransactions.map((transaction, index) => (
+                {recentTransactions.length > 0 ? recentTransactions.map((transaction, index) => (
                   <Box key={transaction.id}>
                     <Flex justify="space-between" align="center">
                       <VStack align="start" spacing={1}>
@@ -368,7 +449,7 @@ export default function WalletPage() {
                           color={transaction.amount > 0 ? 'green.600' : 'red.600'}
                           fontSize="lg"
                         >
-                          {transaction.amount > 0 ? '+' : ''}{formatAmount(transaction.amount)}
+                          {transaction.amount > 0 ? '+' : ''}{formatAmount(Math.abs(transaction.amount))}
                         </Text>
                         <Badge 
                           colorScheme={transaction.status === 'COMPLETED' ? 'green' : 'yellow'} 
@@ -381,7 +462,9 @@ export default function WalletPage() {
                     </Flex>
                     {index < recentTransactions.length - 1 && <Divider mt={4} />}
                   </Box>
-                ))}
+                )) : (
+                  <Text color="gray.500" textAlign="center">No transactions yet</Text>
+                )}
               </VStack>
             </CardBody>
           </Card>
@@ -448,7 +531,7 @@ export default function WalletPage() {
               <VStack spacing={4}>
                 <Alert status="info" borderRadius="md">
                   <AlertIcon />
-                  Available balance: {formatAmount(walletData.balance)}
+                  Available balance: {walletData ? formatAmount(parseFloat(walletData.balance)) : '£0.00'}
                 </Alert>
                 
                 <FormControl>
@@ -463,7 +546,7 @@ export default function WalletPage() {
                       value={withdrawAmount}
                       onChange={(e) => setWithdrawAmount(e.target.value)}
                       min="1"
-                      max={walletData.balance}
+                      max={walletData ? parseFloat(walletData.balance) : 0}
                       step="0.01"
                     />
                   </InputGroup>

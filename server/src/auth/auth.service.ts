@@ -98,16 +98,17 @@ export class AuthService {
 
     // Validate that either email or username is provided
     if (!email && !username) {
-      throw new BadRequestException('Either email or username must be provided');
+      throw new BadRequestException(
+        'Either email or username must be provided',
+      );
     }
 
     // Find user by email or username
     const user = await this.prisma.user.findFirst({
       where: {
-        OR: [
-          email ? { email } : {},
-          username ? { username } : {},
-        ].filter(Boolean),
+        OR: [email ? { email } : {}, username ? { username } : {}].filter(
+          Boolean,
+        ),
       },
       include: {
         wallet: true,

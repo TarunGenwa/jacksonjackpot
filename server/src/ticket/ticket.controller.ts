@@ -1,10 +1,10 @@
-import { 
-  Controller, 
-  Post, 
-  Get, 
-  Body, 
-  Param, 
-  Query, 
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Param,
+  Query,
   UseGuards,
   Request,
   ParseIntPipe,
@@ -14,23 +14,34 @@ import { TicketService } from './ticket.service';
 import { PurchaseTicketDto } from './dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
+interface AuthRequest extends Request {
+  user: {
+    id: string;
+    userId: string;
+    email: string;
+  };
+}
+
 @Controller('tickets')
 @UseGuards(JwtAuthGuard)
 export class TicketController {
   constructor(private readonly ticketService: TicketService) {}
 
   @Post('purchase')
-  async purchaseTickets(@Request() req, @Body() purchaseDto: PurchaseTicketDto) {
+  async purchaseTickets(
+    @Request() req: AuthRequest,
+    @Body() purchaseDto: PurchaseTicketDto,
+  ) {
     return this.ticketService.purchaseTickets(req.user.id, purchaseDto);
   }
 
   @Get('my-tickets')
   async getMyTickets(
-    @Request() req,
+    @Request() req: AuthRequest,
     @Query('competitionId') competitionId?: string,
     @Query('status') status?: string,
   ) {
-    const filters = {};
+    const filters: Record<string, string> = {};
     if (competitionId) filters['competitionId'] = competitionId;
     if (status) filters['status'] = status;
 
@@ -38,7 +49,7 @@ export class TicketController {
   }
 
   @Get(':id')
-  async getTicket(@Param('id') ticketId: string, @Request() req) {
+  async getTicket(@Param('id') ticketId: string, @Request() req: AuthRequest) {
     return this.ticketService.getTicketById(ticketId, req.user.id);
   }
 
