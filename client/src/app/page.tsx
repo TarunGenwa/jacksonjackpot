@@ -93,7 +93,7 @@ export default function Home() {
 
   return (
     <Box minH="100vh" bg="gray.50">
-      {/* Hero Section */}
+      {/* Hero Section - COMMENTED OUT
       <Box
         bgGradient="linear(135deg, blue.500, purple.600, pink.500)"
         color="white"
@@ -103,27 +103,26 @@ export default function Home() {
       >
         <Container maxW="container.xl" position="relative" zIndex={2}>
           <Flex direction={{ base: 'column', lg: 'row' }} align="center" justify="space-between" minH="60vh">
-            {/* Left Content */}
             <VStack spacing={6} maxW="4xl" mx="auto" flex={1} textAlign={{ base: 'center', lg: 'left' }}>
-              <Heading 
-                as="h1" 
-                size={{ base: "3xl", md: "4xl" }} 
+              <Heading
+                as="h1"
+                size={{ base: "3xl", md: "4xl" }}
                 fontWeight="bold"
               >
                 Jackson Jackpot
               </Heading>
-              <Text 
-                fontSize={{ base: "xl", md: "2xl" }} 
+              <Text
+                fontSize={{ base: "xl", md: "2xl" }}
                 opacity={0.9}
               >
                 Win amazing prizes while supporting great causes
               </Text>
-              <Text 
-                fontSize="lg" 
-                opacity={0.8} 
+              <Text
+                fontSize="lg"
+                opacity={0.8}
                 maxW="2xl"
               >
-                Enter charity competitions and lotteries to win incredible prizes while making a difference. 
+                Enter charity competitions and lotteries to win incredible prizes while making a difference.
                 100% transparent, verified charities, and life-changing rewards await.
               </Text>
               <HStack spacing={4} pt={4}>
@@ -140,17 +139,14 @@ export default function Home() {
               </HStack>
             </VStack>
 
-            {/* Right Animated Infographic */}
-            <Box 
-              flex={1} 
-              maxW="500px" 
+            <Box
+              flex={1}
+              maxW="500px"
               display={{ base: 'none', lg: 'block' }}
               position="relative"
               ml={8}
             >
-              {/* Floating Statistics */}
               <VStack spacing={6} align="stretch">
-                {/* Animated Stat 1 */}
                 <Box
                   bg="whiteAlpha.200"
                   backdropFilter="blur(10px)"
@@ -182,7 +178,6 @@ export default function Home() {
                   </HStack>
                 </Box>
 
-                {/* Animated Stat 2 */}
                 <Box
                   bg="whiteAlpha.200"
                   backdropFilter="blur(10px)"
@@ -214,7 +209,6 @@ export default function Home() {
                   </HStack>
                 </Box>
 
-                {/* Animated Stat 3 */}
                 <Box
                   bg="whiteAlpha.200"
                   backdropFilter="blur(10px)"
@@ -247,7 +241,6 @@ export default function Home() {
                 </Box>
               </VStack>
 
-              {/* Floating Icons */}
               <Icon
                 as={FaTicketAlt}
                 position="absolute"
@@ -304,6 +297,7 @@ export default function Home() {
           </Flex>
         </Container>
       </Box>
+      */}
 
       {/* Main Content */}
       <Container maxW="container.xl" py={12}>
