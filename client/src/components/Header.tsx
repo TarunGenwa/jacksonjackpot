@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import {
   Box,
   Flex,
@@ -26,10 +27,11 @@ import {
   DrawerContent,
   DrawerCloseButton,
   useBreakpointValue,
-  Spinner
+  Spinner,
+  Icon
 } from '@chakra-ui/react';
 import { HamburgerIcon } from '@chakra-ui/icons';
-import { FaUser, FaTicketAlt, FaWallet, FaHistory, FaSignOutAlt, FaPoundSign } from 'react-icons/fa';
+import { FaUser, FaTicketAlt, FaWallet, FaHistory, FaSignOutAlt, FaPoundSign, FaHeart, FaQuestionCircle } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
 import { walletService } from '@/services/wallet';
 
@@ -97,10 +99,9 @@ export default function Header() {
                 _hover={{ color: "blue.600" }}
                 transition="color 0.2s"
               >
-                Jackson Jackpot
+                JJ+
               </Text>
             </Link>
-
 
             {/* Right Side */}
             <HStack spacing={4}>
@@ -191,7 +192,16 @@ export default function Header() {
                     <Link href="/transaction-history">
                       <MenuItem icon={<FaHistory />}>Transaction History</MenuItem>
                     </Link>
-                    
+
+                    <MenuDivider />
+
+                    <Link href="/charities">
+                      <MenuItem icon={<FaHeart />}>Charities</MenuItem>
+                    </Link>
+                    <Link href="/how-it-works">
+                      <MenuItem icon={<FaQuestionCircle />}>How It Works</MenuItem>
+                    </Link>
+
                     <MenuDivider />
                     
                     <MenuItem 
@@ -230,12 +240,91 @@ export default function Header() {
         <DrawerContent>
           <DrawerCloseButton />
           <DrawerHeader borderBottomWidth="1px">
-            <Text color="blue.500" fontWeight="bold">
-              Jackson Jackpot
+            <Text color="blue.500" fontWeight="bold" fontSize="xl">
+              JJ+
             </Text>
           </DrawerHeader>
           <DrawerBody>
             <VStack spacing={4} align="stretch" pt={4}>
+              {/* Mobile User Menu */}
+              {user && (
+                <>
+                  <Box borderTop="1px" borderColor="gray.200" pt={4}>
+                    <VStack spacing={2} align="stretch">
+                      <Box px={3} py={2} bg="gray.50" borderRadius="md">
+                        <Text fontWeight="semibold">{getUserDisplayName()}</Text>
+                        <Text fontSize="sm" color="gray.600">{user.email}</Text>
+                        <HStack justify="space-between" mt={2}>
+                          <Badge colorScheme="blue" variant="solid" fontSize="xs">
+                            {user.role}
+                          </Badge>
+                          <Badge colorScheme="green" variant="solid" fontSize="xs">
+                            <HStack spacing={1}>
+                              <FaPoundSign size={8} />
+                              <Text>
+                                {walletLoading ? (
+                                  <Spinner size="xs" />
+                                ) : (
+                                  walletBalance ? formatBalance(walletBalance) : '£0.00'
+                                )}
+                              </Text>
+                            </HStack>
+                          </Badge>
+                        </HStack>
+                      </Box>
+
+                      <Link href="/profile" onClick={onClose}>
+                        <Button variant="ghost" leftIcon={<FaUser />} w="full" justifyContent="flex-start">
+                          Profile Settings
+                        </Button>
+                      </Link>
+                      <Link href="/my-tickets" onClick={onClose}>
+                        <Button variant="ghost" leftIcon={<FaTicketAlt />} w="full" justifyContent="flex-start">
+                          My Tickets
+                        </Button>
+                      </Link>
+                      <Link href="/wallet" onClick={onClose}>
+                        <Button variant="ghost" leftIcon={<FaWallet />} w="full" justifyContent="flex-start">
+                          Wallet
+                        </Button>
+                      </Link>
+                      <Link href="/transaction-history" onClick={onClose}>
+                        <Button variant="ghost" leftIcon={<FaHistory />} w="full" justifyContent="flex-start">
+                          Transaction History
+                        </Button>
+                      </Link>
+
+                      <Box borderTop="1px" borderColor="gray.200" pt={2} mt={2}>
+                        <Link href="/charities" onClick={onClose}>
+                          <Button variant="ghost" leftIcon={<FaHeart />} w="full" justifyContent="flex-start">
+                            Charities
+                          </Button>
+                        </Link>
+                        <Link href="/how-it-works" onClick={onClose}>
+                          <Button variant="ghost" leftIcon={<FaQuestionCircle />} w="full" justifyContent="flex-start">
+                            How It Works
+                          </Button>
+                        </Link>
+                      </Box>
+
+                      <Button
+                        variant="ghost"
+                        leftIcon={<FaSignOutAlt />}
+                        w="full"
+                        justifyContent="flex-start"
+                        color="red.500"
+                        onClick={() => {
+                          logout();
+                          onClose();
+                        }}
+                      >
+                        Sign Out
+                      </Button>
+                    </VStack>
+                  </Box>
+                </>
+              )}
+
               {/* Mobile Auth Links */}
               {!user && (
                 <>
@@ -243,12 +332,12 @@ export default function Header() {
                     <VStack spacing={2}>
                       <Link href="/login" onClick={onClose}>
                         <Button variant="ghost" w="full">
-                          🔑 Log In
+                          Log In
                         </Button>
                       </Link>
                       <Link href="/signup" onClick={onClose}>
                         <Button colorScheme="blue" w="full">
-                          ✨ Sign Up
+                          Sign Up
                         </Button>
                       </Link>
                     </VStack>
