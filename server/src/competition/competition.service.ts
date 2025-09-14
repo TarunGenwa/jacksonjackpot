@@ -5,12 +5,13 @@ import { PrismaService } from '../prisma/prisma.service';
 export class CompetitionService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(status?: string, charityId?: string) {
+  async findAll(status?: string, charityId?: string, type?: string) {
     return this.prisma.competition.findMany({
       where: {
         isActive: true,
         ...(status && { status: status as any }),
         ...(charityId && { charityId }),
+        ...(type && { type: type as any }),
       },
       include: {
         charity: {

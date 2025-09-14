@@ -59,6 +59,7 @@ model Competition {
   id                String             @id @default(uuid())
   title             String
   description       String
+  type              CompetitionType    @default(MYSTERYBOXES)
   charityId         String
   startDate         DateTime
   endDate           DateTime
@@ -81,6 +82,7 @@ model Competition {
 
   @@index([status, isActive])
   @@index([charityId])
+  @@index([type])
   @@map("competitions")
 }
 
@@ -208,6 +210,13 @@ enum UserRole {
   USER
   ADMIN
   MODERATOR
+}
+
+enum CompetitionType {
+  MYSTERYBOXES
+  INSTANT_WINS
+  DAILY_FREE
+  INSTANT_SPINS
 }
 
 enum CompetitionStatus {

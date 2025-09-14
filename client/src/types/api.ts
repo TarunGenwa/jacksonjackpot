@@ -26,6 +26,7 @@ export interface Competition {
   id: string;
   title: string;
   description: string;
+  type: 'MYSTERYBOXES' | 'INSTANT_WINS' | 'DAILY_FREE' | 'INSTANT_SPINS';
   ticketPrice: string;
   maxTickets: number;
   ticketsSold: number;

@@ -1,4 +1,4 @@
-import { PrismaClient, CompetitionStatus } from '@prisma/client';
+import { PrismaClient, CompetitionStatus, CompetitionType } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 
 const prisma = new PrismaClient();
@@ -118,222 +118,301 @@ async function main() {
 
   console.log(`✅ Created ${charities.length} charities`);
 
-  // Create competitions
+  // Create competitions with different types
   console.log('Creating competitions...');
   const now = new Date();
   const competitions: any[] = [];
 
-  // Competition 1 - Cancer Research UK
-  const competition1 = await prisma.competition.create({
+  // MYSTERY BOXES competitions
+  const mysteryBox1 = await prisma.competition.create({
     data: {
-      title: 'Win a Dream Holiday to the Maldives',
-      description: 'Enter our amazing competition to win a 7-night all-inclusive holiday for 2 to the beautiful Maldives. Includes flights, luxury resort accommodation, and all meals. Help us raise funds for vital cancer research while having the chance to win the holiday of a lifetime!',
+      title: 'Electronics Mystery Box',
+      description: 'Contains premium electronics worth up to £2000 including smartphones, tablets, headphones, and smart home gadgets. Every box guaranteed to contain items worth more than the entry fee!',
+      type: CompetitionType.MYSTERYBOXES,
       charityId: charities[0].id,
-      startDate: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
-      endDate: new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
-      drawDate: new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000), // 15 days from now
-      ticketPrice: new Decimal(5.00),
-      maxTickets: 10000,
-      ticketsSold: 3247,
+      startDate: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000),
+      endDate: new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000),
+      drawDate: new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000),
+      ticketPrice: new Decimal(10.00),
+      maxTickets: 500,
+      ticketsSold: 320,
+      minTickets: 50,
+      status: CompetitionStatus.ACTIVE,
+      imageUrl: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop',
+      termsAndConditions: 'Mystery box contents vary. Minimum value guaranteed. UK delivery only.'
+    }
+  });
+
+  const mysteryBox2 = await prisma.competition.create({
+    data: {
+      title: 'Luxury Fashion Mystery Box',
+      description: 'Designer clothing and accessories worth up to £1500 from top brands. Includes a mix of clothing, shoes, bags, and jewelry from premium fashion houses.',
+      type: CompetitionType.MYSTERYBOXES,
+      charityId: charities[1].id,
+      startDate: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000),
+      endDate: new Date(now.getTime() + 18 * 24 * 60 * 60 * 1000),
+      drawDate: new Date(now.getTime() + 19 * 24 * 60 * 60 * 1000),
+      ticketPrice: new Decimal(8.00),
+      maxTickets: 300,
+      ticketsSold: 180,
+      minTickets: 30,
+      status: CompetitionStatus.ACTIVE,
+      imageUrl: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop',
+      termsAndConditions: 'Size selection required after winning. Exchange policy applies.'
+    }
+  });
+
+  // INSTANT WINS competitions
+  const instantWin1 = await prisma.competition.create({
+    data: {
+      title: 'Instant Cash Prize £500',
+      description: 'Win £500 instantly! No waiting for draws - find out immediately if you\'ve won. Multiple prizes available throughout the competition period.',
+      type: CompetitionType.INSTANT_WINS,
+      charityId: charities[2].id,
+      startDate: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000),
+      endDate: new Date(now.getTime() + 25 * 24 * 60 * 60 * 1000),
+      drawDate: new Date(now.getTime() + 25 * 24 * 60 * 60 * 1000),
+      ticketPrice: new Decimal(2.00),
+      maxTickets: 1000,
+      ticketsSold: 750,
       minTickets: 100,
       status: CompetitionStatus.ACTIVE,
-      imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop&crop=center',
-      termsAndConditions: 'Competition open to UK residents aged 18+. Draw will be conducted by independent adjudicator. Winner will be notified within 48 hours of draw.'
+      imageUrl: 'https://images.unsplash.com/photo-1607863680198-23d4b2565df0?w=400&h=300&fit=crop',
+      termsAndConditions: 'Instant win results shown immediately. Winners notified by email.'
     }
   });
 
-  // Competition 2 - British Heart Foundation
-  const competition2 = await prisma.competition.create({
+  const instantWin2 = await prisma.competition.create({
     data: {
-      title: 'Tesla Model 3 Electric Car Giveaway',
-      description: 'Win a brand new Tesla Model 3 electric vehicle worth £40,000! This eco-friendly car comes with all the latest technology and features. Your entry helps fund life-saving heart research. Every ticket counts towards saving lives!',
-      charityId: charities[1].id,
-      startDate: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
-      endDate: new Date(now.getTime() + 21 * 24 * 60 * 60 * 1000), // 21 days from now
-      drawDate: new Date(now.getTime() + 22 * 24 * 60 * 60 * 1000), // 22 days from now
-      ticketPrice: new Decimal(10.00),
+      title: 'Instant Gadget Win',
+      description: 'Win the latest smartphone instantly! Premium devices available including iPhone 15 Pro, Samsung Galaxy S24, and Google Pixel 8 Pro.',
+      type: CompetitionType.INSTANT_WINS,
+      charityId: charities[3].id,
+      startDate: new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000),
+      endDate: new Date(now.getTime() + 12 * 24 * 60 * 60 * 1000),
+      drawDate: new Date(now.getTime() + 12 * 24 * 60 * 60 * 1000),
+      ticketPrice: new Decimal(5.00),
+      maxTickets: 200,
+      ticketsSold: 120,
+      minTickets: 20,
+      status: CompetitionStatus.ACTIVE,
+      imageUrl: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop',
+      termsAndConditions: 'Instant results. Device model may vary based on availability.'
+    }
+  });
+
+  // DAILY FREE competitions
+  const dailyFree1 = await prisma.competition.create({
+    data: {
+      title: 'Daily Free Coffee Voucher',
+      description: 'Free entry! Win a £20 coffee shop voucher daily. New winner selected every day at midnight. Multiple chances to win throughout the month.',
+      type: CompetitionType.DAILY_FREE,
+      charityId: charities[4].id,
+      startDate: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000),
+      endDate: new Date(now.getTime() + 28 * 24 * 60 * 60 * 1000),
+      drawDate: new Date(now.getTime() + 28 * 24 * 60 * 60 * 1000),
+      ticketPrice: new Decimal(0.00),
+      maxTickets: 10000,
+      ticketsSold: 8500,
+      minTickets: 1000,
+      status: CompetitionStatus.ACTIVE,
+      imageUrl: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop',
+      termsAndConditions: 'Free entry. One entry per person per day. Daily draws at midnight.'
+    }
+  });
+
+  const dailyFree2 = await prisma.competition.create({
+    data: {
+      title: 'Free Daily Lunch Draw',
+      description: 'Free entry! Win lunch for two at top restaurants daily. Choose from over 50 participating restaurants in your area.',
+      type: CompetitionType.DAILY_FREE,
+      charityId: charities[0].id,
+      startDate: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000),
+      endDate: new Date(now.getTime() + 29 * 24 * 60 * 60 * 1000),
+      drawDate: new Date(now.getTime() + 29 * 24 * 60 * 60 * 1000),
+      ticketPrice: new Decimal(0.00),
       maxTickets: 5000,
-      ticketsSold: 1856,
+      ticketsSold: 4200,
       minTickets: 500,
       status: CompetitionStatus.ACTIVE,
-      imageUrl: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800&h=600&fit=crop&crop=center',
-      termsAndConditions: 'UK residents only. Winner responsible for insurance and registration. Alternative cash prize of £35,000 available.'
+      imageUrl: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop',
+      termsAndConditions: 'Free entry. Restaurant subject to availability. Valid weekdays only.'
     }
   });
 
-  // Competition 3 - Mind
-  const competition3 = await prisma.competition.create({
+  // INSTANT SPINS competitions
+  const instantSpin1 = await prisma.competition.create({
     data: {
-      title: '£25,000 Cash Prize Draw',
-      description: 'Win £25,000 in cash! Use it however you like - pay off debts, plan a holiday, buy a car, or invest in your future. Your participation helps Mind continue providing vital mental health support across the UK.',
-      charityId: charities[2].id,
-      startDate: new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
-      endDate: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-      drawDate: new Date(now.getTime() + 31 * 24 * 60 * 60 * 1000), // 31 days from now
-      ticketPrice: new Decimal(2.50),
-      maxTickets: 15000,
-      ticketsSold: 0,
-      minTickets: 1000,
-      status: CompetitionStatus.UPCOMING,
-      imageUrl: 'https://images.unsplash.com/photo-1554672723-d42a16e533db?w=800&h=600&fit=crop&crop=center',
-      termsAndConditions: 'Open to UK residents aged 18+. Cash will be transferred to winner\'s bank account within 14 days of verification.'
-    }
-  });
-
-  // Competition 4 - Oxfam
-  const competition4 = await prisma.competition.create({
-    data: {
-      title: 'Luxury Home Makeover Worth £50,000',
-      description: 'Transform your home with a complete luxury makeover worth £50,000! Includes kitchen renovation, bathroom upgrade, flooring throughout, and professional interior design. Help us fight global poverty while potentially winning your dream home transformation.',
-      charityId: charities[3].id,
-      startDate: new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000), // 14 days ago
-      endDate: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-      drawDate: new Date(now.getTime() + 8 * 24 * 60 * 60 * 1000), // 8 days from now
-      ticketPrice: new Decimal(15.00),
-      maxTickets: 4000,
-      ticketsSold: 3890,
-      minTickets: 300,
-      status: CompetitionStatus.ACTIVE,
-      imageUrl: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop&crop=center',
-      termsAndConditions: 'Winner must own their property or have landlord permission. Work to be completed within 6 months of winning.'
-    }
-  });
-
-  // Competition 5 - RSPCA
-  const competition5 = await prisma.competition.create({
-    data: {
-      title: 'Weekend Getaway Package Collection',
-      description: 'Win one of 10 amazing weekend getaway packages across the UK! From luxury spa retreats to adventure holidays, there\'s something for everyone. Multiple winners mean more chances to win while supporting animal welfare.',
-      charityId: charities[4].id,
-      startDate: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
-      endDate: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-      drawDate: new Date(now.getTime()), // today
+      title: 'Spin to Win Gaming Setup',
+      description: 'Spin the wheel for a chance to win a complete gaming setup worth £3000! Includes gaming PC, monitor, keyboard, mouse, and gaming chair.',
+      type: CompetitionType.INSTANT_SPINS,
+      charityId: charities[1].id,
+      startDate: new Date(now.getTime() - 4 * 24 * 60 * 60 * 1000),
+      endDate: new Date(now.getTime() + 20 * 24 * 60 * 60 * 1000),
+      drawDate: new Date(now.getTime() + 20 * 24 * 60 * 60 * 1000),
       ticketPrice: new Decimal(3.00),
-      maxTickets: 8000,
-      ticketsSold: 8000,
-      minTickets: 800,
-      status: CompetitionStatus.DRAWING,
-      imageUrl: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&h=600&fit=crop&crop=center',
-      termsAndConditions: 'Multiple prizes available. Winners will be drawn randomly. Getaway packages valid for 12 months from draw date.'
+      maxTickets: 800,
+      ticketsSold: 560,
+      minTickets: 80,
+      status: CompetitionStatus.ACTIVE,
+      imageUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=300&fit=crop',
+      termsAndConditions: 'Spin wheel shows instant results. Setup customization available.'
     }
   });
 
-  competitions.push(competition1, competition2, competition3, competition4, competition5);
+  const instantSpin2 = await prisma.competition.create({
+    data: {
+      title: 'Lucky Spin Holiday Package',
+      description: 'Spin for your chance to win a luxury weekend getaway worth £2000! Destinations include Paris, Amsterdam, Rome, and Barcelona.',
+      type: CompetitionType.INSTANT_SPINS,
+      charityId: charities[2].id,
+      startDate: new Date(now.getTime() - 6 * 24 * 60 * 60 * 1000),
+      endDate: new Date(now.getTime() + 16 * 24 * 60 * 60 * 1000),
+      drawDate: new Date(now.getTime() + 16 * 24 * 60 * 60 * 1000),
+      ticketPrice: new Decimal(4.00),
+      maxTickets: 600,
+      ticketsSold: 420,
+      minTickets: 60,
+      status: CompetitionStatus.ACTIVE,
+      imageUrl: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&h=300&fit=crop',
+      termsAndConditions: 'Spin results instant. Travel dates subject to availability.'
+    }
+  });
+
+  competitions.push(
+    mysteryBox1, mysteryBox2,
+    instantWin1, instantWin2,
+    dailyFree1, dailyFree2,
+    instantSpin1, instantSpin2
+  );
   console.log(`✅ Created ${competitions.length} competitions`);
 
   // Create prizes for competitions
   console.log('Creating prizes...');
   const prizes: any[] = [];
 
-  // Prizes for Competition 1 (Maldives Holiday)
-  const competition1Prizes = await Promise.all([
+  // Mystery Box Prizes
+  const mysteryBox1Prizes = await Promise.all([
     prisma.prize.create({
       data: {
-        competitionId: competition1.id,
-        name: 'Maldives Holiday for 2',
-        description: '7 nights all-inclusive luxury resort accommodation for 2 people including return flights',
-        value: new Decimal(8000.00),
+        competitionId: mysteryBox1.id,
+        name: 'Electronics Mystery Box',
+        description: 'Premium electronics package including smartphone, tablet, and accessories',
+        value: new Decimal(2000.00),
         position: 1,
         quantity: 1,
-        imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop&crop=center'
+        imageUrl: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop'
       }
-    }),
+    })
+  ]);
+
+  const mysteryBox2Prizes = await Promise.all([
     prisma.prize.create({
       data: {
-        competitionId: competition1.id,
-        name: '£500 Travel Voucher',
-        description: 'Holiday voucher to use with any major travel company',
+        competitionId: mysteryBox2.id,
+        name: 'Fashion Mystery Box',
+        description: 'Designer clothing and accessories from luxury brands',
+        value: new Decimal(1500.00),
+        position: 1,
+        quantity: 1,
+        imageUrl: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop'
+      }
+    })
+  ]);
+
+  // Instant Win Prizes
+  const instantWin1Prizes = await Promise.all([
+    prisma.prize.create({
+      data: {
+        competitionId: instantWin1.id,
+        name: '£500 Cash Prize',
+        description: 'Instant cash prize transferred to your account',
         value: new Decimal(500.00),
-        position: 2,
-        quantity: 1,
-        imageUrl: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&h=300&fit=crop&crop=center'
-      }
-    })
-  ]);
-
-  // Prizes for Competition 2 (Tesla)
-  const competition2Prizes = await Promise.all([
-    prisma.prize.create({
-      data: {
-        competitionId: competition2.id,
-        name: 'Tesla Model 3',
-        description: 'Brand new Tesla Model 3 electric vehicle with full warranty',
-        value: new Decimal(40000.00),
         position: 1,
-        quantity: 1,
-        imageUrl: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=400&h=300&fit=crop&crop=center'
+        quantity: 5,
+        imageUrl: 'https://images.unsplash.com/photo-1607863680198-23d4b2565df0?w=400&h=300&fit=crop'
       }
     })
   ]);
 
-  // Prizes for Competition 3 (Cash Prize)
-  const competition3Prizes = await Promise.all([
+  const instantWin2Prizes = await Promise.all([
     prisma.prize.create({
       data: {
-        competitionId: competition3.id,
-        name: '£25,000 Cash Prize',
-        description: 'Cash prize paid directly to winner\'s bank account',
-        value: new Decimal(25000.00),
-        position: 1,
-        quantity: 1,
-        imageUrl: 'https://images.unsplash.com/photo-1554672723-d42a16e533db?w=400&h=300&fit=crop&crop=center'
-      }
-    })
-  ]);
-
-  // Prizes for Competition 4 (Home Makeover)
-  const competition4Prizes = await Promise.all([
-    prisma.prize.create({
-      data: {
-        competitionId: competition4.id,
-        name: 'Luxury Home Makeover',
-        description: 'Complete home renovation including kitchen, bathroom, flooring and interior design',
-        value: new Decimal(50000.00),
-        position: 1,
-        quantity: 1,
-        imageUrl: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop&crop=center'
-      }
-    })
-  ]);
-
-  // Prizes for Competition 5 (Weekend Getaways) - Multiple prizes
-  const competition5Prizes = await Promise.all([
-    prisma.prize.create({
-      data: {
-        competitionId: competition5.id,
-        name: 'Luxury Spa Weekend',
-        description: '2-night luxury spa break for 2 people including treatments',
-        value: new Decimal(800.00),
+        competitionId: instantWin2.id,
+        name: 'Latest Smartphone',
+        description: 'Brand new premium smartphone with full warranty',
+        value: new Decimal(1200.00),
         position: 1,
         quantity: 3,
-        imageUrl: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&crop=center'
-      }
-    }),
-    prisma.prize.create({
-      data: {
-        competitionId: competition5.id,
-        name: 'Adventure Weekend',
-        description: '2-night adventure break including activities like zip-lining and rock climbing',
-        value: new Decimal(600.00),
-        position: 2,
-        quantity: 3,
-        imageUrl: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=400&h=300&fit=crop&crop=center'
-      }
-    }),
-    prisma.prize.create({
-      data: {
-        competitionId: competition5.id,
-        name: 'City Break Weekend',
-        description: '2-night city break in London, Edinburgh, or Bath with sightseeing tours',
-        value: new Decimal(500.00),
-        position: 3,
-        quantity: 4,
-        imageUrl: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=300&fit=crop&crop=center'
+        imageUrl: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop'
       }
     })
   ]);
 
-  prizes.push(...competition1Prizes, ...competition2Prizes, ...competition3Prizes, ...competition4Prizes, ...competition5Prizes);
+  // Daily Free Prizes
+  const dailyFree1Prizes = await Promise.all([
+    prisma.prize.create({
+      data: {
+        competitionId: dailyFree1.id,
+        name: 'Coffee Shop Voucher',
+        description: '£20 voucher for major coffee shop chains',
+        value: new Decimal(20.00),
+        position: 1,
+        quantity: 30,
+        imageUrl: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop'
+      }
+    })
+  ]);
+
+  const dailyFree2Prizes = await Promise.all([
+    prisma.prize.create({
+      data: {
+        competitionId: dailyFree2.id,
+        name: 'Restaurant Lunch Voucher',
+        description: 'Lunch for two at participating restaurants',
+        value: new Decimal(60.00),
+        position: 1,
+        quantity: 30,
+        imageUrl: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop'
+      }
+    })
+  ]);
+
+  // Instant Spin Prizes
+  const instantSpin1Prizes = await Promise.all([
+    prisma.prize.create({
+      data: {
+        competitionId: instantSpin1.id,
+        name: 'Complete Gaming Setup',
+        description: 'Gaming PC, monitor, peripherals and gaming chair',
+        value: new Decimal(3000.00),
+        position: 1,
+        quantity: 1,
+        imageUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=300&fit=crop'
+      }
+    })
+  ]);
+
+  const instantSpin2Prizes = await Promise.all([
+    prisma.prize.create({
+      data: {
+        competitionId: instantSpin2.id,
+        name: 'European Weekend Getaway',
+        description: 'Luxury weekend trip to European destination for 2',
+        value: new Decimal(2000.00),
+        position: 1,
+        quantity: 1,
+        imageUrl: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&h=300&fit=crop'
+      }
+    })
+  ]);
+
+  prizes.push(
+    ...mysteryBox1Prizes, ...mysteryBox2Prizes,
+    ...instantWin1Prizes, ...instantWin2Prizes,
+    ...dailyFree1Prizes, ...dailyFree2Prizes,
+    ...instantSpin1Prizes, ...instantSpin2Prizes
+  );
   console.log(`✅ Created ${prizes.length} prizes`);
 
   // Create some sample donations

@@ -93,7 +93,7 @@ export default function Home() {
 
   return (
     <Box minH="100vh" bg="gray.50">
-      {/* Hero Section - COMMENTED OUT
+      {/* Hero Section */}
       <Box
         bgGradient="linear(135deg, blue.500, purple.600, pink.500)"
         color="white"
@@ -297,11 +297,11 @@ export default function Home() {
           </Flex>
         </Container>
       </Box>
-      */}
 
       {/* Main Content */}
       <Container maxW="container.xl" py={12}>
-        {/* Active Competitions Section */}
+        {/* Active Competitions Section - HIDDEN */}
+        {/*
         <VStack spacing={12}>
           <VStack spacing={8} w="full">
             <VStack spacing={4} textAlign="center">
@@ -333,14 +333,17 @@ export default function Home() {
             ) : (
               <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6} w="full">
                 {competitions.map((competition) => (
-                  <CompetitionCard 
-                    key={competition.id} 
-                    competition={competition} 
+                  <CompetitionCard
+                    key={competition.id}
+                    competition={competition}
                   />
                 ))}
               </SimpleGrid>
             )}
           </VStack>
+        */}
+
+        <VStack spacing={12}>
 
           {/* Features Section */}
           <Card w="full" shadow="xl">

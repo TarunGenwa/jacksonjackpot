@@ -1,19 +1,21 @@
 import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { 
-  Box, 
-  Card, 
-  CardBody, 
-  Heading, 
-  Text, 
-  Button, 
-  Badge, 
-  Progress, 
-  VStack, 
-  HStack, 
-  Avatar, 
-  Alert, 
-  AlertIcon, 
+import {
+  Box,
+  Card,
+  CardBody,
+  Heading,
+  Text,
+  Button,
+  Badge,
+  Progress,
+  VStack,
+  HStack,
+  Avatar,
+  Alert,
+  AlertIcon,
   Flex,
   Spacer,
   useDisclosure
@@ -28,6 +30,7 @@ interface CompetitionCardProps {
 
 export default function CompetitionCard({ competition }: CompetitionCardProps) {
   const { user } = useAuth();
+  const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [localCompetition, setLocalCompetition] = useState(competition);
   const formatPrice = (price: string) => {
@@ -80,13 +83,23 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
     console.log('Purchase successful');
   };
 
-  const handlePurchaseClick = () => {
+  const handlePurchaseClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click when purchasing
     if (!user) {
       // Could redirect to login or show login modal
       alert('Please log in to purchase tickets');
       return;
     }
     onOpen();
+  };
+
+  const handleCardClick = () => {
+    router.push(`/competitions/${localCompetition.id}`);
+  };
+
+  const handleViewDetailsClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+    router.push(`/competitions/${localCompetition.id}`);
   };
 
   const getStatusColor = (status: string) => {
@@ -119,12 +132,14 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
   };
 
   return (
-    <Card 
-      maxW="sm" 
-      shadow="xl" 
-      _hover={{ shadow: "2xl" }} 
+    <Card
+      maxW="sm"
+      shadow="xl"
+      _hover={{ shadow: "2xl", transform: "translateY(-2px)" }}
       transition="all 0.3s"
       overflow="hidden"
+      cursor="pointer"
+      onClick={handleCardClick}
     >
       {/* Competition Image */}
       <Box position="relative" h="200px">
@@ -194,17 +209,17 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
 
           {/* Progress Bar */}
           <Box>
-            <Progress 
-              value={getProgressPercentage()} 
-              colorScheme="blue" 
-              size="lg" 
+            <Progress
+              value={getProgressPercentage()}
+              colorScheme="blue"
+              size="lg"
               borderRadius="md"
               bg="gray.100"
             />
-            <Text 
-              textAlign="center" 
-              fontSize="md" 
-              color="green.600" 
+            <Text
+              textAlign="center"
+              fontSize="md"
+              color="green.600"
               mt={2}
               fontWeight="bold"
             >
@@ -212,8 +227,26 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
             </Text>
           </Box>
 
-
-
+          {/* Action Buttons */}
+          <VStack spacing={3} w="full">
+            <Button
+              variant="outline"
+              colorScheme="gray"
+              size="sm"
+              w="full"
+              onClick={handleViewDetailsClick}
+            >
+              View Details
+            </Button>
+            <Button
+              {...getButtonProps()}
+              size="sm"
+              w="full"
+              onClick={handlePurchaseClick}
+            >
+              {getButtonText()}
+            </Button>
+          </VStack>
         </VStack>
       </CardBody>
 

@@ -25,7 +25,17 @@ import {
   Image,
   Progress,
   Divider,
-  useBreakpointValue
+  Spinner,
+  useBreakpointValue,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  TableContainer,
+  IconButton,
+  Tooltip
 } from '@chakra-ui/react';
 import { SearchIcon, CalendarIcon } from '@chakra-ui/icons';
 import { FaTicketAlt, FaTrophy, FaClock } from 'react-icons/fa';
@@ -358,7 +368,7 @@ export default function MyTicketsPage() {
             )}
           </Flex>
 
-          {/* Tickets Grid */}
+          {/* Tickets Table */}
           {sortedTickets.length === 0 ? (
             <Card maxW="2xl" mx="auto" shadow="xl">
               <CardBody py={16} textAlign="center">
@@ -377,157 +387,117 @@ export default function MyTicketsPage() {
               </CardBody>
             </Card>
           ) : (
-            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
-              {sortedTickets.map((ticket) => (
-                <Card 
-                  key={ticket.id} 
-                  shadow="lg" 
-                  _hover={{ shadow: "xl" }} 
-                  transition="all 0.3s"
-                  overflow="hidden"
-                  position="relative"
-                >
-                  {/* Winner Badge */}
-                  {ticket.isWinner && (
-                    <Badge
-                      position="absolute"
-                      top={3}
-                      right={3}
-                      colorScheme="purple"
-                      variant="solid"
-                      borderRadius="md"
-                      zIndex={1}
-                      fontSize="sm"
-                      px={3}
-                      py={1}
-                    >
-                      🏆 WINNER!
-                    </Badge>
-                  )}
-
-                  {/* Draw Soon Badge */}
-                  {ticket.status === 'ACTIVE' && isDrawSoon(ticket.competition.drawDate) && (
-                    <Badge
-                      position="absolute"
-                      top={3}
-                      left={3}
-                      colorScheme="orange"
-                      variant="solid"
-                      borderRadius="md"
-                      zIndex={1}
-                      fontSize="xs"
-                      px={2}
-                      py={1}
-                    >
-                      🔥 Draw Soon!
-                    </Badge>
-                  )}
-
-                  {/* Competition Image */}
-                  <Box position="relative" h="150px" bg="gray.100">
-                    {ticket.competition.imageUrl ? (
-                      <Image
-                        src={ticket.competition.imageUrl}
-                        alt={ticket.competition.title}
-                        objectFit="cover"
-                        w="full"
-                        h="full"
-                      />
-                    ) : (
-                      <Flex
-                        w="full"
-                        h="full"
-                        bgGradient="linear(to-br, blue.500, purple.600)"
-                        alignItems="center"
-                        justifyContent="center"
-                      >
-                        <Text color="white" fontSize="4xl">
-                          {getStatusIcon(ticket.status)}
-                        </Text>
-                      </Flex>
-                    )}
-                  </Box>
-
-                  <CardBody p={6}>
-                    <VStack spacing={4} align="stretch">
-                      {/* Ticket Status */}
-                      <HStack justify="space-between">
-                        <Badge 
-                          colorScheme={getStatusColor(ticket.status)} 
-                          variant="solid"
-                          fontSize="xs"
-                        >
-                          {ticket.status}
-                        </Badge>
-                        <Text fontSize="sm" fontFamily="mono" color="gray.600">
-                          {ticket.ticketNumber}
-                        </Text>
-                      </HStack>
-
-                      {/* Competition Info */}
-                      <VStack align="start" spacing={2}>
-                        <Heading as="h3" size="sm" noOfLines={2} color="gray.800">
-                          {ticket.competition.title}
-                        </Heading>
-                        <Text fontSize="sm" color="gray.600" noOfLines={2}>
-                          {ticket.competition.description}
-                        </Text>
-                        <Text fontSize="sm" color="blue.600" fontWeight="medium">
-                          {ticket.competition.charity.name}
-                        </Text>
-                      </VStack>
-
-                      {/* Prize Info (for winners) */}
-                      {ticket.status === 'WINNER' && (
-                        <Alert status="success" borderRadius="md" p={3}>
-                          <VStack align="start" spacing={1} w="full">
-                            <Text fontWeight="bold" fontSize="sm">
-                              🎉 Congratulations! You won!
+            <Card shadow="md">
+              <CardBody p={0}>
+                <TableContainer>
+                  <Table variant="simple" size={isMobile ? 'sm' : 'md'}>
+                    <Thead bg="gray.50">
+                      <Tr>
+                        <Th>Ticket Number</Th>
+                        <Th>Competition</Th>
+                        <Th>Charity</Th>
+                        <Th>Status</Th>
+                        <Th>Purchase Date</Th>
+                        <Th>Draw Date</Th>
+                        <Th isNumeric>Price</Th>
+                        <Th>Actions</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {sortedTickets.map((ticket) => (
+                        <Tr key={ticket.id} _hover={{ bg: 'gray.50' }}>
+                          <Td>
+                            <Text fontFamily="mono" fontSize="sm">
+                              {ticket.ticketNumber}
                             </Text>
+                          </Td>
+                          <Td>
+                            <VStack align="start" spacing={1}>
+                              <Text fontWeight="medium" noOfLines={1}>
+                                {ticket.competition.title}
+                              </Text>
+                              {!isMobile && (
+                                <Text fontSize="xs" color="gray.600" noOfLines={1}>
+                                  {ticket.competition.description}
+                                </Text>
+                              )}
+                            </VStack>
+                          </Td>
+                          <Td>
+                            <Text fontSize="sm" color="blue.600">
+                              {ticket.competition.charity.name}
+                            </Text>
+                          </Td>
+                          <Td>
+                            <HStack spacing={2}>
+                              <Badge
+                                colorScheme={getStatusColor(ticket.status)}
+                                variant="solid"
+                                fontSize="xs"
+                              >
+                                {ticket.status}
+                              </Badge>
+                              {ticket.status === 'WINNER' && (
+                                <Tooltip label="Congratulations! You won!" placement="top">
+                                  <Text fontSize="lg">🏆</Text>
+                                </Tooltip>
+                              )}
+                              {ticket.status === 'ACTIVE' && isDrawSoon(ticket.competition.drawDate) && (
+                                <Tooltip label="Draw happening soon!" placement="top">
+                                  <Text fontSize="sm">🔥</Text>
+                                </Tooltip>
+                              )}
+                            </HStack>
+                          </Td>
+                          <Td>
                             <Text fontSize="sm">
-                              Check your email for prize details.
+                              {new Date(ticket.createdAt).toLocaleDateString('en-GB', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric'
+                              })}
                             </Text>
-                          </VStack>
-                        </Alert>
-                      )}
-
-                      {/* Dates and Price */}
-                      <VStack spacing={2} align="stretch">
-                        <Flex justify="space-between" fontSize="sm">
-                          <Text color="gray.600">Purchased:</Text>
-                          <Text>{formatDate(ticket.createdAt)}</Text>
-                        </Flex>
-                        <Flex justify="space-between" fontSize="sm">
-                          <Text color="gray.600">Draw Date:</Text>
-                          <Text fontWeight="medium">
-                            {formatDate(ticket.competition.drawDate)}
-                          </Text>
-                        </Flex>
-                        <Divider />
-                        <Flex justify="space-between" align="center">
-                          <Text fontSize="sm" color="gray.600">
-                            Ticket Price:
-                          </Text>
-                          <Text fontWeight="bold" color="green.600">
-                            {formatAmount(parseFloat(ticket.purchasePrice))}
-                          </Text>
-                        </Flex>
-                      </VStack>
-
-                      {/* Action Button */}
-                      <Button
-                        size="sm"
-                        colorScheme="blue"
-                        variant="outline"
-                        w="full"
-                      >
-                        View Competition
-                      </Button>
-                    </VStack>
-                  </CardBody>
-                </Card>
-              ))}
-            </SimpleGrid>
+                          </Td>
+                          <Td>
+                            <VStack align="start" spacing={0}>
+                              <Text fontSize="sm" fontWeight={isDrawSoon(ticket.competition.drawDate) ? 'bold' : 'normal'}>
+                                {new Date(ticket.competition.drawDate).toLocaleDateString('en-GB', {
+                                  day: 'numeric',
+                                  month: 'short',
+                                  year: 'numeric'
+                                })}
+                              </Text>
+                              {!isMobile && (
+                                <Text fontSize="xs" color="gray.600">
+                                  {new Date(ticket.competition.drawDate).toLocaleTimeString('en-GB', {
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </Text>
+                              )}
+                            </VStack>
+                          </Td>
+                          <Td isNumeric>
+                            <Text fontWeight="bold" color="green.600">
+                              {formatAmount(parseFloat(ticket.purchasePrice))}
+                            </Text>
+                          </Td>
+                          <Td>
+                            <Button
+                              size="sm"
+                              colorScheme="blue"
+                              variant="outline"
+                            >
+                              View
+                            </Button>
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                </TableContainer>
+              </CardBody>
+            </Card>
           )}
         </VStack>
       </Container>

@@ -17,8 +17,9 @@ export class CompetitionController {
   async findAll(
     @Query('status') status?: string,
     @Query('charityId') charityId?: string,
+    @Query('type') type?: string,
   ) {
-    return this.competitionService.findAll(status, charityId);
+    return this.competitionService.findAll(status, charityId, type);
   }
 
   @Public()

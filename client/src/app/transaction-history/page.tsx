@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -28,168 +28,116 @@ import {
   TableContainer,
   InputGroup,
   InputLeftElement,
-  useBreakpointValue
+  useBreakpointValue,
+  Spinner
 } from '@chakra-ui/react';
 import { SearchIcon, DownloadIcon } from '@chakra-ui/icons';
 import { FaHistory, FaFilter } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
+import { transactionsService, Transaction } from '@/services/transactions';
 
-interface Transaction {
-  id: string;
-  type: string;
-  amount: number;
-  currency: string;
-  status: string;
-  description: string;
-  reference: string;
-  createdAt: string;
-  competitionTitle?: string;
-  paymentMethod?: string;
-}
 
 export default function TransactionHistoryPage() {
   const { user } = useAuth();
   const isMobile = useBreakpointValue({ base: true, md: false });
-  
+
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [dateRange, setDateRange] = useState('ALL');
 
-  // Mock transaction data - replace with actual API call
-  const transactions: Transaction[] = [
-    {
-      id: '1',
-      type: 'DEPOSIT',
-      amount: 50.00,
-      currency: 'GBP',
-      status: 'COMPLETED',
-      description: 'Wallet deposit via credit card',
-      reference: 'DEP-001234',
-      createdAt: '2025-01-10T14:30:00Z',
-      paymentMethod: 'Visa ****1234'
-    },
-    {
-      id: '2',
-      type: 'TICKET_PURCHASE',
-      amount: -5.00,
-      currency: 'GBP',
-      status: 'COMPLETED',
-      description: 'Competition ticket purchase',
-      reference: 'TKT-005678',
-      createdAt: '2025-01-10T12:15:00Z',
-      competitionTitle: 'Summer Prize Draw 2025'
-    },
-    {
-      id: '3',
-      type: 'DEPOSIT',
-      amount: 25.00,
-      currency: 'GBP',
-      status: 'COMPLETED',
-      description: 'Bank transfer deposit',
-      reference: 'DEP-001235',
-      createdAt: '2025-01-09T16:45:00Z',
-      paymentMethod: 'Bank Transfer'
-    },
-    {
-      id: '4',
-      type: 'TICKET_PURCHASE',
-      amount: -10.00,
-      currency: 'GBP',
-      status: 'COMPLETED',
-      description: 'Competition ticket purchase',
-      reference: 'TKT-005679',
-      createdAt: '2025-01-09T14:20:00Z',
-      competitionTitle: 'Winter Wonderland Competition'
-    },
-    {
-      id: '5',
-      type: 'WITHDRAWAL',
-      amount: -20.00,
-      currency: 'GBP',
-      status: 'PENDING',
-      description: 'Withdrawal to bank account',
-      reference: 'WDL-001236',
-      createdAt: '2025-01-08T10:30:00Z',
-      paymentMethod: 'Bank Transfer'
-    },
-    {
-      id: '6',
-      type: 'PRIZE_PAYOUT',
-      amount: 100.00,
-      currency: 'GBP',
-      status: 'COMPLETED',
-      description: 'Prize winnings',
-      reference: 'PRZ-001237',
-      createdAt: '2025-01-07T09:15:00Z',
-      competitionTitle: 'Christmas Mega Draw'
-    }
-  ];
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      if (!user) return;
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Calculate date filters based on dateRange
+        let dateFrom: string | undefined;
+        const now = new Date();
+
+        if (dateRange !== 'ALL') {
+          const daysAgo = parseInt(dateRange);
+          const fromDate = new Date();
+          fromDate.setDate(now.getDate() - daysAgo);
+          dateFrom = fromDate.toISOString();
+        }
+
+        const filters = {
+          type: typeFilter,
+          status: statusFilter,
+          dateFrom,
+        };
+
+        const data = await transactionsService.getTransactions(filters);
+        setTransactions(data);
+      } catch (err) {
+        console.error('Failed to fetch transactions:', err);
+        setError('Failed to load transactions. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTransactions();
+  }, [user, typeFilter, statusFilter, dateRange]);
 
   const filteredTransactions = transactions.filter(transaction => {
-    const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         transaction.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (transaction.competitionTitle && transaction.competitionTitle.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const matchesType = typeFilter === 'ALL' || transaction.type === typeFilter;
-    const matchesStatus = statusFilter === 'ALL' || transaction.status === statusFilter;
-    
-    return matchesSearch && matchesType && matchesStatus;
+    const matchesSearch = searchTerm === '' ||
+                         transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (transaction.referenceNumber && transaction.referenceNumber.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                         (transaction.metadata?.competitionTitle && transaction.metadata.competitionTitle.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    return matchesSearch;
   });
 
-  const formatAmount = (amount: number) => {
-    return new Intl.NumberFormat('en-GB', {
-      style: 'currency',
-      currency: 'GBP'
-    }).format(Math.abs(amount));
+  const formatAmount = (amount: string | number) => {
+    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+    return transactionsService.formatAmount(numAmount);
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-GB', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    return transactionsService.formatDate(dateString);
   };
 
   const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'DEPOSIT': return 'green';
-      case 'TICKET_PURCHASE': return 'blue';
-      case 'WITHDRAWAL': return 'orange';
-      case 'PRIZE_PAYOUT': return 'purple';
-      case 'REFUND': return 'cyan';
-      default: return 'gray';
-    }
+    return transactionsService.getTypeColor(type);
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'COMPLETED': return 'green';
-      case 'PENDING': return 'yellow';
-      case 'PROCESSING': return 'blue';
-      case 'FAILED': return 'red';
-      case 'CANCELLED': return 'gray';
-      default: return 'gray';
-    }
+    return transactionsService.getStatusColor(status);
   };
 
   const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'DEPOSIT': return '↗️';
-      case 'TICKET_PURCHASE': return '🎫';
-      case 'WITHDRAWAL': return '↙️';
-      case 'PRIZE_PAYOUT': return '🏆';
-      case 'REFUND': return '↩️';
-      default: return '💰';
-    }
+    return transactionsService.getTypeIcon(type);
   };
 
-  const exportTransactions = () => {
-    // TODO: Implement actual export functionality
-    console.log('Exporting transactions...');
+  const exportTransactions = async () => {
+    try {
+      const filters = {
+        type: typeFilter,
+        status: statusFilter,
+      };
+
+      const blob = await transactionsService.exportTransactions('csv', filters);
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `transactions_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to export transactions:', error);
+    }
   };
 
   if (!user) {
@@ -200,6 +148,40 @@ export default function TransactionHistoryPage() {
             <AlertIcon />
             Please log in to view your transaction history.
           </Alert>
+        </Container>
+      </Box>
+    );
+  }
+
+  if (loading) {
+    return (
+      <Box minH="100vh" bg="gray.50">
+        <Container maxW="container.lg" py={12}>
+          <VStack spacing={4} justify="center" minH="50vh">
+            <Spinner size="xl" color="blue.500" />
+            <Text color="gray.600">Loading your transactions...</Text>
+          </VStack>
+        </Container>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box minH="100vh" bg="gray.50">
+        <Container maxW="container.lg" py={12}>
+          <VStack spacing={4} justify="center" minH="50vh">
+            <Alert status="error" maxW="md" borderRadius="md">
+              <AlertIcon />
+              {error}
+            </Alert>
+            <Button
+              colorScheme="blue"
+              onClick={() => window.location.reload()}
+            >
+              Try Again
+            </Button>
+          </VStack>
         </Container>
       </Box>
     );
@@ -348,15 +330,15 @@ export default function TransactionHistoryPage() {
                             colorScheme={getTypeColor(transaction.type)} 
                             variant="subtle"
                           >
-                            {transaction.type.replace('_', ' ')}
+                            {transactionsService.getTypeLabel(transaction.type)}
                           </Badge>
                         </HStack>
                         <Text 
                           fontWeight="bold" 
                           fontSize="lg"
-                          color={transaction.amount > 0 ? 'green.600' : 'red.600'}
+                          color={parseFloat(transaction.amount.toString()) > 0 ? 'green.600' : 'red.600'}
                         >
-                          {transaction.amount > 0 ? '+' : ''}{formatAmount(transaction.amount)}
+                          {parseFloat(transaction.amount.toString()) > 0 ? '+' : '-'}{formatAmount(transaction.amount)}
                         </Text>
                       </Flex>
                       
@@ -364,9 +346,9 @@ export default function TransactionHistoryPage() {
                         {transaction.description}
                       </Text>
                       
-                      {transaction.competitionTitle && (
+                      {transaction.metadata?.competitionTitle && (
                         <Text fontSize="sm" color="blue.600" noOfLines={1}>
-                          {transaction.competitionTitle}
+                          {transaction.metadata.competitionTitle}
                         </Text>
                       )}
                       
@@ -383,9 +365,11 @@ export default function TransactionHistoryPage() {
                         </Badge>
                       </Flex>
                       
-                      <Text fontSize="xs" color="gray.500">
-                        Ref: {transaction.reference}
-                      </Text>
+                      {transaction.referenceNumber && (
+                        <Text fontSize="xs" color="gray.500">
+                          Ref: {transaction.referenceNumber}
+                        </Text>
+                      )}
                     </VStack>
                   </CardBody>
                 </Card>
@@ -432,9 +416,9 @@ export default function TransactionHistoryPage() {
                                   {transaction.competitionTitle}
                                 </Text>
                               )}
-                              {transaction.paymentMethod && (
+                              {transaction.paymentProvider && (
                                 <Text fontSize="sm" color="gray.600">
-                                  {transaction.paymentMethod}
+                                  {transaction.paymentProvider}
                                 </Text>
                               )}
                             </VStack>
@@ -463,7 +447,7 @@ export default function TransactionHistoryPage() {
                           </Td>
                           <Td>
                             <Text fontSize="sm" color="gray.600" fontFamily="mono">
-                              {transaction.reference}
+                              {transaction.referenceNumber || transaction.id.slice(0, 8)}
                             </Text>
                           </Td>
                         </Tr>

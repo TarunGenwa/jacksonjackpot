@@ -21,30 +21,56 @@ import {
   Flex,
   InputGroup,
   InputLeftElement,
-  Center
+  Center,
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
+  Icon
 } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
+import { FaGift, FaBolt, FaCalendarDay, FaCircle } from 'react-icons/fa';
 import CompetitionCard from '@/components/CompetitionCard';
 import { Competition } from '@/types/api';
 import { competitionsService } from '@/services/competitions';
 
+type CompetitionType = 'mysteryboxes' | 'instant-wins' | 'daily-free' | 'instant-spins';
+
 export default function CompetitionsPage() {
-  const [competitions, setCompetitions] = useState<Competition[]>([]);
-  const [filteredCompetitions, setFilteredCompetitions] = useState<Competition[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('ALL');
-  const [sortBy, setSortBy] = useState('endDate');
+  const [activeTab, setActiveTab] = useState(0);
+  const [competitionsByType, setCompetitionsByType] = useState<{
+    [key: string]: Competition[];
+  }>({
+    'MYSTERYBOXES': [],
+    'INSTANT_WINS': [],
+    'DAILY_FREE': [],
+    'INSTANT_SPINS': []
+  });
 
   useEffect(() => {
     const fetchCompetitions = async () => {
       try {
         setLoading(true);
-        const allCompetitions = await competitionsService.getAll();
-        setCompetitions(allCompetitions);
-        setFilteredCompetitions(allCompetitions);
         setError(null);
+
+        // Fetch competitions for each type
+        const [mysteryBoxes, instantWins, dailyFree, instantSpins] = await Promise.all([
+          competitionsService.getByType('MYSTERYBOXES'),
+          competitionsService.getByType('INSTANT_WINS'),
+          competitionsService.getByType('DAILY_FREE'),
+          competitionsService.getByType('INSTANT_SPINS')
+        ]);
+
+        setCompetitionsByType({
+          'MYSTERYBOXES': mysteryBoxes,
+          'INSTANT_WINS': instantWins,
+          'DAILY_FREE': dailyFree,
+          'INSTANT_SPINS': instantSpins
+        });
       } catch (err) {
         console.error('Failed to fetch competitions:', err);
         setError('Failed to load competitions. Please try again later.');
@@ -56,51 +82,50 @@ export default function CompetitionsPage() {
     fetchCompetitions();
   }, []);
 
-  useEffect(() => {
-    let filtered = [...competitions];
-
-    // Filter by search term
-    if (searchTerm) {
-      filtered = filtered.filter(competition =>
-        competition.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        competition.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        competition.charity.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+  const competitionTabs = [
+    {
+      id: 'MYSTERYBOXES',
+      label: 'Mystery Boxes',
+      icon: FaGift,
+      description: 'Surprise prizes in exciting mystery boxes',
+      color: 'purple'
+    },
+    {
+      id: 'INSTANT_WINS',
+      label: 'Instant Wins',
+      icon: FaBolt,
+      description: 'Win instantly with every play',
+      color: 'orange'
+    },
+    {
+      id: 'DAILY_FREE',
+      label: 'Daily Free',
+      icon: FaCalendarDay,
+      description: 'Free daily competitions for everyone',
+      color: 'green'
+    },
+    {
+      id: 'INSTANT_SPINS',
+      label: 'Instant Spins',
+      icon: FaCircle,
+      description: 'Spin the wheel for amazing prizes',
+      color: 'blue'
     }
+  ];
 
-    // Filter by status
-    if (statusFilter !== 'ALL') {
-      filtered = filtered.filter(competition => competition.status === statusFilter);
-    }
+  const getCurrentCompetitions = () => {
+    const currentTabId = competitionTabs[activeTab]?.id;
+    return competitionsByType[currentTabId] || [];
+  };
 
-    // Sort competitions
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'endDate':
-          return new Date(a.endDate).getTime() - new Date(b.endDate).getTime();
-        case 'ticketPrice':
-          return parseFloat(a.ticketPrice) - parseFloat(b.ticketPrice);
-        case 'ticketsSold':
-          return b.ticketsSold - a.ticketsSold;
-        case 'title':
-          return a.title.localeCompare(b.title);
-        default:
-          return 0;
-      }
-    });
+  const getFilteredCompetitions = () => {
+    const competitions = getCurrentCompetitions();
+    if (!searchTerm) return competitions;
 
-    setFilteredCompetitions(filtered);
-  }, [competitions, searchTerm, statusFilter, sortBy]);
-
-  const getStatusCounts = () => {
-    const counts = {
-      ALL: competitions.length,
-      ACTIVE: competitions.filter(c => c.status === 'ACTIVE').length,
-      UPCOMING: competitions.filter(c => c.status === 'UPCOMING').length,
-      COMPLETED: competitions.filter(c => c.status === 'COMPLETED').length,
-      SOLD_OUT: competitions.filter(c => c.status === 'SOLD_OUT').length,
-    };
-    return counts;
+    return competitions.filter(competition =>
+      competition.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      competition.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
   };
 
   if (loading) {
@@ -128,8 +153,8 @@ export default function CompetitionsPage() {
                 <AlertIcon />
                 {error}
               </Alert>
-              <Button 
-                colorScheme="blue" 
+              <Button
+                colorScheme="blue"
                 onClick={() => window.location.reload()}
               >
                 Try Again
@@ -141,7 +166,8 @@ export default function CompetitionsPage() {
     );
   }
 
-  const statusCounts = getStatusCounts();
+  const filteredCompetitions = getFilteredCompetitions();
+  const currentTab = competitionTabs[activeTab];
 
   return (
     <Box minH="100vh" bg="gray.50">
@@ -150,128 +176,132 @@ export default function CompetitionsPage() {
           {/* Header */}
           <VStack spacing={4} textAlign="center">
             <Heading as="h1" size="2xl" color="gray.800">
-              All Competitions
+              Competitions
             </Heading>
             <Text fontSize="lg" color="gray.600" maxW="2xl">
-              Browse all available competitions and find your next chance to win amazing prizes
+              Choose your competition type and win amazing prizes while supporting great causes
             </Text>
           </VStack>
 
-          {/* Filters and Search */}
-          <Card shadow="md">
-            <CardBody>
-              <VStack spacing={4}>
-                {/* Search Bar */}
-                <InputGroup size="lg">
-                  <InputLeftElement pointerEvents="none">
-                    <SearchIcon color="gray.400" />
-                  </InputLeftElement>
-                  <Input
-                    placeholder="Search competitions, charities, or prizes..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    bg="white"
-                  />
-                </InputGroup>
-
-                {/* Filters */}
-                <Flex 
-                  direction={{ base: 'column', md: 'row' }} 
-                  gap={4} 
-                  w="full" 
-                  align={{ base: 'stretch', md: 'center' }}
+          {/* Competition Type Tabs */}
+          <Tabs
+            index={activeTab}
+            onChange={setActiveTab}
+            variant="enclosed"
+            colorScheme="blue"
+            isFitted
+          >
+            <TabList>
+              {competitionTabs.map((tab, index) => (
+                <Tab
+                  key={tab.id}
+                  _selected={{
+                    color: `${tab.color}.600`,
+                    borderColor: `${tab.color}.600`,
+                    bg: `${tab.color}.50`
+                  }}
+                  fontWeight="semibold"
+                  py={4}
                 >
-                  <VStack align="start" spacing={2} flex={1}>
-                    <Text fontSize="sm" fontWeight="medium" color="gray.700">
-                      Filter by Status
-                    </Text>
-                    <HStack spacing={2} flexWrap="wrap">
-                      {Object.entries(statusCounts).map(([status, count]) => (
-                        <Button
-                          key={status}
-                          size="sm"
-                          variant={statusFilter === status ? 'solid' : 'outline'}
-                          colorScheme={statusFilter === status ? 'blue' : 'gray'}
-                          onClick={() => setStatusFilter(status)}
-                        >
-                          {status === 'ALL' ? 'All' : status.replace('_', ' ')} ({count})
-                        </Button>
-                      ))}
-                    </HStack>
+                  <VStack spacing={2}>
+                    <Icon as={tab.icon} boxSize={5} />
+                    <Text fontSize="sm">{tab.label}</Text>
                   </VStack>
-
-                  <VStack align="start" spacing={2}>
-                    <Text fontSize="sm" fontWeight="medium" color="gray.700">
-                      Sort by
-                    </Text>
-                    <Select
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                      size="sm"
-                      maxW="200px"
-                    >
-                      <option value="endDate">End Date</option>
-                      <option value="ticketPrice">Ticket Price</option>
-                      <option value="ticketsSold">Popularity</option>
-                      <option value="title">Title</option>
-                    </Select>
-                  </VStack>
-                </Flex>
-              </VStack>
-            </CardBody>
-          </Card>
-
-          {/* Results Summary */}
-          <Flex justify="space-between" align="center">
-            <Text color="gray.600">
-              Showing {filteredCompetitions.length} of {competitions.length} competitions
-            </Text>
-            {searchTerm && (
-              <Badge colorScheme="blue" variant="subtle" px={3} py={1}>
-                Search: "{searchTerm}"
-              </Badge>
-            )}
-          </Flex>
-
-          {/* Competition Grid */}
-          {filteredCompetitions.length === 0 ? (
-            <Card maxW="2xl" mx="auto" shadow="xl">
-              <CardBody py={16} textAlign="center">
-                <VStack spacing={4}>
-                  <Text fontSize="6xl">🔍</Text>
-                  <Heading size="xl" color="gray.700">
-                    No Competitions Found
-                  </Heading>
-                  <Text color="gray.600">
-                    {searchTerm || statusFilter !== 'ALL' 
-                      ? 'Try adjusting your search or filters to find more competitions.'
-                      : 'Check back soon for new competitions and amazing prizes!'
-                    }
-                  </Text>
-                  {(searchTerm || statusFilter !== 'ALL') && (
-                    <Button
-                      colorScheme="blue"
-                      onClick={() => {
-                        setSearchTerm('');
-                        setStatusFilter('ALL');
-                      }}
-                    >
-                      Clear Filters
-                    </Button>
-                  )}
-                </VStack>
-              </CardBody>
-            </Card>
-          ) : (
-            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
-              {filteredCompetitions.map((competition) => (
-                <CompetitionCard 
-                  key={competition.id} 
-                  competition={competition} 
-                />
+                </Tab>
               ))}
-            </SimpleGrid>
-          )}
+            </TabList>
+
+            <TabPanels>
+              {competitionTabs.map((tab, index) => (
+                <TabPanel key={tab.id} px={0}>
+                  <VStack spacing={6} align="stretch">
+                    {/* Tab Description */}
+                    <Card shadow="md" bg={`${tab.color}.50`} borderColor={`${tab.color}.200`}>
+                      <CardBody>
+                        <HStack spacing={4}>
+                          <Icon as={tab.icon} boxSize={8} color={`${tab.color}.600`} />
+                          <VStack align="start" spacing={1}>
+                            <Heading size="md" color={`${tab.color}.800`}>
+                              {tab.label}
+                            </Heading>
+                            <Text color={`${tab.color}.700`}>
+                              {tab.description}
+                            </Text>
+                          </VStack>
+                        </HStack>
+                      </CardBody>
+                    </Card>
+
+                    {/* Search Bar */}
+                    <Card shadow="md">
+                      <CardBody>
+                        <InputGroup size="lg">
+                          <InputLeftElement pointerEvents="none">
+                            <SearchIcon color="gray.400" />
+                          </InputLeftElement>
+                          <Input
+                            placeholder={`Search ${tab.label.toLowerCase()}...`}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            bg="white"
+                          />
+                        </InputGroup>
+                      </CardBody>
+                    </Card>
+
+                    {/* Results Summary */}
+                    <Flex justify="space-between" align="center">
+                      <Text color="gray.600">
+                        Showing {filteredCompetitions.length} {tab.label.toLowerCase()}
+                      </Text>
+                      {searchTerm && (
+                        <Badge colorScheme={tab.color} variant="subtle" px={3} py={1}>
+                          Search: "{searchTerm}"
+                        </Badge>
+                      )}
+                    </Flex>
+
+                    {/* Competition Grid */}
+                    {filteredCompetitions.length === 0 ? (
+                      <Card maxW="2xl" mx="auto" shadow="xl">
+                        <CardBody py={16} textAlign="center">
+                          <VStack spacing={4}>
+                            <Icon as={tab.icon} boxSize={16} color={`${tab.color}.300`} />
+                            <Heading size="xl" color="gray.700">
+                              No {tab.label} Available
+                            </Heading>
+                            <Text color="gray.600">
+                              {searchTerm
+                                ? `No ${tab.label.toLowerCase()} match your search. Try different keywords.`
+                                : `We're working on bringing you amazing ${tab.label.toLowerCase()}. Check back soon!`
+                              }
+                            </Text>
+                            {searchTerm && (
+                              <Button
+                                colorScheme={tab.color}
+                                onClick={() => setSearchTerm('')}
+                              >
+                                Clear Search
+                              </Button>
+                            )}
+                          </VStack>
+                        </CardBody>
+                      </Card>
+                    ) : (
+                      <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+                        {filteredCompetitions.map((competition) => (
+                          <CompetitionCard
+                            key={competition.id}
+                            competition={competition}
+                          />
+                        ))}
+                      </SimpleGrid>
+                    )}
+                  </VStack>
+                </TabPanel>
+              ))}
+            </TabPanels>
+          </Tabs>
         </VStack>
       </Container>
     </Box>
