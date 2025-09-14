@@ -72,10 +72,7 @@ export default function Loading() {
                       <Skeleton height="20px" width="100px" />
                       <Skeleton height="20px" width="80px" />
                     </Flex>
-                    <HStack spacing={3}>
-                      <Skeleton height="40px" flex={1} />
-                      <Skeleton height="40px" width="40px" />
-                    </HStack>
+                    <Skeleton height="40px" width="100%" />
                   </VStack>
                 </CardBody>
               </Card>

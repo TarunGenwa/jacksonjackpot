@@ -18,20 +18,15 @@ import {
   AlertIcon,
   Flex,
   Spacer,
-  useDisclosure
 } from '@chakra-ui/react';
 import { Competition } from '@/types/api';
-import TicketPurchaseModal from './TicketPurchaseModal';
-import { useAuth } from '@/contexts/AuthContext';
 
 interface CompetitionCardProps {
   competition: Competition;
 }
 
 export default function CompetitionCard({ competition }: CompetitionCardProps) {
-  const { user } = useAuth();
   const router = useRouter();
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const [localCompetition, setLocalCompetition] = useState(competition);
   const formatPrice = (price: string) => {
     return `£${parseFloat(price).toFixed(2)}`;
@@ -76,22 +71,6 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
     return formatPrizePool(prizePool.toString());
   };
 
-  const handlePurchaseSuccess = () => {
-    // Refresh competition data or update local state
-    // In a real app, you might want to refetch the competition data
-    // For now, we'll just show the modal closed
-    console.log('Purchase successful');
-  };
-
-  const handlePurchaseClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click when purchasing
-    if (!user) {
-      // Could redirect to login or show login modal
-      alert('Please log in to purchase tickets');
-      return;
-    }
-    onOpen();
-  };
 
   const handleCardClick = () => {
     router.push(`/competitions/${localCompetition.id}`);
@@ -112,24 +91,6 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
     }
   };
 
-  const getButtonProps = () => {
-    if (localCompetition.status === 'SOLD_OUT') 
-      return { colorScheme: 'red', isDisabled: true };
-    if (localCompetition.status === 'COMPLETED') 
-      return { colorScheme: 'gray', isDisabled: true };
-    if (localCompetition.status === 'UPCOMING') 
-      return { colorScheme: 'blue', isDisabled: true };
-    return { colorScheme: 'blue', isDisabled: false };
-  };
-
-  const getButtonText = () => {
-    switch (localCompetition.status) {
-      case 'SOLD_OUT': return 'Sold Out';
-      case 'COMPLETED': return 'Completed';
-      case 'UPCOMING': return 'Coming Soon';
-      default: return 'Buy Tickets';
-    }
-  };
 
   return (
     <Card
@@ -227,36 +188,19 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
             </Text>
           </Box>
 
-          {/* Action Buttons */}
-          <VStack spacing={3} w="full">
-            <Button
-              variant="outline"
-              colorScheme="gray"
-              size="sm"
-              w="full"
-              onClick={handleViewDetailsClick}
-            >
-              View Details
-            </Button>
-            <Button
-              {...getButtonProps()}
-              size="sm"
-              w="full"
-              onClick={handlePurchaseClick}
-            >
-              {getButtonText()}
-            </Button>
-          </VStack>
+          {/* Action Button */}
+          <Button
+            variant="solid"
+            colorScheme="blue"
+            size="md"
+            w="full"
+            onClick={handleViewDetailsClick}
+          >
+            View Details
+          </Button>
         </VStack>
       </CardBody>
 
-      {/* Purchase Modal */}
-      <TicketPurchaseModal
-        isOpen={isOpen}
-        onClose={onClose}
-        competition={localCompetition}
-        onPurchaseSuccess={handlePurchaseSuccess}
-      />
     </Card>
   );
 }
