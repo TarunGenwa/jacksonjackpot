@@ -30,6 +30,7 @@ import { FaTicketAlt, FaPoundSign, FaCalculator } from 'react-icons/fa';
 import { Competition } from '@/types/api';
 import { ticketsService, PurchaseTicketRequest } from '@/services/tickets';
 import { useAuth } from '@/contexts/AuthContext';
+import { useWallet } from '@/contexts/WalletContext';
 
 interface TicketPurchaseModalProps {
   isOpen: boolean;
@@ -38,13 +39,14 @@ interface TicketPurchaseModalProps {
   onPurchaseSuccess?: () => void;
 }
 
-export default function TicketPurchaseModal({ 
-  isOpen, 
-  onClose, 
-  competition, 
-  onPurchaseSuccess 
+export default function TicketPurchaseModal({
+  isOpen,
+  onClose,
+  competition,
+  onPurchaseSuccess
 }: TicketPurchaseModalProps) {
   const { user } = useAuth();
+  const { updateBalance } = useWallet();
   const toast = useToast();
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -83,6 +85,11 @@ export default function TicketPurchaseModal({
       };
 
       const result = await ticketsService.purchaseTickets(purchaseData);
+
+      // Update the wallet balance with the new balance from the response
+      if (result.wallet?.newBalance) {
+        updateBalance(result.wallet.newBalance);
+      }
 
       toast({
         title: 'Purchase Successful! 🎉',

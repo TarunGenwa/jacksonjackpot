@@ -37,10 +37,12 @@ import {
 } from '@chakra-ui/react';
 import { FaWallet, FaCreditCard, FaPlus, FaMinus, FaPoundSign } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
+import { useWallet } from '@/contexts/WalletContext';
 import { walletService, Wallet, Transaction } from '@/services/wallet';
 
 export default function WalletPage() {
   const { user } = useAuth();
+  const { refreshBalance } = useWallet();
   const { isOpen: isDepositOpen, onOpen: onDepositOpen, onClose: onDepositClose } = useDisclosure();
   const { isOpen: isWithdrawOpen, onOpen: onWithdrawOpen, onClose: onWithdrawClose } = useDisclosure();
   const toast = useToast();
@@ -65,6 +67,8 @@ export default function WalletPage() {
       setIsLoadingWallet(true);
       const wallet = await walletService.getWallet();
       setWalletData(wallet);
+      // Also refresh the global wallet balance
+      await refreshBalance();
     } catch (error) {
       console.error('Failed to fetch wallet:', error);
       toast({

@@ -33,33 +33,13 @@ import {
 import { HamburgerIcon } from '@chakra-ui/icons';
 import { FaUser, FaTicketAlt, FaWallet, FaHistory, FaSignOutAlt, FaPoundSign, FaHeart, FaQuestionCircle } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
-import { walletService } from '@/services/wallet';
+import { useWallet } from '@/contexts/WalletContext';
 
 export default function Header() {
   const { user, logout } = useAuth();
+  const { balance: walletBalance, isLoading: walletLoading } = useWallet();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const isMobile = useBreakpointValue({ base: true, lg: false });
-  const [walletBalance, setWalletBalance] = useState<string | null>(null);
-  const [walletLoading, setWalletLoading] = useState(false);
-
-  useEffect(() => {
-    const fetchWalletBalance = async () => {
-      if (!user) return;
-      
-      try {
-        setWalletLoading(true);
-        const balanceData = await walletService.getBalance();
-        setWalletBalance(balanceData.balance);
-      } catch (error) {
-        console.error('Failed to fetch wallet balance:', error);
-        setWalletBalance('0.00');
-      } finally {
-        setWalletLoading(false);
-      }
-    };
-
-    fetchWalletBalance();
-  }, [user]);
 
   const getUserDisplayName = () => {
     if (user?.firstName && user?.lastName) {

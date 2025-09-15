@@ -86,7 +86,7 @@ export class TicketService {
         }
 
         // 3. Update wallet balance
-        await tx.wallet.update({
+        const updatedWallet = await tx.wallet.update({
           where: { id: wallet.id },
           data: {
             balance: wallet.balance.sub(totalCost),
@@ -235,7 +235,7 @@ export class TicketService {
             status: ticket.status,
           })),
           wallet: {
-            newBalance: wallet.balance.sub(totalCost).toString(),
+            newBalance: updatedWallet.balance.toString(),
           },
         };
       },
