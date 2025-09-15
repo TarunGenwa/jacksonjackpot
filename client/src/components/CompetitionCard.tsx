@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Card,
@@ -28,6 +28,11 @@ interface CompetitionCardProps {
 export default function CompetitionCard({ competition }: CompetitionCardProps) {
   const router = useRouter();
   const [localCompetition, setLocalCompetition] = useState(competition);
+
+  // Update local state when prop changes
+  useEffect(() => {
+    setLocalCompetition(competition);
+  }, [competition]);
   const formatPrice = (price: string) => {
     return `£${parseFloat(price).toFixed(2)}`;
   };

@@ -23,8 +23,8 @@ export class WalletService {
 
   async getWalletByUserId(userId: string) {
     return this.prisma.wallet.findUnique({
-      where: { 
-        userId: userId 
+      where: {
+        userId: userId,
       },
       include: {
         transactions: {

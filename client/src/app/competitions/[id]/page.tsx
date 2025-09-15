@@ -51,56 +51,12 @@ export default function CompetitionPage() {
 
   useEffect(() => {
     const fetchCompetition = async () => {
+      if (!params.id || typeof params.id !== 'string') return;
+
       try {
         setLoading(true);
-        // In a real app, you would fetch the specific competition by ID
-        // For now, we'll simulate it with a mock competition
-        const mockCompetition: Competition = {
-          id: params.id as string,
-          title: 'Win a Dream Vacation to the Maldives',
-          description: 'Experience luxury at its finest with a 7-day all-inclusive vacation to the beautiful Maldives. This prize includes flights, accommodation at a 5-star resort, meals, and exciting water activities.',
-          imageUrl: 'https://images.unsplash.com/photo-1573843981267-be1999ff37cd?w=800&h=600&fit=crop',
-          ticketPrice: '5.00',
-          maxTickets: 1000,
-          ticketsSold: 750,
-          startDate: '2024-01-01T00:00:00Z',
-          endDate: '2024-03-01T00:00:00Z',
-          drawDate: '2024-03-15T12:00:00Z',
-          status: 'ACTIVE',
-          charity: {
-            id: '1',
-            name: 'Ocean Conservation Fund',
-            description: 'Protecting marine life worldwide',
-            logoUrl: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=100&h=100&fit=crop',
-            website: 'https://oceanconservation.org',
-            email: 'contact@oceanconservation.org',
-            taxId: 'REG123456',
-            isVerified: true,
-            bankAccountNumber: '',
-            bankSortCode: '',
-            createdAt: '2024-01-01T00:00:00Z',
-            updatedAt: '2024-01-01T00:00:00Z'
-          },
-          prizes: [
-            {
-              id: '1',
-              competitionId: params.id as string,
-              name: 'Maldives Vacation',
-              description: '7-day luxury vacation',
-              value: '8000.00',
-              position: 1,
-              quantity: 1,
-              createdAt: '2024-01-01T00:00:00Z',
-              updatedAt: '2024-01-01T00:00:00Z'
-            }
-          ],
-          createdAt: '2024-01-01T00:00:00Z',
-          updatedAt: '2024-01-01T00:00:00Z'
-        };
-
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setCompetition(mockCompetition);
+        const data = await competitionsService.getById(params.id);
+        setCompetition(data);
         setError(null);
       } catch (err) {
         console.error('Failed to fetch competition:', err);
@@ -152,13 +108,6 @@ export default function CompetitionPage() {
     return Math.round((competition.ticketsSold / competition.maxTickets) * 100);
   };
 
-  const getPrizePool = () => {
-    if (!competition) return '£0';
-    const ticketPrice = parseFloat(competition.ticketPrice);
-    const ticketsSold = competition.ticketsSold;
-    const prizePool = ticketPrice * ticketsSold;
-    return formatPrice(prizePool.toString());
-  };
 
   const handlePurchaseClick = () => {
     if (!user) {
@@ -320,9 +269,7 @@ export default function CompetitionPage() {
                         <Heading size="sm" color="blue.600">
                           {competition.charity.name}
                         </Heading>
-                        <Text fontSize="sm" color="gray.600">
-                          {competition.charity.description}
-                        </Text>
+                        {/* Description removed as it's not available in the API response */}
                         {competition.charity.isVerified && (
                           <Badge colorScheme="green" variant="subtle">
                             Verified Charity
@@ -501,8 +448,17 @@ export default function CompetitionPage() {
           isOpen={isOpen}
           onClose={onClose}
           competition={competition}
-          onPurchaseSuccess={() => {
+          onPurchaseSuccess={async () => {
             console.log('Purchase successful');
+            // Refresh competition data to show updated ticket count
+            if (params.id && typeof params.id === 'string') {
+              try {
+                const data = await competitionsService.getById(params.id);
+                setCompetition(data);
+              } catch (err) {
+                console.error('Failed to refresh competition:', err);
+              }
+            }
             onClose();
           }}
         />

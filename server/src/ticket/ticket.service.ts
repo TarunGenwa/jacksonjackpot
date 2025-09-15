@@ -19,198 +19,231 @@ export class TicketService {
     // Increase timeout to 20 seconds for complex ticket purchase operations
     return this.prisma.$transaction(
       async (tx) => {
-      // 1. Get competition details and validate
-      const competition = await tx.competition.findUnique({
-        where: { id: competitionId },
-        select: {
-          id: true,
-          title: true,
-          ticketPrice: true,
-          maxTickets: true,
-          ticketsSold: true,
-          status: true,
-          startDate: true,
-          endDate: true,
-          isActive: true,
-        },
-      });
-
-      if (!competition) {
-        throw new NotFoundException('Competition not found');
-      }
-
-      if (!competition.isActive || competition.status !== 'ACTIVE') {
-        throw new BadRequestException(
-          'Competition is not available for ticket purchases',
-        );
-      }
-
-      // Check if competition has started and not ended
-      const now = new Date();
-      if (now < competition.startDate) {
-        throw new BadRequestException('Competition has not started yet');
-      }
-
-      if (now > competition.endDate) {
-        throw new BadRequestException('Competition has ended');
-      }
-
-      // Check if enough tickets are available
-      const availableTickets = competition.maxTickets - competition.ticketsSold;
-      if (quantity > availableTickets) {
-        throw new BadRequestException(
-          `Only ${availableTickets} tickets available`,
-        );
-      }
-
-      // 2. Get user wallet and validate balance
-      const wallet = await tx.wallet.findUnique({
-        where: { userId },
-      });
-
-      if (!wallet) {
-        throw new NotFoundException('Wallet not found');
-      }
-
-      if (wallet.isLocked) {
-        throw new ForbiddenException('Wallet is locked');
-      }
-
-      const totalCost = competition.ticketPrice.mul(quantity);
-
-      if (wallet.balance.lt(totalCost)) {
-        throw new BadRequestException(
-          `Insufficient balance. Required: £${totalCost.toString()}, Available: £${wallet.balance.toString()}`,
-        );
-      }
-
-      // 3. Update wallet balance
-      await tx.wallet.update({
-        where: { id: wallet.id },
-        data: {
-          balance: wallet.balance.sub(totalCost),
-          updatedAt: new Date(),
-        },
-      });
-
-      // 4. Create transaction record
-      const transaction = await tx.transaction.create({
-        data: {
-          walletId: wallet.id,
-          userId: userId,
-          type: 'TICKET_PURCHASE',
-          amount: totalCost.neg(), // Negative for deduction
-          currency: wallet.currency,
-          status: 'COMPLETED',
-          description: `Purchased ${quantity} ticket(s) for ${competition.title}`,
-          referenceId: `TKT-${Date.now()}-${userId.slice(-6)}`,
-          metadata: {
-            competitionId,
-            quantity,
-            unitPrice: competition.ticketPrice.toString(),
-            paymentMethod: paymentMethod || 'WALLET',
+        // 1. Get competition details and validate
+        const competition = await tx.competition.findUnique({
+          where: { id: competitionId },
+          select: {
+            id: true,
+            title: true,
+            ticketPrice: true,
+            maxTickets: true,
+            ticketsSold: true,
+            status: true,
+            startDate: true,
+            endDate: true,
+            isActive: true,
           },
-        },
-      });
+        });
 
-      // 5. Generate ticket numbers and create tickets
-      const tickets: Array<{
-        id: string;
-        ticketNumber: string;
-        competition: { title: string; drawDate: Date };
-        purchasePrice: any;
-        status: string;
-      }> = [];
-      const ticketNumbers = await this.generateTicketNumbers(
-        competitionId,
-        quantity,
-        tx,
-      );
+        if (!competition) {
+          throw new NotFoundException('Competition not found');
+        }
 
-      // Create all tickets in batch for better performance
-      const ticketData = ticketNumbers.map(ticketNumber => ({
-        ticketNumber,
-        competitionId,
-        userId: userId,
-        purchasePrice: competition.ticketPrice,
-        status: 'ACTIVE' as const,
-      }));
+        if (!competition.isActive || competition.status !== 'ACTIVE') {
+          throw new BadRequestException(
+            'Competition is not available for ticket purchases',
+          );
+        }
 
-      await tx.ticket.createMany({
-        data: ticketData,
-      });
+        // Check if competition has started and not ended
+        const now = new Date();
+        if (now < competition.startDate) {
+          throw new BadRequestException('Competition has not started yet');
+        }
 
-      // Fetch created tickets with competition details
-      const createdTickets = await tx.ticket.findMany({
-        where: {
-          ticketNumber: { in: ticketNumbers },
-          userId: userId,
-        },
-        include: {
-          competition: {
-            select: {
-              id: true,
-              title: true,
-              drawDate: true,
+        if (now > competition.endDate) {
+          throw new BadRequestException('Competition has ended');
+        }
+
+        // Check if enough tickets are available
+        const availableTickets =
+          competition.maxTickets - competition.ticketsSold;
+        if (quantity > availableTickets) {
+          throw new BadRequestException(
+            `Only ${availableTickets} tickets available`,
+          );
+        }
+
+        // 2. Get user wallet and validate balance
+        const wallet = await tx.wallet.findUnique({
+          where: { userId },
+        });
+
+        if (!wallet) {
+          throw new NotFoundException('Wallet not found');
+        }
+
+        if (wallet.isLocked) {
+          throw new ForbiddenException('Wallet is locked');
+        }
+
+        const totalCost = competition.ticketPrice.mul(quantity);
+
+        if (wallet.balance.lt(totalCost)) {
+          throw new BadRequestException(
+            `Insufficient balance. Required: £${totalCost.toString()}, Available: £${wallet.balance.toString()}`,
+          );
+        }
+
+        // 3. Update wallet balance
+        await tx.wallet.update({
+          where: { id: wallet.id },
+          data: {
+            balance: wallet.balance.sub(totalCost),
+            updatedAt: new Date(),
+          },
+        });
+
+        // 4. Create transaction record
+        const transaction = await tx.transaction.create({
+          data: {
+            walletId: wallet.id,
+            userId: userId,
+            type: 'TICKET_PURCHASE',
+            amount: totalCost.neg(), // Negative for deduction
+            currency: wallet.currency,
+            status: 'COMPLETED',
+            description: `Purchased ${quantity} ticket(s) for ${competition.title}`,
+            referenceId: `TKT-${Date.now()}-${userId.slice(-6)}`,
+            metadata: {
+              competitionId,
+              quantity,
+              unitPrice: competition.ticketPrice.toString(),
+              paymentMethod: paymentMethod || 'WALLET',
             },
           },
-        },
-      });
-      
-      tickets.push(...createdTickets);
+        });
 
-      // 6. Update competition tickets sold
-      await tx.competition.update({
-        where: { id: competitionId },
-        data: {
-          ticketsSold: {
-            increment: quantity,
+        // 5. Generate ticket numbers and create tickets
+        const tickets: Array<{
+          id: string;
+          ticketNumber: string;
+          competition: { title: string; drawDate: Date };
+          purchasePrice: any;
+          status: string;
+        }> = [];
+
+        // Try to create tickets with retry logic for unique constraint
+        let ticketNumbers: string[] = [];
+        let retryCount = 0;
+        const maxRetries = 3;
+
+        while (retryCount < maxRetries) {
+          try {
+            ticketNumbers = this.generateTicketNumbers(
+              competitionId,
+              quantity,
+            );
+
+            // Create all tickets in batch for better performance
+            const ticketData = ticketNumbers.map((ticketNumber) => ({
+              ticketNumber,
+              competitionId,
+              userId: userId,
+              purchasePrice: competition.ticketPrice,
+              status: 'ACTIVE' as const,
+            }));
+
+            await tx.ticket.createMany({
+              data: ticketData,
+            });
+
+            // If successful, break out of retry loop
+            break;
+          } catch (error) {
+            // If it's a unique constraint error and we haven't exceeded retries, try again
+            const isPrismaUniqueError =
+              error &&
+              typeof error === 'object' &&
+              'code' in error &&
+              error.code === 'P2002';
+
+            if (isPrismaUniqueError && retryCount < maxRetries - 1) {
+              retryCount++;
+              console.warn(
+                `Ticket number collision detected, retrying (${retryCount}/${maxRetries})...`,
+              );
+              // Add a small delay before retry
+              await new Promise((resolve) => setTimeout(resolve, 100));
+            } else {
+              // If it's a different error or we've exceeded retries, throw it
+              throw error;
+            }
+          }
+        }
+
+        // Fetch created tickets with competition details
+        const createdTickets = await tx.ticket.findMany({
+          where: {
+            ticketNumber: { in: ticketNumbers },
+            userId: userId,
           },
-          updatedAt: new Date(),
-        },
-      });
+          include: {
+            competition: {
+              select: {
+                id: true,
+                title: true,
+                drawDate: true,
+              },
+            },
+          },
+        });
 
-      // 7. Check if competition should be marked as SOLD_OUT
-      const updatedCompetition = await tx.competition.findUnique({
-        where: { id: competitionId },
-        select: { ticketsSold: true, maxTickets: true },
-      });
+        tickets.push(...createdTickets);
 
-      if (
-        updatedCompetition &&
-        updatedCompetition.ticketsSold >= updatedCompetition.maxTickets
-      ) {
+        // 6. Update competition tickets sold
         await tx.competition.update({
           where: { id: competitionId },
-          data: { status: 'SOLD_OUT' },
+          data: {
+            ticketsSold: {
+              increment: quantity,
+            },
+            updatedAt: new Date(),
+          },
         });
-      }
 
-      return {
-        success: true,
-        transaction: {
-          id: transaction.id,
-          reference: transaction.referenceId,
-          amount: totalCost.toString(),
-          status: transaction.status,
-        },
-        tickets: tickets.map((ticket) => ({
-          id: ticket.id,
-          ticketNumber: ticket.ticketNumber,
-          competitionTitle: ticket.competition.title,
-          drawDate: ticket.competition.drawDate,
-          purchasePrice: ticket.purchasePrice.toString(),
-          status: ticket.status,
-        })),
-        wallet: {
-          newBalance: wallet.balance.sub(totalCost).toString(),
-        },
-      };
-    },
-    {
-      maxWait: 20000, // Maximum time to wait for a transaction slot (20 seconds)
-      timeout: 20000, // Maximum time the transaction can run (20 seconds)
-    });
+        // 7. Check if competition should be marked as SOLD_OUT
+        const updatedCompetition = await tx.competition.findUnique({
+          where: { id: competitionId },
+          select: { ticketsSold: true, maxTickets: true },
+        });
+
+        if (
+          updatedCompetition &&
+          updatedCompetition.ticketsSold >= updatedCompetition.maxTickets
+        ) {
+          await tx.competition.update({
+            where: { id: competitionId },
+            data: { status: 'SOLD_OUT' },
+          });
+        }
+
+        return {
+          success: true,
+          transaction: {
+            id: transaction.id,
+            reference: transaction.referenceId,
+            amount: totalCost.toString(),
+            status: transaction.status,
+          },
+          tickets: tickets.map((ticket) => ({
+            id: ticket.id,
+            ticketNumber: ticket.ticketNumber,
+            competitionTitle: ticket.competition.title,
+            drawDate: ticket.competition.drawDate,
+            purchasePrice: ticket.purchasePrice.toString(),
+            status: ticket.status,
+          })),
+          wallet: {
+            newBalance: wallet.balance.sub(totalCost).toString(),
+          },
+        };
+      },
+      {
+        maxWait: 20000, // Maximum time to wait for a transaction slot (20 seconds)
+        timeout: 20000, // Maximum time the transaction can run (20 seconds)
+      },
+    );
   }
 
   async getUserTickets(
@@ -275,30 +308,26 @@ export class TicketService {
     return ticket;
   }
 
-  private async generateTicketNumbers(
+  private generateTicketNumbers(
     competitionId: string,
     quantity: number,
-    tx: Prisma.TransactionClient,
-  ): Promise<string[]> {
+  ): string[] {
     const ticketNumbers: string[] = [];
-    const year = new Date().getFullYear();
 
-    // Get the last ticket number for this competition
-    const lastTicket = await tx.ticket.findFirst({
-      where: { competitionId },
-      orderBy: { ticketNumber: 'desc' },
-    });
+    // Include competition ID in ticket number for uniqueness
+    // Use timestamp and random component to ensure uniqueness even in concurrent purchases
+    const timestamp = Date.now();
+    const competitionPrefix = competitionId.slice(-6).toUpperCase();
 
-    let lastNumber = 0;
-    if (lastTicket) {
-      const match = lastTicket.ticketNumber.match(/(\d+)$/);
-      lastNumber = match ? parseInt(match[1], 10) : 0;
-    }
-
-    // Generate sequential ticket numbers
-    for (let i = 1; i <= quantity; i++) {
-      const nextNumber = String(lastNumber + i).padStart(6, '0');
-      ticketNumbers.push(`TKT-${year}-${nextNumber}`);
+    for (let i = 0; i < quantity; i++) {
+      // Generate a unique ticket number with competition prefix, timestamp, and sequence
+      const randomComponent = Math.random()
+        .toString(36)
+        .substring(2, 6)
+        .toUpperCase();
+      const sequence = String(i + 1).padStart(3, '0');
+      const ticketNumber = `TKT-${competitionPrefix}-${timestamp}-${randomComponent}-${sequence}`;
+      ticketNumbers.push(ticketNumber);
     }
 
     return ticketNumbers;
