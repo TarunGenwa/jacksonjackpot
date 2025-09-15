@@ -97,7 +97,7 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
   return (
     <Card
       w="full"
-      h="180px"
+      h="220px"
       shadow="md"
       _hover={{ shadow: "lg", transform: "translateY(-1px)" }}
       transition="all 0.2s"
@@ -109,7 +109,7 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
       <CardBody p={0} h="full">
         <HStack spacing={0} h="full">
           {/* Left side - Image */}
-          <Box position="relative" w="120px" h="full" flexShrink={0}>
+          <Box position="relative" w="140px" h="full" flexShrink={0}>
             {localCompetition.imageUrl ? (
               <Image
                 src={localCompetition.imageUrl}
@@ -145,46 +145,48 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
           </Box>
 
           {/* Right side - Content */}
-          <VStack flex={1} p={3} spacing={2} align="stretch" h="full">
+          <VStack flex={1} p={4} spacing={3} align="stretch" h="full">
             {/* Title and Price */}
-            <Flex justify="space-between" align="flex-start">
+            <Flex justify="space-between" align="flex-start" mb={1}>
               <Heading
                 as="h3"
-                size="sm"
+                size="md"
                 noOfLines={2}
                 color="gray.800"
                 flex={1}
-                mr={2}
-                lineHeight="1.3"
+                mr={3}
+                lineHeight="1.4"
+                fontSize="16px"
               >
                 {localCompetition.title}
               </Heading>
               <Badge
                 colorScheme="green"
                 variant="solid"
-                fontSize="xs"
-                px={2}
+                fontSize="sm"
+                px={3}
                 py={1}
                 borderRadius="md"
                 flexShrink={0}
+                fontWeight="bold"
               >
                 {formatPrice(localCompetition.ticketPrice)}
               </Badge>
             </Flex>
 
             {/* Key Info Row */}
-            <HStack spacing={4} fontSize="xs" color="gray.600">
-              <HStack spacing={1}>
-                <Icon as={FaClock} />
-                <Text fontWeight="medium">{getRemainingTime()}</Text>
+            <HStack spacing={3} fontSize="sm" color="gray.600" flexWrap="wrap">
+              <HStack spacing={1} minW="fit-content">
+                <Icon as={FaClock} boxSize={3} />
+                <Text fontWeight="medium" whiteSpace="nowrap">{getRemainingTime()}</Text>
               </HStack>
-              <HStack spacing={1}>
-                <Icon as={FaTicketAlt} />
-                <Text>{localCompetition.ticketsSold}/{localCompetition.maxTickets}</Text>
+              <HStack spacing={1} minW="fit-content">
+                <Icon as={FaTicketAlt} boxSize={3} />
+                <Text whiteSpace="nowrap">{localCompetition.ticketsSold}/{localCompetition.maxTickets}</Text>
               </HStack>
-              <HStack spacing={1}>
-                <Icon as={FaTrophy} />
-                <Text fontWeight="medium" color="green.600">{getPrizePool()}</Text>
+              <HStack spacing={1} minW="fit-content">
+                <Icon as={FaTrophy} boxSize={3} />
+                <Text fontWeight="medium" color="green.600" whiteSpace="nowrap">{getPrizePool()}</Text>
               </HStack>
             </HStack>
 
@@ -193,24 +195,25 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
               <Progress
                 value={getProgressPercentage()}
                 colorScheme="blue"
-                size="sm"
-                borderRadius="sm"
+                size="md"
+                borderRadius="md"
                 bg="gray.100"
               />
-              <Text fontSize="xs" color="gray.500" mt={1}>
+              <Text fontSize="xs" color="gray.500" mt={2} textAlign="center">
                 {getProgressPercentage()}% sold
               </Text>
             </Box>
 
             {/* Action Button */}
             <Button
-              size="sm"
+              size="md"
               colorScheme="blue"
               variant="solid"
               w="full"
               onClick={handleViewDetailsClick}
-              fontSize="xs"
-              h="28px"
+              fontSize="sm"
+              h="36px"
+              fontWeight="semibold"
             >
               Buy Tickets
             </Button>
