@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import {
@@ -13,12 +12,10 @@ import {
   Progress,
   VStack,
   HStack,
-  Avatar,
-  Alert,
-  AlertIcon,
   Flex,
-  Spacer,
+  Icon,
 } from '@chakra-ui/react';
+import { FaClock, FaTicketAlt, FaTrophy } from 'react-icons/fa';
 import { Competition } from '@/types/api';
 
 interface CompetitionCardProps {
@@ -99,113 +96,127 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
 
   return (
     <Card
-      maxW="sm"
-      shadow="xl"
-      _hover={{ shadow: "2xl", transform: "translateY(-2px)" }}
-      transition="all 0.3s"
+      w="full"
+      h="180px"
+      shadow="md"
+      _hover={{ shadow: "lg", transform: "translateY(-1px)" }}
+      transition="all 0.2s"
       overflow="hidden"
       cursor="pointer"
       onClick={handleCardClick}
+      bg="white"
     >
-      {/* Competition Image */}
-      <Box position="relative" h="200px">
-        {localCompetition.imageUrl ? (
-          <Image
-            src={localCompetition.imageUrl}
-            alt={localCompetition.title}
-            fill
-            style={{ objectFit: 'cover' }}
-          />
-        ) : (
-          <Box 
-            w="full" 
-            h="full" 
-            bgGradient="linear(to-br, blue.500, purple.600)" 
-            display="flex" 
-            alignItems="center" 
-            justifyContent="center"
-          >
-            <Text color="white" fontSize="xl" fontWeight="semibold">
-              No Image
-            </Text>
-          </Box>
-        )}
-        
-        {/* Time Remaining Badge */}
-        <Badge
-          position="absolute"
-          top={3}
-          left={3}
-          colorScheme="orange"
-          variant="solid"
-          borderRadius="md"
-        >
-          {getRemainingTime()}
-        </Badge>
-        
-        {/* Ticket Price Badge */}
-        <Badge
-          position="absolute"
-          top={3}
-          right={3}
-          colorScheme="green"
-          variant="solid"
-          borderRadius="md"
-          fontSize="sm"
-          px={3}
-          py={1}
-        >
-          {formatPrice(localCompetition.ticketPrice)}
-        </Badge>
-      </Box>
+      <CardBody p={0} h="full">
+        <HStack spacing={0} h="full">
+          {/* Left side - Image */}
+          <Box position="relative" w="120px" h="full" flexShrink={0}>
+            {localCompetition.imageUrl ? (
+              <Image
+                src={localCompetition.imageUrl}
+                alt={localCompetition.title}
+                fill
+                style={{ objectFit: 'cover' }}
+              />
+            ) : (
+              <Box
+                w="full"
+                h="full"
+                bgGradient="linear(to-br, blue.500, purple.600)"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Icon as={FaTrophy} color="white" boxSize={6} />
+              </Box>
+            )}
 
-      <CardBody p={6}>
-        <VStack spacing={4} align="stretch">
-
-          {/* Title */}
-          <Heading 
-            as="h3" 
-            size="md" 
-            noOfLines={2}
-            color="gray.800"
-          >
-            {localCompetition.title}
-          </Heading>
-
-
-          {/* Progress Bar */}
-          <Box>
-            <Progress
-              value={getProgressPercentage()}
-              colorScheme="blue"
-              size="lg"
-              borderRadius="md"
-              bg="gray.100"
-            />
-            <Text
-              textAlign="center"
-              fontSize="md"
-              color="green.600"
-              mt={2}
-              fontWeight="bold"
+            {/* Status Badge */}
+            <Badge
+              position="absolute"
+              top={2}
+              left={2}
+              colorScheme={getStatusColor(localCompetition.status)}
+              variant="solid"
+              fontSize="xs"
+              borderRadius="sm"
             >
-              {getPrizePool()} to win
-            </Text>
+              {localCompetition.status}
+            </Badge>
           </Box>
 
-          {/* Action Button */}
-          <Button
-            variant="solid"
-            colorScheme="blue"
-            size="md"
-            w="full"
-            onClick={handleViewDetailsClick}
-          >
-            View Details
-          </Button>
-        </VStack>
-      </CardBody>
+          {/* Right side - Content */}
+          <VStack flex={1} p={3} spacing={2} align="stretch" h="full">
+            {/* Title and Price */}
+            <Flex justify="space-between" align="flex-start">
+              <Heading
+                as="h3"
+                size="sm"
+                noOfLines={2}
+                color="gray.800"
+                flex={1}
+                mr={2}
+                lineHeight="1.3"
+              >
+                {localCompetition.title}
+              </Heading>
+              <Badge
+                colorScheme="green"
+                variant="solid"
+                fontSize="xs"
+                px={2}
+                py={1}
+                borderRadius="md"
+                flexShrink={0}
+              >
+                {formatPrice(localCompetition.ticketPrice)}
+              </Badge>
+            </Flex>
 
+            {/* Key Info Row */}
+            <HStack spacing={4} fontSize="xs" color="gray.600">
+              <HStack spacing={1}>
+                <Icon as={FaClock} />
+                <Text fontWeight="medium">{getRemainingTime()}</Text>
+              </HStack>
+              <HStack spacing={1}>
+                <Icon as={FaTicketAlt} />
+                <Text>{localCompetition.ticketsSold}/{localCompetition.maxTickets}</Text>
+              </HStack>
+              <HStack spacing={1}>
+                <Icon as={FaTrophy} />
+                <Text fontWeight="medium" color="green.600">{getPrizePool()}</Text>
+              </HStack>
+            </HStack>
+
+            {/* Progress Bar */}
+            <Box>
+              <Progress
+                value={getProgressPercentage()}
+                colorScheme="blue"
+                size="sm"
+                borderRadius="sm"
+                bg="gray.100"
+              />
+              <Text fontSize="xs" color="gray.500" mt={1}>
+                {getProgressPercentage()}% sold
+              </Text>
+            </Box>
+
+            {/* Action Button */}
+            <Button
+              size="sm"
+              colorScheme="blue"
+              variant="solid"
+              w="full"
+              onClick={handleViewDetailsClick}
+              fontSize="xs"
+              h="28px"
+            >
+              Buy Tickets
+            </Button>
+          </VStack>
+        </HStack>
+      </CardBody>
     </Card>
   );
 }
