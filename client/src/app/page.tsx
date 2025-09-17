@@ -127,7 +127,13 @@ export default function Home() {
               </Text>
               <HStack spacing={4} pt={4}>
                 <Link href="/competitions">
-                  <Button colorScheme="green" size="lg">
+                  <Button
+                    size="lg"
+                    bg="green.400"
+                    color="gray.900"
+                    _hover={{ bg: "green.300" }}
+                    fontWeight="bold"
+                  >
                     Browse Competitions
                   </Button>
                 </Link>

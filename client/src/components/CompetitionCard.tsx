@@ -298,10 +298,10 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
             {/* Action Button */}
             <Button
               size="md"
-              bgGradient="linear(to-r, purple.500, blue.500)"
-              color="white"
+              bg="green.400"
+              color="gray.900"
               _hover={{
-                bgGradient: "linear(to-r, purple.400, blue.400)",
+                bg: "green.300",
                 transform: "translateY(-1px)"
               }}
               variant="solid"
