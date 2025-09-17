@@ -149,9 +149,7 @@ export default function Header() {
                         color="white"
                         border="2px"
                         borderColor="purple.400"
-                      >
-                        {getUserInitials()}
-                      </Avatar>
+                      />
                     </MenuButton>
                     <MenuList minW="250px" p={2} bg="gray.800" borderColor="gray.700">
                       <Box px={3} py={2} borderBottom="1px" borderColor="gray.600" mb={2}>

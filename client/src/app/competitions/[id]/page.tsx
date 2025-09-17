@@ -193,6 +193,30 @@ export default function CompetitionPage() {
     <Box minH="100vh" bg="gray.900">
       <Container maxW="container.xl" py={6}>
         <VStack spacing={6} align="stretch">
+          {/* Back to Competitions Button */}
+          <Button
+            leftIcon={<ArrowBackIcon boxSize={6} />}
+            onClick={() => router.push('/competitions')}
+            variant="ghost"
+            color="gray.300"
+            borderColor="purple.700"
+            border="1px"
+            _hover={{
+              bg: "purple.900",
+              borderColor: "purple.600",
+              color: "white"
+            }}
+            size="lg"
+            w="full"
+            justifyContent="center"
+            px={4}
+            h="50px"
+            fontSize="md"
+            fontWeight="semibold"
+          >
+            Back to All Competitions
+          </Button>
+
           {/* Main Content - Three Sections */}
           <VStack spacing={6} align="stretch">
             {/* Section 1: Image with Charity Info */}
