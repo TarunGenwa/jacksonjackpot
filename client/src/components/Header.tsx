@@ -177,25 +177,25 @@ export default function Header() {
                       </Box>
                     
                     <Link href="/profile">
-                      <MenuItem icon={<FaUser />} _hover={{ bg: "gray.700" }} color="gray.200">Profile Settings</MenuItem>
+                      <MenuItem icon={<FaUser />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">Profile Settings</MenuItem>
                     </Link>
                     <Link href="/my-tickets">
-                      <MenuItem icon={<FaTicketAlt />} _hover={{ bg: "gray.700" }} color="gray.200">My Tickets</MenuItem>
+                      <MenuItem icon={<FaTicketAlt />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">My Tickets</MenuItem>
                     </Link>
                     <Link href="/wallet">
-                      <MenuItem icon={<FaWallet />} _hover={{ bg: "gray.700" }} color="gray.200">Wallet</MenuItem>
+                      <MenuItem icon={<FaWallet />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">Wallet</MenuItem>
                     </Link>
                     <Link href="/transaction-history">
-                      <MenuItem icon={<FaHistory />} _hover={{ bg: "gray.700" }} color="gray.200">Transaction History</MenuItem>
+                      <MenuItem icon={<FaHistory />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">Transaction History</MenuItem>
                     </Link>
 
                     <MenuDivider borderColor="gray.600" />
 
                     <Link href="/charities">
-                      <MenuItem icon={<FaHeart />} _hover={{ bg: "gray.700" }} color="gray.200">Charities</MenuItem>
+                      <MenuItem icon={<FaHeart />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">Charities</MenuItem>
                     </Link>
                     <Link href="/how-it-works">
-                      <MenuItem icon={<FaQuestionCircle />} _hover={{ bg: "gray.700" }} color="gray.200">How It Works</MenuItem>
+                      <MenuItem icon={<FaQuestionCircle />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">How It Works</MenuItem>
                     </Link>
 
                     <MenuDivider borderColor="gray.600" />
@@ -203,6 +203,7 @@ export default function Header() {
                     <MenuItem
                       icon={<FaSignOutAlt />}
                       onClick={logout}
+                      bg="gray.800"
                       color="red.400"
                       _hover={{ bg: "gray.700" }}
                     >
@@ -284,34 +285,34 @@ export default function Header() {
                       </Box>
 
                       <Link href="/profile" onClick={onClose}>
-                        <Button variant="ghost" leftIcon={<FaUser />} w="full" justifyContent="flex-start">
+                        <Button variant="ghost" leftIcon={<FaUser />} w="full" justifyContent="flex-start" color="gray.200" _hover={{ bg: "gray.700" }}>
                           Profile Settings
                         </Button>
                       </Link>
                       <Link href="/my-tickets" onClick={onClose}>
-                        <Button variant="ghost" leftIcon={<FaTicketAlt />} w="full" justifyContent="flex-start">
+                        <Button variant="ghost" leftIcon={<FaTicketAlt />} w="full" justifyContent="flex-start" color="gray.200" _hover={{ bg: "gray.700" }}>
                           My Tickets
                         </Button>
                       </Link>
                       <Link href="/wallet" onClick={onClose}>
-                        <Button variant="ghost" leftIcon={<FaWallet />} w="full" justifyContent="flex-start">
+                        <Button variant="ghost" leftIcon={<FaWallet />} w="full" justifyContent="flex-start" color="gray.200" _hover={{ bg: "gray.700" }}>
                           Wallet
                         </Button>
                       </Link>
                       <Link href="/transaction-history" onClick={onClose}>
-                        <Button variant="ghost" leftIcon={<FaHistory />} w="full" justifyContent="flex-start">
+                        <Button variant="ghost" leftIcon={<FaHistory />} w="full" justifyContent="flex-start" color="gray.200" _hover={{ bg: "gray.700" }}>
                           Transaction History
                         </Button>
                       </Link>
 
                       <Box borderTop="1px" borderColor="gray.200" pt={2} mt={2}>
                         <Link href="/charities" onClick={onClose}>
-                          <Button variant="ghost" leftIcon={<FaHeart />} w="full" justifyContent="flex-start">
+                          <Button variant="ghost" leftIcon={<FaHeart />} w="full" justifyContent="flex-start" color="gray.200" _hover={{ bg: "gray.700" }}>
                             Charities
                           </Button>
                         </Link>
                         <Link href="/how-it-works" onClick={onClose}>
-                          <Button variant="ghost" leftIcon={<FaQuestionCircle />} w="full" justifyContent="flex-start">
+                          <Button variant="ghost" leftIcon={<FaQuestionCircle />} w="full" justifyContent="flex-start" color="gray.200" _hover={{ bg: "gray.700" }}>
                             How It Works
                           </Button>
                         </Link>
@@ -322,7 +323,8 @@ export default function Header() {
                         leftIcon={<FaSignOutAlt />}
                         w="full"
                         justifyContent="flex-start"
-                        color="red.500"
+                        color="red.400"
+                        _hover={{ bg: "gray.700" }}
                         onClick={() => {
                           logout();
                           onClose();
@@ -341,12 +343,19 @@ export default function Header() {
                   <Box borderTop="1px" borderColor="gray.200" pt={4} mt={4}>
                     <VStack spacing={2}>
                       <Link href="/login" onClick={onClose}>
-                        <Button variant="ghost" w="full">
+                        <Button variant="ghost" w="full" color="gray.200" _hover={{ bg: "gray.700" }}>
                           Log In
                         </Button>
                       </Link>
                       <Link href="/signup" onClick={onClose}>
-                        <Button colorScheme="blue" w="full">
+                        <Button
+                          w="full"
+                          bgGradient="linear(to-r, purple.500, blue.500)"
+                          color="white"
+                          _hover={{
+                            bgGradient: "linear(to-r, purple.400, blue.400)"
+                          }}
+                        >
                           Sign Up
                         </Button>
                       </Link>

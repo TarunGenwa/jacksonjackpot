@@ -29,11 +29,8 @@ import {
   StatNumber,
   StatHelpText,
   useDisclosure,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink
 } from '@chakra-ui/react';
-import { ChevronRightIcon, ArrowBackIcon } from '@chakra-ui/icons';
+import { ArrowBackIcon } from '@chakra-ui/icons';
 import { FaTrophy, FaUsers, FaClock, FaTicketAlt, FaHeart } from 'react-icons/fa';
 import { Competition } from '@/types/api';
 import { competitionsService } from '@/services/competitions';
@@ -152,12 +149,12 @@ export default function CompetitionPage() {
 
   if (loading) {
     return (
-      <Box minH="100vh" bg="gray.50">
+      <Box minH="100vh" bg="gray.900">
         <Container maxW="container.xl" py={8}>
           <Center minH="50vh">
             <VStack spacing={4}>
-              <Spinner size="xl" color="blue.500" />
-              <Text color="gray.600">Loading competition...</Text>
+              <Spinner size="xl" color="blue.400" />
+              <Text color="gray.300">Loading competition...</Text>
             </VStack>
           </Center>
         </Container>
@@ -167,11 +164,11 @@ export default function CompetitionPage() {
 
   if (error || !competition) {
     return (
-      <Box minH="100vh" bg="gray.50">
+      <Box minH="100vh" bg="gray.900">
         <Container maxW="container.xl" py={8}>
           <Center minH="50vh">
             <VStack spacing={4}>
-              <Alert status="error" maxW="md" borderRadius="md">
+              <Alert status="error" maxW="md" borderRadius="md" bg="gray.800" color="white">
                 <AlertIcon />
                 {error || 'Competition not found'}
               </Alert>
@@ -190,24 +187,18 @@ export default function CompetitionPage() {
   }
 
   return (
-    <Box minH="100vh" bg="gray.50">
+    <Box minH="100vh" bg="gray.900">
       <Container maxW="container.xl" py={6}>
         <VStack spacing={6} align="stretch">
-          {/* Breadcrumb */}
-          <Breadcrumb spacing="8px" separator={<ChevronRightIcon color="gray.500" />}>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/">Home</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/competitions">Competitions</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbItem isCurrentPage>
-              <BreadcrumbLink>{competition.title}</BreadcrumbLink>
-            </BreadcrumbItem>
-          </Breadcrumb>
-
           {/* Unified Main Content Panel */}
-          <Card shadow="lg" overflow="hidden">
+          <Card
+            shadow="2xl"
+            overflow="hidden"
+            bgGradient="linear(to-br, purple.900, blue.900)"
+            borderRadius="lg"
+            border="1px"
+            borderColor="purple.800"
+          >
             <CardBody p={4}>
               <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={4}>
                 {/* Left Column - Image and Charity */}
@@ -225,14 +216,12 @@ export default function CompetitionPage() {
                       <Box
                         w="full"
                         h="full"
-                        bgGradient="linear(to-br, blue.500, purple.600)"
+                        bgGradient="linear(to-br, purple.700, blue.700)"
                         display="flex"
                         alignItems="center"
                         justifyContent="center"
                       >
-                        <Text color="white" fontSize="xl" fontWeight="semibold">
-                          No Image
-                        </Text>
+                        <Icon as={FaTrophy} color="white" boxSize={10} />
                       </Box>
                     )}
                     {/* Status Badge */}
@@ -252,16 +241,18 @@ export default function CompetitionPage() {
                   </Box>
 
                   {/* Charity Info */}
-                  <Box bg="gray.50" p={3} borderRadius="md">
+                  <Box bg="blackAlpha.400" p={3} borderRadius="md" border="1px" borderColor="purple.700">
                     <HStack spacing={3}>
                       <Avatar
                         src={competition.charity.logoUrl}
                         name={competition.charity.name}
                         size="sm"
+                        border="2px"
+                        borderColor="purple.400"
                       />
                       <VStack align="start" spacing={0} flex={1}>
-                        <Text fontSize="sm" color="gray.600">Supporting</Text>
-                        <Text fontSize="sm" fontWeight="semibold" color="blue.600">
+                        <Text fontSize="sm" color="gray.400">Supporting</Text>
+                        <Text fontSize="sm" fontWeight="semibold" color="purple.300">
                           {competition.charity.name}
                         </Text>
                         {competition.charity.isVerified && (
@@ -278,49 +269,49 @@ export default function CompetitionPage() {
                 <VStack spacing={3} align="stretch">
                   {/* Title, Description, and Key Stats */}
                   <VStack spacing={2} align="stretch">
-                    <Heading as="h1" size="md" color="gray.800" lineHeight="1.2">
+                    <Heading as="h1" size="md" color="white" lineHeight="1.2">
                       {competition.title}
                     </Heading>
-                    <Text color="gray.600" lineHeight="1.5" fontSize="xs" noOfLines={2}>
+                    <Text color="gray.300" lineHeight="1.5" fontSize="xs" noOfLines={2}>
                       {competition.description}
                     </Text>
                   </VStack>
 
                   {/* Compact Stats Grid */}
                   <SimpleGrid columns={2} spacing={2}>
-                    <Box textAlign="center" bg="green.50" p={2} borderRadius="md">
+                    <Box textAlign="center" bg="blackAlpha.400" p={2} borderRadius="md" border="1px" borderColor="green.800">
                       <HStack justify="center" spacing={1}>
-                        <Icon as={FaTicketAlt} boxSize={3} color="green.600" />
-                        <Text fontSize="xs" color="gray.600">Price</Text>
+                        <Icon as={FaTicketAlt} boxSize={3} color="green.400" />
+                        <Text fontSize="xs" color="gray.400">Price</Text>
                       </HStack>
-                      <Text fontWeight="bold" color="green.600" fontSize="sm">
+                      <Text fontWeight="bold" color="green.400" fontSize="sm">
                         {formatPrice(competition.ticketPrice)}
                       </Text>
                     </Box>
-                    <Box textAlign="center" bg="purple.50" p={2} borderRadius="md">
+                    <Box textAlign="center" bg="blackAlpha.400" p={2} borderRadius="md" border="1px" borderColor="purple.800">
                       <HStack justify="center" spacing={1}>
-                        <Icon as={FaTrophy} boxSize={3} color="purple.600" />
-                        <Text fontSize="xs" color="gray.600">Prize</Text>
+                        <Icon as={FaTrophy} boxSize={3} color="purple.400" />
+                        <Text fontSize="xs" color="gray.400">Prize</Text>
                       </HStack>
-                      <Text fontWeight="bold" color="purple.600" fontSize="sm">
+                      <Text fontWeight="bold" color="purple.400" fontSize="sm">
                         £{competition.prizes[0]?.value || '0'}
                       </Text>
                     </Box>
-                    <Box textAlign="center" bg="blue.50" p={2} borderRadius="md">
+                    <Box textAlign="center" bg="blackAlpha.400" p={2} borderRadius="md" border="1px" borderColor="blue.800">
                       <HStack justify="center" spacing={1}>
-                        <Icon as={FaUsers} boxSize={3} color="blue.600" />
-                        <Text fontSize="xs" color="gray.600">Sold</Text>
+                        <Icon as={FaUsers} boxSize={3} color="blue.400" />
+                        <Text fontSize="xs" color="gray.400">Sold</Text>
                       </HStack>
-                      <Text fontWeight="bold" color="blue.600" fontSize="sm">
+                      <Text fontWeight="bold" color="blue.400" fontSize="sm">
                         {competition.ticketsSold}/{competition.maxTickets}
                       </Text>
                     </Box>
-                    <Box textAlign="center" bg="orange.50" p={2} borderRadius="md">
+                    <Box textAlign="center" bg="blackAlpha.400" p={2} borderRadius="md" border="1px" borderColor="orange.800">
                       <HStack justify="center" spacing={1}>
-                        <Icon as={FaClock} boxSize={3} color="orange.600" />
-                        <Text fontSize="xs" color="gray.600">Time</Text>
+                        <Icon as={FaClock} boxSize={3} color="orange.400" />
+                        <Text fontSize="xs" color="gray.400">Time</Text>
                       </HStack>
-                      <Text fontWeight="bold" color="orange.600" fontSize="sm">
+                      <Text fontWeight="bold" color="orange.400" fontSize="sm">
                         {getRemainingTime()}
                       </Text>
                     </Box>
@@ -329,67 +320,74 @@ export default function CompetitionPage() {
                   {/* Progress Bar */}
                   <Box>
                     <Flex w="full" justify="space-between" align="center" mb={1}>
-                      <Text fontWeight="medium" color="gray.700" fontSize="xs">
+                      <Text fontWeight="medium" color="gray.300" fontSize="xs">
                         Progress
                       </Text>
-                      <Text fontSize="xs" color="gray.600">
+                      <Text fontSize="xs" color="gray.400">
                         {getProgressPercentage()}% sold
                       </Text>
                     </Flex>
                     <Progress
                       value={getProgressPercentage()}
-                      colorScheme="blue"
+                      colorScheme="purple"
                       size="sm"
                       borderRadius="md"
                       w="full"
+                      bg="blackAlpha.400"
                     />
                     <Flex w="full" justify="space-between" align="center" mt={1}>
-                      <Text fontSize="xs" color="gray.600">
+                      <Text fontSize="xs" color="gray.400">
                         {competition.ticketsSold} sold
                       </Text>
-                      <Text fontSize="xs" color="gray.600">
+                      <Text fontSize="xs" color="gray.400">
                         {competition.maxTickets - competition.ticketsSold} left
                       </Text>
                     </Flex>
                   </Box>
 
                   {/* Purchase Section */}
-                  <Box bg="blue.50" p={3} borderRadius="md" border="1px" borderColor="blue.200">
+                  <Box bg="blackAlpha.400" p={3} borderRadius="md" border="1px" borderColor="purple.700">
                     <VStack spacing={2}>
-                      <Text textAlign="center" fontSize="sm" fontWeight="medium" color="gray.800">
+                      <Text textAlign="center" fontSize="sm" fontWeight="medium" color="white">
                         Ready to enter?
                       </Text>
                       <Button
-                        {...getButtonProps()}
                         size="md"
                         w="full"
                         onClick={handlePurchaseClick}
+                        bgGradient="linear(to-r, purple.500, blue.500)"
+                        color="white"
+                        _hover={{
+                          bgGradient: "linear(to-r, purple.400, blue.400)",
+                          transform: "translateY(-1px)"
+                        }}
+                        isDisabled={getButtonProps().isDisabled}
                       >
                         {getButtonText()}
                       </Button>
-                      <Text fontSize="xs" color="gray.600" textAlign="center">
+                      <Text fontSize="xs" color="gray.400" textAlign="center">
                         Supporting {competition.charity.name}
                       </Text>
                     </VStack>
                   </Box>
 
                   {/* Important Dates */}
-                  <Box bg="gray.50" p={3} borderRadius="md">
-                    <Text fontSize="xs" fontWeight="medium" color="gray.800" mb={2}>
+                  <Box bg="blackAlpha.400" p={3} borderRadius="md" border="1px" borderColor="gray.700">
+                    <Text fontSize="xs" fontWeight="medium" color="white" mb={2}>
                       Important Dates
                     </Text>
                     <VStack spacing={1}>
                       <HStack justify="space-between" w="full">
-                        <Text color="gray.600" fontSize="xs">Started:</Text>
-                        <Text fontWeight="medium" fontSize="xs">{formatDate(competition.startDate)}</Text>
+                        <Text color="gray.400" fontSize="xs">Started:</Text>
+                        <Text fontWeight="medium" fontSize="xs" color="gray.300">{formatDate(competition.startDate)}</Text>
                       </HStack>
                       <HStack justify="space-between" w="full">
-                        <Text color="gray.600" fontSize="xs">Sales End:</Text>
-                        <Text fontWeight="medium" fontSize="xs">{formatDate(competition.endDate)}</Text>
+                        <Text color="gray.400" fontSize="xs">Sales End:</Text>
+                        <Text fontWeight="medium" fontSize="xs" color="gray.300">{formatDate(competition.endDate)}</Text>
                       </HStack>
                       <HStack justify="space-between" w="full">
-                        <Text color="gray.600" fontSize="xs">Draw:</Text>
-                        <Text fontWeight="medium" color="orange.600" fontSize="xs">
+                        <Text color="gray.400" fontSize="xs">Draw:</Text>
+                        <Text fontWeight="medium" color="orange.400" fontSize="xs">
                           {formatDate(competition.drawDate)}
                         </Text>
                       </HStack>
