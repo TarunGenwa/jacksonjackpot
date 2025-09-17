@@ -31,7 +31,7 @@ import {
   Icon
 } from '@chakra-ui/react';
 import { HamburgerIcon } from '@chakra-ui/icons';
-import { FaUser, FaTicketAlt, FaWallet, FaHistory, FaSignOutAlt, FaPoundSign, FaHeart, FaQuestionCircle, FaCog } from 'react-icons/fa';
+import { FaUser, FaTicketAlt, FaWallet, FaHistory, FaSignOutAlt, FaPoundSign, FaHeart, FaQuestionCircle, FaCog, FaUsers, FaTrophy } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
 import { useWallet } from '@/contexts/WalletContext';
 
@@ -112,8 +112,8 @@ export default function Header() {
               {user ? (
                 /* Authenticated User Menu */
                 <HStack spacing={3}>
-                  {/* Wallet Balance */}
-                  {!isMobile && (
+                  {/* Wallet Balance - Only for non-admin users */}
+                  {!isMobile && user.role !== 'ADMIN' && (
                     <Link href="/wallet">
                       <Badge
                         bg="green.400"
@@ -159,51 +159,65 @@ export default function Header() {
                           <Badge colorScheme="blue" variant="solid" fontSize="xs">
                             {user.role}
                           </Badge>
-                          <Badge colorScheme="green" variant="solid" fontSize="xs">
-                            <HStack spacing={1}>
-                              <FaPoundSign size={8} />
-                              <Text>
-                                {walletLoading ? (
-                                  <Spinner size="xs" />
-                                ) : (
-                                  walletBalance ? formatBalance(walletBalance) : '£0.00'
-                                )}
-                              </Text>
-                            </HStack>
-                          </Badge>
+                          {user.role !== 'ADMIN' && (
+                            <Badge colorScheme="green" variant="solid" fontSize="xs">
+                              <HStack spacing={1}>
+                                <FaPoundSign size={8} />
+                                <Text>
+                                  {walletLoading ? (
+                                    <Spinner size="xs" />
+                                  ) : (
+                                    walletBalance ? formatBalance(walletBalance) : '£0.00'
+                                  )}
+                                </Text>
+                              </HStack>
+                            </Badge>
+                          )}
                         </HStack>
                       </Box>
                     
-                    <Link href="/profile">
-                      <MenuItem icon={<FaUser />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">Profile Settings</MenuItem>
-                    </Link>
-                    <Link href="/my-tickets">
-                      <MenuItem icon={<FaTicketAlt />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">My Tickets</MenuItem>
-                    </Link>
-                    <Link href="/wallet">
-                      <MenuItem icon={<FaWallet />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">Wallet</MenuItem>
-                    </Link>
-                    <Link href="/transaction-history">
-                      <MenuItem icon={<FaHistory />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">Transaction History</MenuItem>
-                    </Link>
-
-                    {user.role === 'ADMIN' && (
+                    {user.role === 'ADMIN' ? (
+                      /* Admin Menu Items */
                       <>
-                        <MenuDivider borderColor="gray.600" />
                         <Link href="/admin">
-                          <MenuItem icon={<FaCog />} bg="gray.800" _hover={{ bg: "gray.700" }} color="orange.300">Admin Panel</MenuItem>
+                          <MenuItem icon={<FaCog />} bg="gray.800" _hover={{ bg: "gray.700" }} color="orange.300">Dashboard</MenuItem>
+                        </Link>
+                        <Link href="/admin/users">
+                          <MenuItem icon={<FaUsers />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">Users</MenuItem>
+                        </Link>
+                        <Link href="/admin/competitions">
+                          <MenuItem icon={<FaTrophy />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">Competitions</MenuItem>
+                        </Link>
+                        <Link href="/admin/charities">
+                          <MenuItem icon={<FaHeart />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">Charities</MenuItem>
+                        </Link>
+                      </>
+                    ) : (
+                      /* Regular User Menu Items */
+                      <>
+                        <Link href="/profile">
+                          <MenuItem icon={<FaUser />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">Profile Settings</MenuItem>
+                        </Link>
+                        <Link href="/my-tickets">
+                          <MenuItem icon={<FaTicketAlt />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">My Tickets</MenuItem>
+                        </Link>
+                        <Link href="/wallet">
+                          <MenuItem icon={<FaWallet />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">Wallet</MenuItem>
+                        </Link>
+                        <Link href="/transaction-history">
+                          <MenuItem icon={<FaHistory />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">Transaction History</MenuItem>
+                        </Link>
+
+                        <MenuDivider borderColor="gray.600" />
+
+                        <Link href="/charities">
+                          <MenuItem icon={<FaHeart />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">Charities</MenuItem>
+                        </Link>
+                        <Link href="/how-it-works">
+                          <MenuItem icon={<FaQuestionCircle />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">How It Works</MenuItem>
                         </Link>
                       </>
                     )}
-
-                    <MenuDivider borderColor="gray.600" />
-
-                    <Link href="/charities">
-                      <MenuItem icon={<FaHeart />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">Charities</MenuItem>
-                    </Link>
-                    <Link href="/how-it-works">
-                      <MenuItem icon={<FaQuestionCircle />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">How It Works</MenuItem>
-                    </Link>
 
                     <MenuDivider borderColor="gray.600" />
 
@@ -276,62 +290,85 @@ export default function Header() {
                           <Badge colorScheme="blue" variant="solid" fontSize="xs">
                             {user.role}
                           </Badge>
-                          <Badge colorScheme="green" variant="solid" fontSize="xs">
-                            <HStack spacing={1}>
-                              <FaPoundSign size={8} />
-                              <Text>
-                                {walletLoading ? (
-                                  <Spinner size="xs" />
-                                ) : (
-                                  walletBalance ? formatBalance(walletBalance) : '£0.00'
-                                )}
-                              </Text>
-                            </HStack>
-                          </Badge>
+                          {user.role !== 'ADMIN' && (
+                            <Badge colorScheme="green" variant="solid" fontSize="xs">
+                              <HStack spacing={1}>
+                                <FaPoundSign size={8} />
+                                <Text>
+                                  {walletLoading ? (
+                                    <Spinner size="xs" />
+                                  ) : (
+                                    walletBalance ? formatBalance(walletBalance) : '£0.00'
+                                  )}
+                                </Text>
+                              </HStack>
+                            </Badge>
+                          )}
                         </HStack>
                       </Box>
 
-                      <Link href="/profile" onClick={onClose}>
-                        <Button variant="ghost" leftIcon={<FaUser />} w="full" justifyContent="flex-start" color="gray.200" _hover={{ bg: "gray.700" }}>
-                          Profile Settings
-                        </Button>
-                      </Link>
-                      <Link href="/my-tickets" onClick={onClose}>
-                        <Button variant="ghost" leftIcon={<FaTicketAlt />} w="full" justifyContent="flex-start" color="gray.200" _hover={{ bg: "gray.700" }}>
-                          My Tickets
-                        </Button>
-                      </Link>
-                      <Link href="/wallet" onClick={onClose}>
-                        <Button variant="ghost" leftIcon={<FaWallet />} w="full" justifyContent="flex-start" color="gray.200" _hover={{ bg: "gray.700" }}>
-                          Wallet
-                        </Button>
-                      </Link>
-                      <Link href="/transaction-history" onClick={onClose}>
-                        <Button variant="ghost" leftIcon={<FaHistory />} w="full" justifyContent="flex-start" color="gray.200" _hover={{ bg: "gray.700" }}>
-                          Transaction History
-                        </Button>
-                      </Link>
+                      {user.role === 'ADMIN' ? (
+                        /* Admin Mobile Menu Items */
+                        <>
+                          <Link href="/admin" onClick={onClose}>
+                            <Button variant="ghost" leftIcon={<FaCog />} w="full" justifyContent="flex-start" color="orange.300" _hover={{ bg: "gray.700" }}>
+                              Dashboard
+                            </Button>
+                          </Link>
+                          <Link href="/admin/users" onClick={onClose}>
+                            <Button variant="ghost" leftIcon={<FaUsers />} w="full" justifyContent="flex-start" color="gray.200" _hover={{ bg: "gray.700" }}>
+                              Users
+                            </Button>
+                          </Link>
+                          <Link href="/admin/competitions" onClick={onClose}>
+                            <Button variant="ghost" leftIcon={<FaTrophy />} w="full" justifyContent="flex-start" color="gray.200" _hover={{ bg: "gray.700" }}>
+                              Competitions
+                            </Button>
+                          </Link>
+                          <Link href="/admin/charities" onClick={onClose}>
+                            <Button variant="ghost" leftIcon={<FaHeart />} w="full" justifyContent="flex-start" color="gray.200" _hover={{ bg: "gray.700" }}>
+                              Charities
+                            </Button>
+                          </Link>
+                        </>
+                      ) : (
+                        /* Regular User Mobile Menu Items */
+                        <>
+                          <Link href="/profile" onClick={onClose}>
+                            <Button variant="ghost" leftIcon={<FaUser />} w="full" justifyContent="flex-start" color="gray.200" _hover={{ bg: "gray.700" }}>
+                              Profile Settings
+                            </Button>
+                          </Link>
+                          <Link href="/my-tickets" onClick={onClose}>
+                            <Button variant="ghost" leftIcon={<FaTicketAlt />} w="full" justifyContent="flex-start" color="gray.200" _hover={{ bg: "gray.700" }}>
+                              My Tickets
+                            </Button>
+                          </Link>
+                          <Link href="/wallet" onClick={onClose}>
+                            <Button variant="ghost" leftIcon={<FaWallet />} w="full" justifyContent="flex-start" color="gray.200" _hover={{ bg: "gray.700" }}>
+                              Wallet
+                            </Button>
+                          </Link>
+                          <Link href="/transaction-history" onClick={onClose}>
+                            <Button variant="ghost" leftIcon={<FaHistory />} w="full" justifyContent="flex-start" color="gray.200" _hover={{ bg: "gray.700" }}>
+                              Transaction History
+                            </Button>
+                          </Link>
 
-                      {user.role === 'ADMIN' && (
-                        <Link href="/admin" onClick={onClose}>
-                          <Button variant="ghost" leftIcon={<FaCog />} w="full" justifyContent="flex-start" color="orange.300" _hover={{ bg: "gray.700" }}>
-                            Admin Panel
-                          </Button>
-                        </Link>
+                          <Box borderTop="1px" borderColor="gray.200" pt={2} mt={2}>
+                            <Link href="/charities" onClick={onClose}>
+                              <Button variant="ghost" leftIcon={<FaHeart />} w="full" justifyContent="flex-start" color="gray.200" _hover={{ bg: "gray.700" }}>
+                                Charities
+                              </Button>
+                            </Link>
+                            <Link href="/how-it-works" onClick={onClose}>
+                              <Button variant="ghost" leftIcon={<FaQuestionCircle />} w="full" justifyContent="flex-start" color="gray.200" _hover={{ bg: "gray.700" }}>
+                                How It Works
+                              </Button>
+                            </Link>
+                          </Box>
+                        </>
                       )}
-
-                      <Box borderTop="1px" borderColor="gray.200" pt={2} mt={2}>
-                        <Link href="/charities" onClick={onClose}>
-                          <Button variant="ghost" leftIcon={<FaHeart />} w="full" justifyContent="flex-start" color="gray.200" _hover={{ bg: "gray.700" }}>
-                            Charities
-                          </Button>
-                        </Link>
-                        <Link href="/how-it-works" onClick={onClose}>
-                          <Button variant="ghost" leftIcon={<FaQuestionCircle />} w="full" justifyContent="flex-start" color="gray.200" _hover={{ bg: "gray.700" }}>
-                            How It Works
-                          </Button>
-                        </Link>
-                      </Box>
 
                       <Button
                         variant="ghost"

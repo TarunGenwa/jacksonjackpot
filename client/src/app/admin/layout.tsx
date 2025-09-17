@@ -9,7 +9,7 @@ import {
   Users,
   Trophy,
   Heart,
-  ArrowLeft,
+  LogOut,
   Menu,
   X
 } from 'lucide-react';
@@ -20,7 +20,7 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, logout } = useAuth();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -97,13 +97,13 @@ export default function AdminLayout({
 
           {/* Footer */}
           <div className="p-4 border-t">
-            <Link
-              href="/"
-              className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+            <button
+              onClick={logout}
+              className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors w-full text-left"
             >
-              <ArrowLeft className="h-5 w-5" />
-              <span className="font-medium">Back to Site</span>
-            </Link>
+              <LogOut className="h-5 w-5" />
+              <span className="font-medium">Logout</span>
+            </button>
             <div className="px-4 py-3 text-sm text-gray-500">
               Logged in as: <span className="font-medium">{user.email}</span>
             </div>

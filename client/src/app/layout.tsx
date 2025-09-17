@@ -3,8 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { WalletProvider } from "@/contexts/WalletContext";
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
+import ConditionalLayout from "@/components/ConditionalLayout";
+import AdminRouteGuard from "@/components/AdminRouteGuard";
 import { ChakraProvider } from "@chakra-ui/react";
 
 const geistSans = Geist({
@@ -41,13 +41,11 @@ export default function RootLayout({
         <ChakraProvider>
           <AuthProvider>
             <WalletProvider>
-              <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#1a202c' }}>
-                <Header />
-                <main style={{ flex: 1, backgroundColor: '#1a202c' }}>
+              <AdminRouteGuard>
+                <ConditionalLayout>
                   {children}
-                </main>
-                <Footer />
-              </div>
+                </ConditionalLayout>
+              </AdminRouteGuard>
             </WalletProvider>
           </AuthProvider>
         </ChakraProvider>
