@@ -115,15 +115,15 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
     <Card
       w="full"
       shadow="xl"
-      _hover={{ shadow: "2xl", transform: "translateY(-2px)", borderColor: "blue.400" }}
+      _hover={{ shadow: "2xl", transform: "translateY(-2px)", borderColor: "purple.400" }}
       transition="all 0.3s"
       overflow="hidden"
       cursor="pointer"
       onClick={handleCardClick}
-      bg="gray.800"
+      bgGradient="linear(to-br, purple.900, blue.900)"
       borderRadius="lg"
       border="1px"
-      borderColor="gray.700"
+      borderColor="purple.800"
     >
       <CardBody p={0}>
         <VStack spacing={0} align="stretch">
@@ -140,7 +140,7 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
               <Box
                 w="full"
                 h="full"
-                bgGradient="linear(to-br, blue.500, purple.600)"
+                bgGradient="linear(to-br, purple.700, blue.700)"
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
@@ -189,8 +189,8 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
               position="absolute"
               top={4}
               right={4}
-              colorScheme="green"
-              variant="solid"
+              bg="green.400"
+              color="gray.900"
               fontSize="md"
               px={3}
               py={1}
@@ -264,16 +264,16 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
                 <Text fontSize="xs" fontWeight="semibold" color="gray.300">
                   Progress
                 </Text>
-                <Text fontSize="xs" fontWeight="bold" color="blue.400">
+                <Text fontSize="xs" fontWeight="bold" color="purple.400">
                   {getProgressPercentage()}%
                 </Text>
               </Flex>
               <Progress
                 value={getProgressPercentage()}
-                colorScheme="blue"
+                colorScheme="purple"
                 size="sm"
                 borderRadius="full"
-                bg="gray.700"
+                bg="blackAlpha.400"
               />
             </Box>
 
@@ -298,7 +298,12 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
             {/* Action Button */}
             <Button
               size="md"
-              colorScheme="blue"
+              bgGradient="linear(to-r, purple.500, blue.500)"
+              color="white"
+              _hover={{
+                bgGradient: "linear(to-r, purple.400, blue.400)",
+                transform: "translateY(-1px)"
+              }}
               variant="solid"
               w="full"
               onClick={handleViewDetailsClick}
