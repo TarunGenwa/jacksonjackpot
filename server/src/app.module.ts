@@ -10,6 +10,7 @@ import { CharityModule } from './charity/charity.module';
 import { CompetitionModule } from './competition/competition.module';
 import { TicketModule } from './ticket/ticket.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
     CharityModule,
     CompetitionModule,
     TicketModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [

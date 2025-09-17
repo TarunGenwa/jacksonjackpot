@@ -31,7 +31,7 @@ import {
   Icon
 } from '@chakra-ui/react';
 import { HamburgerIcon } from '@chakra-ui/icons';
-import { FaUser, FaTicketAlt, FaWallet, FaHistory, FaSignOutAlt, FaPoundSign, FaHeart, FaQuestionCircle } from 'react-icons/fa';
+import { FaUser, FaTicketAlt, FaWallet, FaHistory, FaSignOutAlt, FaPoundSign, FaHeart, FaQuestionCircle, FaCog } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
 import { useWallet } from '@/contexts/WalletContext';
 
@@ -187,6 +187,15 @@ export default function Header() {
                       <MenuItem icon={<FaHistory />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">Transaction History</MenuItem>
                     </Link>
 
+                    {user.role === 'ADMIN' && (
+                      <>
+                        <MenuDivider borderColor="gray.600" />
+                        <Link href="/admin">
+                          <MenuItem icon={<FaCog />} bg="gray.800" _hover={{ bg: "gray.700" }} color="orange.300">Admin Panel</MenuItem>
+                        </Link>
+                      </>
+                    )}
+
                     <MenuDivider borderColor="gray.600" />
 
                     <Link href="/charities">
@@ -302,6 +311,14 @@ export default function Header() {
                           Transaction History
                         </Button>
                       </Link>
+
+                      {user.role === 'ADMIN' && (
+                        <Link href="/admin" onClick={onClose}>
+                          <Button variant="ghost" leftIcon={<FaCog />} w="full" justifyContent="flex-start" color="orange.300" _hover={{ bg: "gray.700" }}>
+                            Admin Panel
+                          </Button>
+                        </Link>
+                      )}
 
                       <Box borderTop="1px" borderColor="gray.200" pt={2} mt={2}>
                         <Link href="/charities" onClick={onClose}>
