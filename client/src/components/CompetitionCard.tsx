@@ -97,19 +97,19 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
   return (
     <Card
       w="full"
-      h="220px"
       shadow="md"
-      _hover={{ shadow: "lg", transform: "translateY(-1px)" }}
-      transition="all 0.2s"
+      _hover={{ shadow: "lg", transform: "translateY(-2px)" }}
+      transition="all 0.3s"
       overflow="hidden"
       cursor="pointer"
       onClick={handleCardClick}
       bg="white"
+      borderRadius="lg"
     >
-      <CardBody p={0} h="full">
-        <HStack spacing={0} h="full">
-          {/* Left side - Image */}
-          <Box position="relative" w="140px" h="full" flexShrink={0}>
+      <CardBody p={0}>
+        <VStack spacing={0} align="stretch">
+          {/* Top - Image Section */}
+          <Box position="relative" w="full" h="180px">
             {localCompetition.imageUrl ? (
               <Image
                 src={localCompetition.imageUrl}
@@ -126,83 +126,135 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
                 alignItems="center"
                 justifyContent="center"
               >
-                <Icon as={FaTrophy} color="white" boxSize={6} />
+                <Icon as={FaTrophy} color="white" boxSize={10} />
               </Box>
             )}
 
             {/* Status Badge */}
             <Badge
               position="absolute"
-              top={2}
-              left={2}
+              top={4}
+              left={4}
               colorScheme={getStatusColor(localCompetition.status)}
               variant="solid"
-              fontSize="xs"
-              borderRadius="sm"
+              fontSize="sm"
+              borderRadius="md"
+              px={3}
+              py={1}
             >
               {localCompetition.status}
             </Badge>
+
+            {/* Price Badge */}
+            <Badge
+              position="absolute"
+              top={4}
+              right={4}
+              colorScheme="green"
+              variant="solid"
+              fontSize="md"
+              px={3}
+              py={1}
+              borderRadius="md"
+              fontWeight="bold"
+            >
+              {formatPrice(localCompetition.ticketPrice)}
+            </Badge>
           </Box>
 
-          {/* Right side - Content */}
-          <VStack flex={1} p={4} spacing={3} align="stretch" h="full">
-            {/* Title and Price */}
-            <Flex justify="space-between" align="flex-start" mb={1}>
-              <Heading
-                as="h3"
-                size="md"
-                noOfLines={2}
-                color="gray.800"
-                flex={1}
-                mr={3}
-                lineHeight="1.4"
-                fontSize="16px"
-              >
-                {localCompetition.title}
-              </Heading>
-              <Badge
-                colorScheme="green"
-                variant="solid"
-                fontSize="sm"
-                px={3}
-                py={1}
-                borderRadius="md"
-                flexShrink={0}
-                fontWeight="bold"
-              >
-                {formatPrice(localCompetition.ticketPrice)}
-              </Badge>
-            </Flex>
+          {/* Bottom - Content */}
+          <VStack p={4} spacing={3} align="stretch">
+            {/* Title */}
+            <Heading
+              as="h3"
+              size="md"
+              color="gray.800"
+              lineHeight="1.3"
+              noOfLines={2}
+            >
+              {localCompetition.title}
+            </Heading>
 
-            {/* Key Info Row */}
-            <HStack spacing={3} fontSize="sm" color="gray.600" flexWrap="wrap">
-              <HStack spacing={1} minW="fit-content">
-                <Icon as={FaClock} boxSize={3} />
-                <Text fontWeight="medium" whiteSpace="nowrap">{getRemainingTime()}</Text>
+            {/* Description */}
+            {localCompetition.description && (
+              <Text
+                color="gray.600"
+                fontSize="sm"
+                noOfLines={2}
+              >
+                {localCompetition.description}
+              </Text>
+            )}
+
+            {/* Stats Grid */}
+            <VStack spacing={2} align="stretch">
+              <HStack justify="space-between" py={1}>
+                <HStack spacing={1}>
+                  <Icon as={FaTrophy} boxSize={3} color="gold" />
+                  <Text fontSize="xs" color="gray.600">Prize</Text>
+                </HStack>
+                <Text fontWeight="bold" color="green.600" fontSize="sm">
+                  {getPrizePool()}
+                </Text>
               </HStack>
-              <HStack spacing={1} minW="fit-content">
-                <Icon as={FaTicketAlt} boxSize={3} />
-                <Text whiteSpace="nowrap">{localCompetition.ticketsSold}/{localCompetition.maxTickets}</Text>
+
+              <HStack justify="space-between" py={1}>
+                <HStack spacing={1}>
+                  <Icon as={FaClock} boxSize={3} color="blue.500" />
+                  <Text fontSize="xs" color="gray.600">Time Left</Text>
+                </HStack>
+                <Text fontWeight="semibold" color="gray.800" fontSize="sm">
+                  {getRemainingTime()}
+                </Text>
               </HStack>
-              <HStack spacing={1} minW="fit-content">
-                <Icon as={FaTrophy} boxSize={3} />
-                <Text fontWeight="medium" color="green.600" whiteSpace="nowrap">{getPrizePool()}</Text>
+
+              <HStack justify="space-between" py={1}>
+                <HStack spacing={1}>
+                  <Icon as={FaTicketAlt} boxSize={3} color="purple.500" />
+                  <Text fontSize="xs" color="gray.600">Tickets</Text>
+                </HStack>
+                <Text fontWeight="semibold" color="gray.800" fontSize="sm">
+                  {localCompetition.ticketsSold} / {localCompetition.maxTickets}
+                </Text>
               </HStack>
-            </HStack>
+            </VStack>
 
             {/* Progress Bar */}
             <Box>
+              <Flex justify="space-between" mb={1}>
+                <Text fontSize="xs" fontWeight="semibold" color="gray.700">
+                  Progress
+                </Text>
+                <Text fontSize="xs" fontWeight="bold" color="blue.600">
+                  {getProgressPercentage()}%
+                </Text>
+              </Flex>
               <Progress
                 value={getProgressPercentage()}
                 colorScheme="blue"
-                size="md"
-                borderRadius="md"
+                size="sm"
+                borderRadius="full"
                 bg="gray.100"
               />
-              <Text fontSize="xs" color="gray.500" mt={2} textAlign="center">
-                {getProgressPercentage()}% sold
-              </Text>
             </Box>
+
+            {/* Additional Details */}
+            <HStack spacing={4} pt={1}>
+              <VStack align="start" spacing={0}>
+                <Text fontSize="xs" color="gray.500">Draw</Text>
+                <Text fontSize="xs" fontWeight="semibold">
+                  {formatDate(localCompetition.drawDate)}
+                </Text>
+              </VStack>
+              {localCompetition.charity && (
+                <VStack align="start" spacing={0}>
+                  <Text fontSize="xs" color="gray.500">Charity</Text>
+                  <Text fontSize="xs" fontWeight="semibold" color="purple.600" noOfLines={1}>
+                    {localCompetition.charity.name}
+                  </Text>
+                </VStack>
+              )}
+            </HStack>
 
             {/* Action Button */}
             <Button
@@ -212,13 +264,14 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
               w="full"
               onClick={handleViewDetailsClick}
               fontSize="sm"
-              h="36px"
+              h="40px"
               fontWeight="semibold"
+              mt={1}
             >
-              Buy Tickets
+              View Details
             </Button>
           </VStack>
-        </HStack>
+        </VStack>
       </CardBody>
     </Card>
   );

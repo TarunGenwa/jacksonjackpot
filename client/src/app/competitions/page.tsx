@@ -5,19 +5,15 @@ import {
   Box,
   Container,
   VStack,
-  HStack,
   Heading,
   Text,
-  Button,
-  SimpleGrid,
   Spinner,
   Alert,
   AlertIcon,
-  Card,
-  CardBody,
   Center,
-  Icon,
-  Stack
+  Button,
+  Divider,
+  SimpleGrid
 } from '@chakra-ui/react';
 import { FaGift, FaBolt, FaCalendarDay, FaCircle } from 'react-icons/fa';
 import CompetitionCard from '@/components/CompetitionCard';
@@ -27,14 +23,16 @@ import { competitionsService } from '@/services/competitions';
 export default function CompetitionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState(0);
-  const [competitionsByType, setCompetitionsByType] = useState<{
-    [key: string]: Competition[];
+  const [allCompetitions, setAllCompetitions] = useState<{
+    mysteryBoxes: Competition[];
+    instantWins: Competition[];
+    dailyFree: Competition[];
+    instantSpins: Competition[];
   }>({
-    'MYSTERYBOXES': [],
-    'INSTANT_WINS': [],
-    'DAILY_FREE': [],
-    'INSTANT_SPINS': []
+    mysteryBoxes: [],
+    instantWins: [],
+    dailyFree: [],
+    instantSpins: []
   });
 
   useEffect(() => {
@@ -51,11 +49,11 @@ export default function CompetitionsPage() {
           competitionsService.getByType('INSTANT_SPINS')
         ]);
 
-        setCompetitionsByType({
-          'MYSTERYBOXES': mysteryBoxes,
-          'INSTANT_WINS': instantWins,
-          'DAILY_FREE': dailyFree,
-          'INSTANT_SPINS': instantSpins
+        setAllCompetitions({
+          mysteryBoxes,
+          instantWins,
+          dailyFree,
+          instantSpins
         });
       } catch (err) {
         console.error('Failed to fetch competitions:', err);
@@ -68,37 +66,32 @@ export default function CompetitionsPage() {
     fetchCompetitions();
   }, []);
 
-  const competitionTabs = [
+  const competitionSections = [
     {
-      id: 'MYSTERYBOXES',
-      label: 'Mystery Boxes',
+      title: 'Mystery Boxes',
       icon: FaGift,
-      color: 'purple'
+      color: 'purple',
+      competitions: allCompetitions.mysteryBoxes
     },
     {
-      id: 'INSTANT_WINS',
-      label: 'Instant Wins',
+      title: 'Instant Wins',
       icon: FaBolt,
-      color: 'orange'
+      color: 'orange',
+      competitions: allCompetitions.instantWins
     },
     {
-      id: 'DAILY_FREE',
-      label: 'Daily Free',
+      title: 'Daily Free',
       icon: FaCalendarDay,
-      color: 'green'
+      color: 'green',
+      competitions: allCompetitions.dailyFree
     },
     {
-      id: 'INSTANT_SPINS',
-      label: 'Instant Spins',
+      title: 'Instant Spins',
       icon: FaCircle,
-      color: 'blue'
+      color: 'blue',
+      competitions: allCompetitions.instantSpins
     }
   ];
-
-  const getCurrentCompetitions = () => {
-    const currentTabId = competitionTabs[activeTab]?.id;
-    return competitionsByType[currentTabId] || [];
-  };
 
 
   if (loading) {
@@ -139,121 +132,76 @@ export default function CompetitionsPage() {
     );
   }
 
-  const currentCompetitions = getCurrentCompetitions();
-
   return (
     <Box minH="100vh" bg="gray.50">
       <Container maxW="container.xl" py={12}>
-        <VStack spacing={8} align="stretch">
+        <VStack spacing={12} align="stretch">
           {/* Header */}
           <VStack spacing={4} textAlign="center">
             <Heading as="h1" size="2xl" color="gray.800">
-              Competitions
+              All Competitions
             </Heading>
             <Text fontSize="lg" color="gray.600" maxW="2xl">
-              Choose your competition type and win amazing prizes while supporting great causes
+              Browse all available competitions and win amazing prizes while supporting great causes
             </Text>
           </VStack>
 
-          {/* Sidebar + Content Layout */}
-          <Stack
-            direction={{ base: "column", md: "row" }}
-            spacing={6}
-            align="flex-start"
-          >
-            {/* Left Sidebar - Vertical Tabs */}
-            <Stack
-              direction={{ base: "row", md: "column" }}
-              spacing={2}
-              w={{ base: "full", md: "250px" }}
-              flexShrink={0}
-              align="stretch"
-              overflowX={{ base: "auto", md: "visible" }}
-            >
-              {competitionTabs.map((tab, index) => (
-                <Button
-                  key={tab.id}
-                  onClick={() => setActiveTab(index)}
-                  variant={activeTab === index ? "solid" : "ghost"}
-                  colorScheme={activeTab === index ? tab.color : "gray"}
-                  justifyContent="flex-start"
-                  h="auto"
-                  py={4}
-                  px={4}
-                  borderRadius="lg"
-                  _hover={{
-                    bg: activeTab === index ? `${tab.color}.600` : `${tab.color}.50`,
-                    transform: "translateY(-1px)",
-                  }}
-                  transition="all 0.2s"
-                  boxShadow={activeTab === index ? "md" : "sm"}
-                  minW={{ base: "auto", md: "full" }}
-                  flexShrink={{ base: 0, md: 1 }}
-                >
-                  <HStack spacing={3} w="full">
-                    <Icon
-                      as={tab.icon}
-                      boxSize={5}
-                      color={activeTab === index ? "white" : `${tab.color}.600`}
-                    />
-                    <VStack align="start" spacing={0} flex={1}>
-                      <Text
-                        fontWeight="semibold"
-                        fontSize="sm"
-                        color={activeTab === index ? "white" : `${tab.color}.700`}
-                      >
-                        {tab.label}
-                      </Text>
-                      <Text
-                        fontSize="xs"
-                        opacity={0.8}
-                        color={activeTab === index ? "white" : "gray.600"}
-                      >
-                        {currentCompetitions.length === 0 && activeTab === index
-                          ? "Coming soon"
-                          : activeTab === index
-                            ? `${currentCompetitions.length} available`
-                            : `${competitionsByType[tab.id]?.length || 0} available`
-                        }
-                      </Text>
-                    </VStack>
-                  </HStack>
-                </Button>
-              ))}
-            </Stack>
+          {/* All Competition Sections */}
+          <VStack spacing={12} align="stretch">
+            {competitionSections.map((section) => {
+              const hasCompetitions = section.competitions.length > 0;
 
-            {/* Right Content Area */}
-            <Box flex={1} minH="500px">
-              {currentCompetitions.length === 0 ? (
-                <Card maxW="2xl" mx="auto" shadow="xl">
-                  <CardBody py={16} textAlign="center">
-                    <VStack spacing={4}>
-                      <Icon
-                        as={competitionTabs[activeTab].icon}
-                        boxSize={16}
-                        color={`${competitionTabs[activeTab].color}.300`}
-                      />
-                      <Heading size="xl" color="gray.700">
-                        No {competitionTabs[activeTab].label} Available
-                      </Heading>
-                      <Text color="gray.600">
-                        We're working on bringing you amazing {competitionTabs[activeTab].label.toLowerCase()}. Check back soon!
+              return (
+                <VStack key={section.title} spacing={6} align="stretch">
+                  {/* Section Header */}
+                  <Box>
+                    <Heading
+                      as="h2"
+                      size="lg"
+                      color={`${section.color}.600`}
+                      mb={2}
+                    >
+                      {section.title}
+                    </Heading>
+                    <Text color="gray.600" fontSize="sm">
+                      {hasCompetitions
+                        ? `${section.competitions.length} competition${section.competitions.length > 1 ? 's' : ''} available`
+                        : 'Coming soon'
+                      }
+                    </Text>
+                  </Box>
+
+                  {/* Competition Cards */}
+                  {hasCompetitions ? (
+                    <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+                      {section.competitions.map((competition) => (
+                        <CompetitionCard
+                          key={competition.id}
+                          competition={competition}
+                        />
+                      ))}
+                    </SimpleGrid>
+                  ) : (
+                    <Box
+                      p={12}
+                      bg="white"
+                      borderRadius="lg"
+                      border="1px"
+                      borderColor="gray.200"
+                      textAlign="center"
+                    >
+                      <Text color="gray.500">
+                        No {section.title.toLowerCase()} available at the moment. Check back soon!
                       </Text>
-                    </VStack>
-                  </CardBody>
-                </Card>
-              ) : (
-                <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
-                  {currentCompetitions.map((competition) => (
-                    <CompetitionCard
-                      key={competition.id}
-                      competition={competition}
-                    />
-                  ))}
-                </SimpleGrid>
-              )}
-            </Box>
-          </Stack>
+                    </Box>
+                  )}
+
+                  {/* Divider between sections */}
+                  <Divider borderColor="gray.300" />
+                </VStack>
+              );
+            })}
+          </VStack>
         </VStack>
       </Container>
     </Box>

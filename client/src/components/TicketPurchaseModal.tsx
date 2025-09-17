@@ -24,7 +24,12 @@ import {
   Flex,
   Box,
   useToast,
-  Spinner
+  Spinner,
+  Slider,
+  SliderTrack,
+  SliderFilledTrack,
+  SliderThumb,
+  SliderMark
 } from '@chakra-ui/react';
 import { FaTicketAlt, FaPoundSign, FaCalculator } from 'react-icons/fa';
 import { Competition } from '@/types/api';
@@ -56,8 +61,7 @@ export default function TicketPurchaseModal({
   const totalCost = ticketPrice * quantity;
   const availableTickets = competition.maxTickets - competition.ticketsSold;
 
-  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value) || 1;
+  const handleQuantityChange = (value: number) => {
     const maxAllowed = Math.min(availableTickets, 10); // Limit to 10 tickets per purchase
     setQuantity(Math.max(1, Math.min(value, maxAllowed)));
   };
@@ -207,21 +211,48 @@ export default function TicketPurchaseModal({
                 {/* Quantity Selector */}
                 <FormControl>
                   <FormLabel>
-                    <HStack spacing={2}>
-                      <Text>Number of Tickets</Text>
-                      <Badge colorScheme="blue" variant="outline">
+                    <Flex justify="space-between" align="center" w="full">
+                      <HStack spacing={2}>
+                        <Text>Number of Tickets</Text>
+                        <Badge colorScheme="blue" variant="solid" fontSize="md" px={2}>
+                          {quantity}
+                        </Badge>
+                      </HStack>
+                      <Badge colorScheme="gray" variant="outline">
                         Max: {Math.min(availableTickets, 10)}
                       </Badge>
-                    </HStack>
+                    </Flex>
                   </FormLabel>
-                  <Input
-                    type="number"
-                    value={quantity}
-                    onChange={handleQuantityChange}
-                    min={1}
-                    max={Math.min(availableTickets, 10)}
-                    size="lg"
-                  />
+                  <Box pt={6} pb={2}>
+                    <Slider
+                      value={quantity}
+                      onChange={handleQuantityChange}
+                      min={1}
+                      max={Math.min(availableTickets, 10)}
+                      step={1}
+                      colorScheme="blue"
+                    >
+                      <SliderMark value={1} mt={3} ml={-2} fontSize="sm">
+                        1
+                      </SliderMark>
+                      <SliderMark value={Math.min(availableTickets, 10)} mt={3} ml={-2} fontSize="sm">
+                        {Math.min(availableTickets, 10)}
+                      </SliderMark>
+                      {Math.min(availableTickets, 10) > 5 && (
+                        <SliderMark value={Math.ceil(Math.min(availableTickets, 10) / 2)} mt={3} ml={-2} fontSize="sm">
+                          {Math.ceil(Math.min(availableTickets, 10) / 2)}
+                        </SliderMark>
+                      )}
+                      <SliderTrack bg="gray.200">
+                        <SliderFilledTrack />
+                      </SliderTrack>
+                      <SliderThumb boxSize={6} bg="blue.500">
+                        <Box color="white" fontSize="xs" fontWeight="bold">
+                          {quantity}
+                        </Box>
+                      </SliderThumb>
+                    </Slider>
+                  </Box>
                 </FormControl>
 
                 {/* Price Breakdown */}
