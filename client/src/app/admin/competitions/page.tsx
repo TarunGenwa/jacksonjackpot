@@ -14,6 +14,7 @@ import {
   Trophy,
   Plus
 } from 'lucide-react';
+import { adminApi } from '@/services/adminApi';
 
 interface Competition {
   id: string;
@@ -55,29 +56,15 @@ export default function CompetitionsManagement() {
   const fetchCompetitions = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('authToken');
+      setError(null);
 
-      const params = new URLSearchParams({
-        page: currentPage.toString(),
-        limit: itemsPerPage.toString(),
+      const data = await adminApi.getCompetitions({
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchTerm || undefined,
+        status: statusFilter || undefined,
       });
 
-      if (searchTerm) params.append('search', searchTerm);
-      if (statusFilter) params.append('status', statusFilter);
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/admin/competitions?${params}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      if (!response.ok) throw new Error('Failed to fetch competitions');
-
-      const data = await response.json();
       setCompetitions(data.competitions);
       setTotalCompetitions(data.total);
       setTotalPages(Math.ceil(data.total / itemsPerPage));
@@ -90,21 +77,7 @@ export default function CompetitionsManagement() {
 
   const handleStatusChange = async (competitionId: string, newStatus: string) => {
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/admin/competitions/${competitionId}/status`,
-        {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ status: newStatus })
-        }
-      );
-
-      if (!response.ok) throw new Error('Failed to update competition status');
-
+      await adminApi.updateCompetitionStatus(competitionId, newStatus);
       await fetchCompetitions();
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to update status');
@@ -115,20 +88,7 @@ export default function CompetitionsManagement() {
     if (!confirm('Are you sure you want to delete this competition?')) return;
 
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/admin/competitions/${competitionId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      if (!response.ok) throw new Error('Failed to delete competition');
-
+      await adminApi.deleteCompetition(competitionId);
       await fetchCompetitions();
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to delete competition');

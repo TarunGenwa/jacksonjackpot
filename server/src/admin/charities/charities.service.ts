@@ -104,6 +104,10 @@ export class CharitiesService {
     return this.update(id, { isVerified: !charity.isVerified });
   }
 
+  async updateVerification(id: string, isVerified: boolean) {
+    return this.update(id, { isVerified });
+  }
+
   async toggleActive(id: string) {
     const charity = await this.prisma.charity.findUnique({
       where: { id },

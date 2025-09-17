@@ -15,6 +15,7 @@ import {
   Heart,
   DollarSign
 } from 'lucide-react';
+import { adminApi } from '@/services/adminApi';
 
 interface Charity {
   id: string;
@@ -51,30 +52,16 @@ export default function CharitiesManagement() {
   const fetchCharities = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('authToken');
+      setError(null);
 
-      const params = new URLSearchParams({
-        page: currentPage.toString(),
-        limit: itemsPerPage.toString(),
+      const data = await adminApi.getCharities({
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchTerm || undefined,
+        isVerified: verifiedFilter || undefined,
+        isActive: activeFilter || undefined,
       });
 
-      if (searchTerm) params.append('search', searchTerm);
-      if (verifiedFilter) params.append('isVerified', verifiedFilter);
-      if (activeFilter) params.append('isActive', activeFilter);
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/admin/charities?${params}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      if (!response.ok) throw new Error('Failed to fetch charities');
-
-      const data = await response.json();
       setCharities(data.charities);
       setTotalCharities(data.total);
       setTotalPages(Math.ceil(data.total / itemsPerPage));
@@ -87,20 +74,7 @@ export default function CharitiesManagement() {
 
   const handleToggleVerification = async (charityId: string) => {
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/admin/charities/${charityId}/toggle-verification`,
-        {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      if (!response.ok) throw new Error('Failed to update verification status');
-
+      await adminApi.toggleCharityVerification(charityId);
       await fetchCharities();
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to update verification');
@@ -109,20 +83,7 @@ export default function CharitiesManagement() {
 
   const handleToggleActive = async (charityId: string) => {
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/admin/charities/${charityId}/toggle-active`,
-        {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      if (!response.ok) throw new Error('Failed to update active status');
-
+      await adminApi.toggleCharityActive(charityId);
       await fetchCharities();
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to update status');
@@ -133,20 +94,7 @@ export default function CharitiesManagement() {
     if (!confirm('Are you sure you want to delete this charity?')) return;
 
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/admin/charities/${charityId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      if (!response.ok) throw new Error('Failed to delete charity');
-
+      await adminApi.deleteCharity(charityId);
       await fetchCharities();
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to delete charity');

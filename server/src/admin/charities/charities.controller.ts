@@ -86,6 +86,14 @@ export class CharitiesController {
     return this.charitiesService.toggleVerification(id);
   }
 
+  @Put(':id/verification')
+  async updateVerification(
+    @Param('id') id: string,
+    @Body() data: { isVerified: boolean }
+  ) {
+    return this.charitiesService.updateVerification(id, data.isVerified);
+  }
+
   @Put(':id/toggle-active')
   async toggleActive(@Param('id') id: string) {
     return this.charitiesService.toggleActive(id);

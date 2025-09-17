@@ -11,6 +11,7 @@ import {
   Award,
   UserCheck
 } from 'lucide-react';
+import { adminApi } from '@/services/adminApi';
 
 interface Statistics {
   users: {
@@ -44,26 +45,12 @@ export default function AdminDashboard() {
 
   const fetchStatistics = async () => {
     try {
-      const token = localStorage.getItem('authToken');
-      const headers = {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      };
-
-      const [usersRes, competitionsRes, charitiesRes] = await Promise.all([
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users/statistics`, { headers }),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/competitions/statistics`, { headers }),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/charities/statistics`, { headers })
-      ]);
-
-      if (!usersRes.ok || !competitionsRes.ok || !charitiesRes.ok) {
-        throw new Error('Failed to fetch statistics');
-      }
+      setError(null);
 
       const [users, competitions, charities] = await Promise.all([
-        usersRes.json(),
-        competitionsRes.json(),
-        charitiesRes.json()
+        adminApi.getUserStatistics(),
+        adminApi.getCompetitionStatistics(),
+        adminApi.getCharityStatistics()
       ]);
 
       setStatistics({ users, competitions, charities });

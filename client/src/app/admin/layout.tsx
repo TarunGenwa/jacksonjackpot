@@ -14,6 +14,8 @@ import {
   X
 } from 'lucide-react';
 import { useState } from 'react';
+import { useToast } from '@/hooks/useToast';
+import ToastContainer from '@/components/admin/ToastContainer';
 
 export default function AdminLayout({
   children,
@@ -23,6 +25,7 @@ export default function AdminLayout({
   const { user, isLoading, logout } = useAuth();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { toasts, removeToast } = useToast();
 
   useEffect(() => {
     if (!isLoading && (!user || user.role !== 'ADMIN')) {
@@ -125,6 +128,9 @@ export default function AdminLayout({
           onClick={() => setSidebarOpen(false)}
         />
       )}
+
+      {/* Toast Container */}
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   );
 }

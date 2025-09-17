@@ -13,6 +13,7 @@ import {
   UserX,
   Eye
 } from 'lucide-react';
+import { adminApi } from '@/services/adminApi';
 
 interface User {
   id: string;
@@ -52,30 +53,16 @@ export default function UsersManagement() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('authToken');
+      setError(null);
 
-      const params = new URLSearchParams({
-        page: currentPage.toString(),
-        limit: itemsPerPage.toString(),
+      const data = await adminApi.getUsers({
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchTerm || undefined,
+        role: roleFilter || undefined,
+        isActive: statusFilter || undefined,
       });
 
-      if (searchTerm) params.append('search', searchTerm);
-      if (roleFilter) params.append('role', roleFilter);
-      if (statusFilter) params.append('isActive', statusFilter);
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/admin/users?${params}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      if (!response.ok) throw new Error('Failed to fetch users');
-
-      const data = await response.json();
       setUsers(data.users);
       setTotalUsers(data.total);
       setTotalPages(Math.ceil(data.total / itemsPerPage));
@@ -88,20 +75,7 @@ export default function UsersManagement() {
 
   const handleToggleStatus = async (userId: string) => {
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/admin/users/${userId}/toggle-status`,
-        {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      if (!response.ok) throw new Error('Failed to update user status');
-
+      await adminApi.toggleUserStatus(userId);
       await fetchUsers();
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to update user status');
@@ -110,21 +84,7 @@ export default function UsersManagement() {
 
   const handleRoleChange = async (userId: string, newRole: string) => {
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/admin/users/${userId}/role`,
-        {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ role: newRole })
-        }
-      );
-
-      if (!response.ok) throw new Error('Failed to update user role');
-
+      await adminApi.updateUserRole(userId, newRole);
       await fetchUsers();
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to update user role');
@@ -135,20 +95,7 @@ export default function UsersManagement() {
     if (!confirm('Are you sure you want to delete this user?')) return;
 
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/admin/users/${userId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      if (!response.ok) throw new Error('Failed to delete user');
-
+      await adminApi.deleteUser(userId);
       await fetchUsers();
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to delete user');
