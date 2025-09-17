@@ -29,9 +29,22 @@ import {
   StatNumber,
   StatHelpText,
   useDisclosure,
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
+  Accordion,
+  AccordionItem,
+  AccordionButton,
+  AccordionPanel,
+  AccordionIcon,
+  List,
+  ListItem,
+  ListIcon,
 } from '@chakra-ui/react';
-import { ArrowBackIcon } from '@chakra-ui/icons';
-import { FaTrophy, FaUsers, FaClock, FaTicketAlt, FaHeart } from 'react-icons/fa';
+import { ArrowBackIcon, CheckCircleIcon } from '@chakra-ui/icons';
+import { FaTrophy, FaUsers, FaClock, FaTicketAlt, FaHeart, FaCheckCircle, FaQuestionCircle, FaInfoCircle, FaGift } from 'react-icons/fa';
 import { Competition } from '@/types/api';
 import { competitionsService } from '@/services/competitions';
 import { useAuth } from '@/contexts/AuthContext';
@@ -459,7 +472,7 @@ export default function CompetitionPage() {
               </CardBody>
             </Card>
 
-            {/* Section 3: Prizes List */}
+            {/* Section 3: Tabbed Content - Details, Prizes, FAQ */}
             <Card
               shadow="2xl"
               overflow="hidden"
@@ -469,83 +482,345 @@ export default function CompetitionPage() {
               borderColor="purple.800"
             >
               <CardBody p={6}>
-                <VStack spacing={4} align="stretch">
-                  <HStack>
-                    <Icon as={FaTrophy} color="yellow.400" boxSize={6} />
-                    <Heading size="lg" color="white">Prizes</Heading>
-                  </HStack>
-
-                  {competition.prizes && competition.prizes.length > 0 ? (
-                    <SimpleGrid columns={{ base: 1, md: 2 }} spacing={3}>
-                      {competition.prizes.map((prize, index) => (
-                        <Box
-                          key={prize.id}
-                          bg="blackAlpha.400"
-                          p={4}
-                          borderRadius="lg"
-                          border="1px"
-                          borderColor={index === 0 ? "yellow.600" : "gray.700"}
-                          position="relative"
-                        >
-                          {index === 0 && (
-                            <Badge
-                              position="absolute"
-                              top={2}
-                              right={2}
-                              colorScheme="yellow"
-                              variant="solid"
-                            >
-                              GRAND PRIZE
-                            </Badge>
-                          )}
-                          <HStack align="start" spacing={3}>
-                            <Box
-                              bg={index === 0 ? "yellow.600" : "gray.700"}
-                              color="white"
-                              borderRadius="md"
-                              w="40px"
-                              h="40px"
-                              display="flex"
-                              alignItems="center"
-                              justifyContent="center"
-                              fontWeight="bold"
-                              fontSize="lg"
-                            >
-                              {prize.position || index + 1}
-                            </Box>
-                            <VStack align="start" flex={1} spacing={1}>
-                              <Text color="white" fontWeight="semibold">
-                                {prize.name}
-                              </Text>
-                              {prize.description && (
-                                <Text color="gray.400" fontSize="sm">
-                                  {prize.description}
-                                </Text>
-                              )}
-                              <Text color={index === 0 ? "yellow.400" : "green.400"} fontWeight="bold">
-                                £{prize.value}
-                              </Text>
-                              {prize.quantity > 1 && (
-                                <Badge colorScheme="blue" variant="subtle">
-                                  {prize.quantity} available
-                                </Badge>
-                              )}
-                            </VStack>
-                          </HStack>
-                        </Box>
-                      ))}
-                    </SimpleGrid>
-                  ) : (
-                    <Box
-                      bg="blackAlpha.400"
-                      p={8}
-                      borderRadius="lg"
-                      textAlign="center"
+                <Tabs variant="soft-rounded" colorScheme="purple">
+                  <TabList mb={4}>
+                    <Tab
+                      _selected={{
+                        bg: "purple.600",
+                        color: "white",
+                      }}
+                      color="gray.300"
+                      mr={2}
                     >
-                      <Text color="gray.400">Prize details will be announced soon!</Text>
-                    </Box>
-                  )}
-                </VStack>
+                      <Icon as={FaInfoCircle} mr={2} />
+                      Details
+                    </Tab>
+                    <Tab
+                      _selected={{
+                        bg: "purple.600",
+                        color: "white",
+                      }}
+                      color="gray.300"
+                      mr={2}
+                    >
+                      <Icon as={FaGift} mr={2} />
+                      Prizes
+                    </Tab>
+                    <Tab
+                      _selected={{
+                        bg: "purple.600",
+                        color: "white",
+                      }}
+                      color="gray.300"
+                    >
+                      <Icon as={FaQuestionCircle} mr={2} />
+                      FAQ
+                    </Tab>
+                  </TabList>
+
+                  <TabPanels>
+                    {/* Details Tab */}
+                    <TabPanel px={0}>
+                      <VStack spacing={4} align="stretch">
+                        <Box bg="blackAlpha.400" p={5} borderRadius="lg">
+                          <Heading size="md" color="white" mb={4}>Competition Details</Heading>
+                          <List spacing={3}>
+                            <ListItem color="gray.300">
+                              <HStack>
+                                <ListIcon as={CheckCircleIcon} color="green.400" />
+                                <Text>Entry Price: <Text as="span" fontWeight="bold" color="green.400">{formatPrice(competition.ticketPrice)}</Text> per ticket</Text>
+                              </HStack>
+                            </ListItem>
+                            <ListItem color="gray.300">
+                              <HStack>
+                                <ListIcon as={CheckCircleIcon} color="green.400" />
+                                <Text>Maximum Tickets: <Text as="span" fontWeight="bold" color="white">{competition.maxTickets}</Text></Text>
+                              </HStack>
+                            </ListItem>
+                            <ListItem color="gray.300">
+                              <HStack>
+                                <ListIcon as={CheckCircleIcon} color="green.400" />
+                                <Text>Draw Date: <Text as="span" fontWeight="bold" color="orange.400">{formatDate(competition.drawDate)}</Text></Text>
+                              </HStack>
+                            </ListItem>
+                            <ListItem color="gray.300">
+                              <HStack>
+                                <ListIcon as={CheckCircleIcon} color="green.400" />
+                                <Text>Competition Type: <Badge colorScheme="purple" ml={2}>{competition.type}</Badge></Text>
+                              </HStack>
+                            </ListItem>
+                          </List>
+                        </Box>
+
+                        <Box bg="blackAlpha.400" p={5} borderRadius="lg">
+                          <Heading size="md" color="white" mb={4}>How It Works</Heading>
+                          <List spacing={3}>
+                            <ListItem color="gray.300">
+                              <HStack align="start">
+                                <Text color="purple.400" fontWeight="bold">1.</Text>
+                                <Text>Purchase your tickets for just {formatPrice(competition.ticketPrice)} each</Text>
+                              </HStack>
+                            </ListItem>
+                            <ListItem color="gray.300">
+                              <HStack align="start">
+                                <Text color="purple.400" fontWeight="bold">2.</Text>
+                                <Text>Each ticket gives you a chance to win amazing prizes</Text>
+                              </HStack>
+                            </ListItem>
+                            <ListItem color="gray.300">
+                              <HStack align="start">
+                                <Text color="purple.400" fontWeight="bold">3.</Text>
+                                <Text>Winners are drawn randomly on {new Date(competition.drawDate).toLocaleDateString('en-GB')}</Text>
+                              </HStack>
+                            </ListItem>
+                            <ListItem color="gray.300">
+                              <HStack align="start">
+                                <Text color="purple.400" fontWeight="bold">4.</Text>
+                                <Text>100% of proceeds support {competition.charity.name}</Text>
+                              </HStack>
+                            </ListItem>
+                          </List>
+                        </Box>
+
+                        <Box bg="blackAlpha.400" p={5} borderRadius="lg">
+                          <Heading size="md" color="white" mb={4}>About {competition.charity.name}</Heading>
+                          <Text color="gray.300" mb={3}>
+                            {competition.charity.description || 'This verified charity is making a real difference in our community. Your participation directly supports their important work.'}
+                          </Text>
+                          {competition.charity.website && (
+                            <Button
+                              as="a"
+                              href={competition.charity.website}
+                              target="_blank"
+                              size="sm"
+                              variant="outline"
+                              colorScheme="purple"
+                              leftIcon={<Icon as={FaHeart} />}
+                            >
+                              Learn More About This Charity
+                            </Button>
+                          )}
+                        </Box>
+                      </VStack>
+                    </TabPanel>
+
+                    {/* Prizes Tab */}
+                    <TabPanel px={0}>
+                      <VStack spacing={4} align="stretch">
+                        {competition.prizes && competition.prizes.length > 0 ? (
+                          <>
+                            <Text color="gray.300" mb={2}>
+                              Win one of {competition.prizes.length} amazing prizes in this competition!
+                            </Text>
+                            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={3}>
+                              {competition.prizes.map((prize, index) => (
+                                <Box
+                                  key={prize.id}
+                                  bg="blackAlpha.400"
+                                  p={4}
+                                  borderRadius="lg"
+                                  border="1px"
+                                  borderColor={index === 0 ? "yellow.600" : "gray.700"}
+                                  position="relative"
+                                  transition="all 0.2s"
+                                  _hover={{
+                                    transform: "translateY(-2px)",
+                                    borderColor: index === 0 ? "yellow.500" : "purple.600",
+                                  }}
+                                >
+                                  {index === 0 && (
+                                    <Badge
+                                      position="absolute"
+                                      top={2}
+                                      right={2}
+                                      colorScheme="yellow"
+                                      variant="solid"
+                                    >
+                                      GRAND PRIZE
+                                    </Badge>
+                                  )}
+                                  <HStack align="start" spacing={3}>
+                                    <Box
+                                      bg={index === 0 ? "yellow.600" : "purple.700"}
+                                      color="white"
+                                      borderRadius="md"
+                                      w="40px"
+                                      h="40px"
+                                      display="flex"
+                                      alignItems="center"
+                                      justifyContent="center"
+                                      fontWeight="bold"
+                                      fontSize="lg"
+                                    >
+                                      {prize.position || index + 1}
+                                    </Box>
+                                    <VStack align="start" flex={1} spacing={1}>
+                                      <Text color="white" fontWeight="semibold">
+                                        {prize.name}
+                                      </Text>
+                                      {prize.description && (
+                                        <Text color="gray.400" fontSize="sm">
+                                          {prize.description}
+                                        </Text>
+                                      )}
+                                      <Text color={index === 0 ? "yellow.400" : "green.400"} fontWeight="bold" fontSize="lg">
+                                        £{prize.value}
+                                      </Text>
+                                      {prize.quantity > 1 && (
+                                        <Badge colorScheme="blue" variant="subtle">
+                                          {prize.quantity} winners
+                                        </Badge>
+                                      )}
+                                    </VStack>
+                                  </HStack>
+                                </Box>
+                              ))}
+                            </SimpleGrid>
+                            <Box bg="blackAlpha.400" p={4} borderRadius="lg" mt={2}>
+                              <Text color="purple.400" fontWeight="semibold" fontSize="sm">
+                                Total Prize Value: £{competition.prizes.reduce((sum, p) => sum + parseFloat(p.value), 0).toFixed(2)}
+                              </Text>
+                            </Box>
+                          </>
+                        ) : (
+                          <Box
+                            bg="blackAlpha.400"
+                            p={8}
+                            borderRadius="lg"
+                            textAlign="center"
+                          >
+                            <Icon as={FaTrophy} color="gray.500" boxSize={12} mb={3} />
+                            <Text color="gray.400">Prize details will be announced soon!</Text>
+                          </Box>
+                        )}
+                      </VStack>
+                    </TabPanel>
+
+                    {/* FAQ Tab */}
+                    <TabPanel px={0}>
+                      <Accordion allowToggle>
+                        <AccordionItem border="none" mb={3}>
+                          <AccordionButton
+                            bg="blackAlpha.400"
+                            borderRadius="lg"
+                            _hover={{ bg: "blackAlpha.500" }}
+                            _expanded={{ bg: "purple.900", borderBottomRadius: 0 }}
+                          >
+                            <Box flex="1" textAlign="left" color="white" fontWeight="semibold">
+                              How do I purchase tickets?
+                            </Box>
+                            <AccordionIcon color="purple.400" />
+                          </AccordionButton>
+                          <AccordionPanel pb={4} bg="blackAlpha.400" borderBottomRadius="lg" color="gray.300">
+                            Simply click the "Buy Tickets" button above, select how many tickets you'd like, and complete your purchase securely. You'll receive an email confirmation with your ticket numbers.
+                          </AccordionPanel>
+                        </AccordionItem>
+
+                        <AccordionItem border="none" mb={3}>
+                          <AccordionButton
+                            bg="blackAlpha.400"
+                            borderRadius="lg"
+                            _hover={{ bg: "blackAlpha.500" }}
+                            _expanded={{ bg: "purple.900", borderBottomRadius: 0 }}
+                          >
+                            <Box flex="1" textAlign="left" color="white" fontWeight="semibold">
+                              When will the draw take place?
+                            </Box>
+                            <AccordionIcon color="purple.400" />
+                          </AccordionButton>
+                          <AccordionPanel pb={4} bg="blackAlpha.400" borderBottomRadius="lg" color="gray.300">
+                            The draw will take place on {formatDate(competition.drawDate)}. Winners will be selected randomly and notified via email immediately after the draw.
+                          </AccordionPanel>
+                        </AccordionItem>
+
+                        <AccordionItem border="none" mb={3}>
+                          <AccordionButton
+                            bg="blackAlpha.400"
+                            borderRadius="lg"
+                            _hover={{ bg: "blackAlpha.500" }}
+                            _expanded={{ bg: "purple.900", borderBottomRadius: 0 }}
+                          >
+                            <Box flex="1" textAlign="left" color="white" fontWeight="semibold">
+                              How are winners selected?
+                            </Box>
+                            <AccordionIcon color="purple.400" />
+                          </AccordionButton>
+                          <AccordionPanel pb={4} bg="blackAlpha.400" borderBottomRadius="lg" color="gray.300">
+                            Winners are selected using a certified random number generator to ensure complete fairness. Each ticket has an equal chance of winning, regardless of when it was purchased.
+                          </AccordionPanel>
+                        </AccordionItem>
+
+                        <AccordionItem border="none" mb={3}>
+                          <AccordionButton
+                            bg="blackAlpha.400"
+                            borderRadius="lg"
+                            _hover={{ bg: "blackAlpha.500" }}
+                            _expanded={{ bg: "purple.900", borderBottomRadius: 0 }}
+                          >
+                            <Box flex="1" textAlign="left" color="white" fontWeight="semibold">
+                              Where does the money go?
+                            </Box>
+                            <AccordionIcon color="purple.400" />
+                          </AccordionButton>
+                          <AccordionPanel pb={4} bg="blackAlpha.400" borderBottomRadius="lg" color="gray.300">
+                            100% of the proceeds from ticket sales go directly to {competition.charity.name}. We cover all operational costs separately to ensure maximum impact for the charity.
+                          </AccordionPanel>
+                        </AccordionItem>
+
+                        <AccordionItem border="none" mb={3}>
+                          <AccordionButton
+                            bg="blackAlpha.400"
+                            borderRadius="lg"
+                            _hover={{ bg: "blackAlpha.500" }}
+                            _expanded={{ bg: "purple.900", borderBottomRadius: 0 }}
+                          >
+                            <Box flex="1" textAlign="left" color="white" fontWeight="semibold">
+                              Is there a limit on tickets I can buy?
+                            </Box>
+                            <AccordionIcon color="purple.400" />
+                          </AccordionButton>
+                          <AccordionPanel pb={4} bg="blackAlpha.400" borderBottomRadius="lg" color="gray.300">
+                            You can purchase as many tickets as you like, up to the maximum available. More tickets mean more chances to win! However, please gamble responsibly.
+                          </AccordionPanel>
+                        </AccordionItem>
+
+                        <AccordionItem border="none" mb={3}>
+                          <AccordionButton
+                            bg="blackAlpha.400"
+                            borderRadius="lg"
+                            _hover={{ bg: "blackAlpha.500" }}
+                            _expanded={{ bg: "purple.900", borderBottomRadius: 0 }}
+                          >
+                            <Box flex="1" textAlign="left" color="white" fontWeight="semibold">
+                              How will I know if I've won?
+                            </Box>
+                            <AccordionIcon color="purple.400" />
+                          </AccordionButton>
+                          <AccordionPanel pb={4} bg="blackAlpha.400" borderBottomRadius="lg" color="gray.300">
+                            Winners are notified via email and SMS (if provided) immediately after the draw. You can also check your account dashboard to see if any of your tickets have won.
+                          </AccordionPanel>
+                        </AccordionItem>
+
+                        <AccordionItem border="none">
+                          <AccordionButton
+                            bg="blackAlpha.400"
+                            borderRadius="lg"
+                            _hover={{ bg: "blackAlpha.500" }}
+                            _expanded={{ bg: "purple.900", borderBottomRadius: 0 }}
+                          >
+                            <Box flex="1" textAlign="left" color="white" fontWeight="semibold">
+                              Can I get a refund?
+                            </Box>
+                            <AccordionIcon color="purple.400" />
+                          </AccordionButton>
+                          <AccordionPanel pb={4} bg="blackAlpha.400" borderBottomRadius="lg" color="gray.300">
+                            As per our terms and conditions, all ticket sales are final and non-refundable. This ensures fairness for all participants and maximizes the charity's fundraising.
+                          </AccordionPanel>
+                        </AccordionItem>
+                      </Accordion>
+                    </TabPanel>
+                  </TabPanels>
+                </Tabs>
               </CardBody>
             </Card>
           </VStack>
