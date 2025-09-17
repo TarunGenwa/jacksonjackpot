@@ -41,9 +41,9 @@ export default function RootLayout({
         <ChakraProvider>
           <AuthProvider>
             <WalletProvider>
-              <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#1a202c' }}>
                 <Header />
-                <main style={{ flex: 1 }}>
+                <main style={{ flex: 1, backgroundColor: '#1a202c' }}>
                   {children}
                 </main>
                 <Footer />

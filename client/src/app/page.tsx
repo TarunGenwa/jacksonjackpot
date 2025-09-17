@@ -55,12 +55,12 @@ export default function Home() {
 
   if (loading) {
     return (
-      <Box minH="100vh" bg="gray.50">
+      <Box minH="100vh" bg="gray.900">
         <Container maxW="container.xl" py={8}>
           <Center minH="50vh">
             <VStack spacing={4}>
-              <Spinner size="xl" color="blue.500" />
-              <Text color="gray.600">Loading competitions...</Text>
+              <Spinner size="xl" color="blue.400" />
+              <Text color="gray.300">Loading competitions...</Text>
             </VStack>
           </Center>
         </Container>
@@ -70,11 +70,11 @@ export default function Home() {
 
   if (error) {
     return (
-      <Box minH="100vh" bg="gray.50">
+      <Box minH="100vh" bg="gray.900">
         <Container maxW="container.xl" py={8}>
           <Center minH="50vh">
             <VStack spacing={4}>
-              <Alert status="error" maxW="md" borderRadius="md">
+              <Alert status="error" maxW="md" borderRadius="md" bg="gray.800" color="white">
                 <AlertIcon />
                 {error}
               </Alert>
@@ -92,10 +92,10 @@ export default function Home() {
   }
 
   return (
-    <Box minH="100vh" bg="gray.50">
+    <Box minH="100vh" bg="gray.900">
       {/* Hero Section */}
       <Box
-        bgGradient="linear(135deg, blue.500, purple.600, pink.500)"
+        bgGradient="linear(135deg, blue.600, purple.700, pink.600)"
         color="white"
         py={20}
         textAlign="center"
@@ -346,37 +346,37 @@ export default function Home() {
         <VStack spacing={12}>
 
           {/* Features Section */}
-          <Card w="full" shadow="xl">
+          <Card w="full" shadow="xl" bg="gray.800" border="1px" borderColor="gray.700">
             <CardBody p={8}>
               <VStack spacing={8}>
-                <Heading size="xl" textAlign="center" color="gray.800">
+                <Heading size="xl" textAlign="center" color="white">
                   Why Choose Jackson Jackpot?
                 </Heading>
                 <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8} w="full">
                   <VStack spacing={4} textAlign="center">
-                    <Circle size="16" bg="blue.100" color="blue.500">
+                    <Circle size="16" bg="blue.900" color="blue.400">
                       <Icon as={FaTrophy} boxSize={8} />
                     </Circle>
-                    <Heading size="md">Amazing Prizes</Heading>
-                    <Text color="gray.600">
+                    <Heading size="md" color="white">Amazing Prizes</Heading>
+                    <Text color="gray.400">
                       Win holidays, cash, cars, and more incredible prizes
                     </Text>
                   </VStack>
                   <VStack spacing={4} textAlign="center">
-                    <Circle size="16" bg="green.100" color="green.500">
+                    <Circle size="16" bg="green.900" color="green.400">
                       <Icon as={FaHeart} boxSize={8} />
                     </Circle>
-                    <Heading size="md">Support Charities</Heading>
-                    <Text color="gray.600">
+                    <Heading size="md" color="white">Support Charities</Heading>
+                    <Text color="gray.400">
                       Every ticket supports verified charitable causes
                     </Text>
                   </VStack>
                   <VStack spacing={4} textAlign="center">
-                    <Circle size="16" bg="purple.100" color="purple.500">
+                    <Circle size="16" bg="purple.900" color="purple.400">
                       <Icon as={FaShieldAlt} boxSize={8} />
                     </Circle>
-                    <Heading size="md">100% Transparent</Heading>
-                    <Text color="gray.600">
+                    <Heading size="md" color="white">100% Transparent</Heading>
+                    <Text color="gray.400">
                       Fair draws, verified charities, secure payments
                     </Text>
                   </VStack>
@@ -386,34 +386,34 @@ export default function Home() {
           </Card>
 
           {/* Stats Section */}
-          <Card w="full" shadow="xl">
+          <Card w="full" shadow="xl" bg="gray.800" border="1px" borderColor="gray.700">
             <CardBody p={8}>
               <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8}>
                 <Stat textAlign="center">
                   <Flex justify="center" mb={2}>
-                    <Icon as={FaInfoCircle} boxSize={8} color="blue.500" />
+                    <Icon as={FaInfoCircle} boxSize={8} color="blue.400" />
                   </Flex>
-                  <StatLabel fontSize="lg">Total Raised</StatLabel>
-                  <StatNumber fontSize="3xl" color="blue.500">£1.2M</StatNumber>
-                  <StatHelpText>For charities this year</StatHelpText>
+                  <StatLabel fontSize="lg" color="gray.300">Total Raised</StatLabel>
+                  <StatNumber fontSize="3xl" color="blue.400">£1.2M</StatNumber>
+                  <StatHelpText color="gray.400">For charities this year</StatHelpText>
                 </Stat>
 
                 <Stat textAlign="center">
                   <Flex justify="center" mb={2}>
-                    <Icon as={FaUsers} boxSize={8} color="green.500" />
+                    <Icon as={FaUsers} boxSize={8} color="green.400" />
                   </Flex>
-                  <StatLabel fontSize="lg">Happy Winners</StatLabel>
-                  <StatNumber fontSize="3xl" color="green.500">2,450</StatNumber>
-                  <StatHelpText>Life-changing prizes</StatHelpText>
+                  <StatLabel fontSize="lg" color="gray.300">Happy Winners</StatLabel>
+                  <StatNumber fontSize="3xl" color="green.400">2,450</StatNumber>
+                  <StatHelpText color="gray.400">Life-changing prizes</StatHelpText>
                 </Stat>
 
                 <Stat textAlign="center">
                   <Flex justify="center" mb={2}>
-                    <Icon as={FaGift} boxSize={8} color="purple.500" />
+                    <Icon as={FaGift} boxSize={8} color="purple.400" />
                   </Flex>
-                  <StatLabel fontSize="lg">Active Competitions</StatLabel>
-                  <StatNumber fontSize="3xl" color="purple.500">{competitions.length}</StatNumber>
-                  <StatHelpText>Ready to enter</StatHelpText>
+                  <StatLabel fontSize="lg" color="gray.300">Active Competitions</StatLabel>
+                  <StatNumber fontSize="3xl" color="purple.400">{competitions.length}</StatNumber>
+                  <StatHelpText color="gray.400">Ready to enter</StatHelpText>
                 </Stat>
               </SimpleGrid>
             </CardBody>

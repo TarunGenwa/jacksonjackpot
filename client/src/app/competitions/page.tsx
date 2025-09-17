@@ -63,12 +63,12 @@ export default function CompetitionsPage() {
 
   if (loading) {
     return (
-      <Box minH="100vh" bg="gray.50">
+      <Box minH="100vh" bg="gray.900">
         <Container maxW="container.xl" py={8}>
           <Center minH="50vh">
             <VStack spacing={4}>
-              <Spinner size="xl" color="blue.500" />
-              <Text color="gray.600">Loading competitions...</Text>
+              <Spinner size="xl" color="blue.400" />
+              <Text color="gray.300">Loading competitions...</Text>
             </VStack>
           </Center>
         </Container>
@@ -78,11 +78,11 @@ export default function CompetitionsPage() {
 
   if (error) {
     return (
-      <Box minH="100vh" bg="gray.50">
+      <Box minH="100vh" bg="gray.900">
         <Container maxW="container.xl" py={8}>
           <Center minH="50vh">
             <VStack spacing={4}>
-              <Alert status="error" maxW="md" borderRadius="md">
+              <Alert status="error" maxW="md" borderRadius="md" bg="gray.800" color="white">
                 <AlertIcon />
                 {error}
               </Alert>
@@ -100,19 +100,19 @@ export default function CompetitionsPage() {
   }
 
   return (
-    <Box minH="100vh" bg="gray.50">
+    <Box minH="100vh" bg="gray.900">
       <Container maxW="container.xl" py={12}>
         <VStack spacing={8} align="stretch">
           {/* Header */}
           <VStack spacing={4} textAlign="center">
-            <Heading as="h1" size="2xl" color="gray.800">
+            <Heading as="h1" size="2xl" color="white">
               All Competitions
             </Heading>
-            <Text fontSize="lg" color="gray.600" maxW="2xl">
+            <Text fontSize="lg" color="gray.300" maxW="2xl">
               Browse all available competitions and win amazing prizes while supporting great causes
             </Text>
             {allCompetitions.length > 0 && (
-              <Text fontSize="md" color="gray.500">
+              <Text fontSize="md" color="gray.400">
                 {allCompetitions.length} competition{allCompetitions.length > 1 ? 's' : ''} available
               </Text>
             )}
@@ -131,19 +131,19 @@ export default function CompetitionsPage() {
           ) : (
             <Box
               p={16}
-              bg="white"
+              bg="gray.900"
               borderRadius="lg"
               border="1px"
-              borderColor="gray.200"
+              borderColor="gray.700"
               textAlign="center"
               maxW="2xl"
               mx="auto"
             >
               <VStack spacing={4}>
-                <Text fontSize="lg" fontWeight="semibold" color="gray.700">
+                <Text fontSize="lg" fontWeight="semibold" color="white">
                   No Competitions Available
                 </Text>
-                <Text color="gray.500">
+                <Text color="gray.400">
                   Check back soon for exciting new competitions!
                 </Text>
               </VStack>

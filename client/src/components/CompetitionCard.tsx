@@ -114,14 +114,16 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
   return (
     <Card
       w="full"
-      shadow="md"
-      _hover={{ shadow: "lg", transform: "translateY(-2px)" }}
+      shadow="xl"
+      _hover={{ shadow: "2xl", transform: "translateY(-2px)", borderColor: "blue.400" }}
       transition="all 0.3s"
       overflow="hidden"
       cursor="pointer"
       onClick={handleCardClick}
-      bg="white"
+      bg="gray.800"
       borderRadius="lg"
+      border="1px"
+      borderColor="gray.700"
     >
       <CardBody p={0}>
         <VStack spacing={0} align="stretch">
@@ -205,7 +207,7 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
             <Heading
               as="h3"
               size="md"
-              color="gray.800"
+              color="white"
               lineHeight="1.3"
               noOfLines={2}
             >
@@ -215,7 +217,7 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
             {/* Description */}
             {localCompetition.description && (
               <Text
-                color="gray.600"
+                color="gray.400"
                 fontSize="sm"
                 noOfLines={2}
               >
@@ -227,30 +229,30 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
             <VStack spacing={2} align="stretch">
               <HStack justify="space-between" py={1}>
                 <HStack spacing={1}>
-                  <Icon as={FaTrophy} boxSize={3} color="gold" />
-                  <Text fontSize="xs" color="gray.600">Prize</Text>
+                  <Icon as={FaTrophy} boxSize={3} color="yellow.400" />
+                  <Text fontSize="xs" color="gray.400">Prize</Text>
                 </HStack>
-                <Text fontWeight="bold" color="green.600" fontSize="sm">
+                <Text fontWeight="bold" color="green.400" fontSize="sm">
                   {getPrizePool()}
                 </Text>
               </HStack>
 
               <HStack justify="space-between" py={1}>
                 <HStack spacing={1}>
-                  <Icon as={FaClock} boxSize={3} color="blue.500" />
-                  <Text fontSize="xs" color="gray.600">Time Left</Text>
+                  <Icon as={FaClock} boxSize={3} color="blue.400" />
+                  <Text fontSize="xs" color="gray.400">Time Left</Text>
                 </HStack>
-                <Text fontWeight="semibold" color="gray.800" fontSize="sm">
+                <Text fontWeight="semibold" color="gray.200" fontSize="sm">
                   {getRemainingTime()}
                 </Text>
               </HStack>
 
               <HStack justify="space-between" py={1}>
                 <HStack spacing={1}>
-                  <Icon as={FaTicketAlt} boxSize={3} color="purple.500" />
-                  <Text fontSize="xs" color="gray.600">Tickets</Text>
+                  <Icon as={FaTicketAlt} boxSize={3} color="purple.400" />
+                  <Text fontSize="xs" color="gray.400">Tickets</Text>
                 </HStack>
-                <Text fontWeight="semibold" color="gray.800" fontSize="sm">
+                <Text fontWeight="semibold" color="gray.200" fontSize="sm">
                   {localCompetition.ticketsSold} / {localCompetition.maxTickets}
                 </Text>
               </HStack>
@@ -259,10 +261,10 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
             {/* Progress Bar */}
             <Box>
               <Flex justify="space-between" mb={1}>
-                <Text fontSize="xs" fontWeight="semibold" color="gray.700">
+                <Text fontSize="xs" fontWeight="semibold" color="gray.300">
                   Progress
                 </Text>
-                <Text fontSize="xs" fontWeight="bold" color="blue.600">
+                <Text fontSize="xs" fontWeight="bold" color="blue.400">
                   {getProgressPercentage()}%
                 </Text>
               </Flex>
@@ -271,22 +273,22 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
                 colorScheme="blue"
                 size="sm"
                 borderRadius="full"
-                bg="gray.100"
+                bg="gray.700"
               />
             </Box>
 
             {/* Additional Details */}
             <HStack spacing={4} pt={1}>
               <VStack align="start" spacing={0}>
-                <Text fontSize="xs" color="gray.500">Draw</Text>
-                <Text fontSize="xs" fontWeight="semibold">
+                <Text fontSize="xs" color="gray.400">Draw</Text>
+                <Text fontSize="xs" fontWeight="semibold" color="gray.200">
                   {formatDate(localCompetition.drawDate)}
                 </Text>
               </VStack>
               {localCompetition.charity && (
                 <VStack align="start" spacing={0}>
-                  <Text fontSize="xs" color="gray.500">Charity</Text>
-                  <Text fontSize="xs" fontWeight="semibold" color="purple.600" noOfLines={1}>
+                  <Text fontSize="xs" color="gray.400">Charity</Text>
+                  <Text fontSize="xs" fontWeight="semibold" color="purple.400" noOfLines={1}>
                     {localCompetition.charity.name}
                   </Text>
                 </VStack>

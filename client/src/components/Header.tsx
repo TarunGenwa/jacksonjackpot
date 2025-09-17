@@ -67,7 +67,15 @@ export default function Header() {
 
   return (
     <>
-      <Box bg="white" shadow="lg" position="sticky" top={0} zIndex={1000}>
+      <Box
+        bgGradient="linear(to-r, purple.900, blue.900, purple.900)"
+        shadow="2xl"
+        position="sticky"
+        top={0}
+        zIndex={1000}
+        borderBottom="1px"
+        borderColor="purple.700"
+      >
         <Container maxW="container.xl">
           <Flex h={16} alignItems="center" justifyContent="space-between">
             {/* Logo */}
@@ -75,9 +83,13 @@ export default function Header() {
               <Text
                 fontSize="2xl"
                 fontWeight="bold"
-                color="blue.500"
-                _hover={{ color: "blue.600" }}
-                transition="color 0.2s"
+                bgGradient="linear(to-r, cyan.400, blue.400, purple.400)"
+                bgClip="text"
+                _hover={{
+                  bgGradient: "linear(to-r, cyan.300, blue.300, purple.300)",
+                  bgClip: "text"
+                }}
+                transition="all 0.3s"
               >
                 JJ+
               </Text>
@@ -91,6 +103,8 @@ export default function Header() {
                   aria-label="Open Menu"
                   icon={<HamburgerIcon />}
                   variant="ghost"
+                  color="white"
+                  _hover={{ bg: "whiteAlpha.200" }}
                   onClick={onOpen}
                 />
               )}
@@ -102,14 +116,14 @@ export default function Header() {
                   {!isMobile && (
                     <Link href="/wallet">
                       <Badge
-                        colorScheme="green"
-                        variant="solid"
+                        bg="green.400"
+                        color="gray.900"
                         px={3}
                         py={1}
                         borderRadius="full"
                         fontSize="sm"
                         cursor="pointer"
-                        _hover={{ bg: 'green.600' }}
+                        _hover={{ bg: 'green.300' }}
                         transition="all 0.2s"
                       >
                         <HStack spacing={1}>
@@ -131,16 +145,18 @@ export default function Header() {
                       <Avatar
                         size="sm"
                         name={getUserDisplayName()}
-                        bg="blue.500"
+                        bg="purple.500"
                         color="white"
+                        border="2px"
+                        borderColor="purple.400"
                       >
                         {getUserInitials()}
                       </Avatar>
                     </MenuButton>
-                    <MenuList minW="250px" p={2}>
-                      <Box px={3} py={2} borderBottom="1px" borderColor="gray.200" mb={2}>
-                        <Text fontWeight="semibold">{getUserDisplayName()}</Text>
-                        <Text fontSize="sm" color="gray.600">{user.email}</Text>
+                    <MenuList minW="250px" p={2} bg="gray.800" borderColor="gray.700">
+                      <Box px={3} py={2} borderBottom="1px" borderColor="gray.600" mb={2}>
+                        <Text fontWeight="semibold" color="white">{getUserDisplayName()}</Text>
+                        <Text fontSize="sm" color="gray.400">{user.email}</Text>
                         <HStack justify="space-between" mt={2}>
                           <Badge colorScheme="blue" variant="solid" fontSize="xs">
                             {user.role}
@@ -161,33 +177,34 @@ export default function Header() {
                       </Box>
                     
                     <Link href="/profile">
-                      <MenuItem icon={<FaUser />}>Profile Settings</MenuItem>
+                      <MenuItem icon={<FaUser />} _hover={{ bg: "gray.700" }} color="gray.200">Profile Settings</MenuItem>
                     </Link>
                     <Link href="/my-tickets">
-                      <MenuItem icon={<FaTicketAlt />}>My Tickets</MenuItem>
+                      <MenuItem icon={<FaTicketAlt />} _hover={{ bg: "gray.700" }} color="gray.200">My Tickets</MenuItem>
                     </Link>
                     <Link href="/wallet">
-                      <MenuItem icon={<FaWallet />}>Wallet</MenuItem>
+                      <MenuItem icon={<FaWallet />} _hover={{ bg: "gray.700" }} color="gray.200">Wallet</MenuItem>
                     </Link>
                     <Link href="/transaction-history">
-                      <MenuItem icon={<FaHistory />}>Transaction History</MenuItem>
+                      <MenuItem icon={<FaHistory />} _hover={{ bg: "gray.700" }} color="gray.200">Transaction History</MenuItem>
                     </Link>
 
-                    <MenuDivider />
+                    <MenuDivider borderColor="gray.600" />
 
                     <Link href="/charities">
-                      <MenuItem icon={<FaHeart />}>Charities</MenuItem>
+                      <MenuItem icon={<FaHeart />} _hover={{ bg: "gray.700" }} color="gray.200">Charities</MenuItem>
                     </Link>
                     <Link href="/how-it-works">
-                      <MenuItem icon={<FaQuestionCircle />}>How It Works</MenuItem>
+                      <MenuItem icon={<FaQuestionCircle />} _hover={{ bg: "gray.700" }} color="gray.200">How It Works</MenuItem>
                     </Link>
 
-                    <MenuDivider />
-                    
-                    <MenuItem 
-                      icon={<FaSignOutAlt />} 
+                    <MenuDivider borderColor="gray.600" />
+
+                    <MenuItem
+                      icon={<FaSignOutAlt />}
                       onClick={logout}
-                      color="red.500"
+                      color="red.400"
+                      _hover={{ bg: "gray.700" }}
                     >
                       Sign Out
                     </MenuItem>
@@ -198,12 +215,20 @@ export default function Header() {
                 /* Guest User Buttons */
                 <HStack spacing={2}>
                   <Link href="/login">
-                    <Button variant="ghost">
+                    <Button
+                      variant="ghost"
+                      color="white"
+                      _hover={{ bg: "whiteAlpha.200" }}
+                    >
                       Log In
                     </Button>
                   </Link>
                   <Link href="/signup">
-                    <Button colorScheme="blue">
+                    <Button
+                      bg="purple.500"
+                      color="white"
+                      _hover={{ bg: "purple.400" }}
+                    >
                       Sign Up
                     </Button>
                   </Link>
@@ -217,10 +242,15 @@ export default function Header() {
       {/* Mobile Navigation Drawer */}
       <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
         <DrawerOverlay />
-        <DrawerContent>
+        <DrawerContent bg="gray.800" color="white">
           <DrawerCloseButton />
-          <DrawerHeader borderBottomWidth="1px">
-            <Text color="blue.500" fontWeight="bold" fontSize="xl">
+          <DrawerHeader borderBottomWidth="1px" borderColor="gray.700">
+            <Text
+              fontWeight="bold"
+              fontSize="xl"
+              bgGradient="linear(to-r, cyan.400, blue.400, purple.400)"
+              bgClip="text"
+            >
               JJ+
             </Text>
           </DrawerHeader>
@@ -229,11 +259,11 @@ export default function Header() {
               {/* Mobile User Menu */}
               {user && (
                 <>
-                  <Box borderTop="1px" borderColor="gray.200" pt={4}>
+                  <Box borderTop="1px" borderColor="gray.700" pt={4}>
                     <VStack spacing={2} align="stretch">
-                      <Box px={3} py={2} bg="gray.50" borderRadius="md">
-                        <Text fontWeight="semibold">{getUserDisplayName()}</Text>
-                        <Text fontSize="sm" color="gray.600">{user.email}</Text>
+                      <Box px={3} py={2} bg="gray.700" borderRadius="md">
+                        <Text fontWeight="semibold" color="white">{getUserDisplayName()}</Text>
+                        <Text fontSize="sm" color="gray.400">{user.email}</Text>
                         <HStack justify="space-between" mt={2}>
                           <Badge colorScheme="blue" variant="solid" fontSize="xs">
                             {user.role}

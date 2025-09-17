@@ -33,7 +33,7 @@ import {
 } from 'react-icons/fa';
 
 export default function Footer() {
-  const bgColor = useColorModeValue('gray.900', 'gray.900');
+  const bgColor = 'gray.800';
   const textColor = useColorModeValue('gray.300', 'gray.300');
   const headingColor = useColorModeValue('white', 'white');
 
