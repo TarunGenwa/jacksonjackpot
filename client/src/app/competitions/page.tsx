@@ -23,17 +23,7 @@ import { competitionsService } from '@/services/competitions';
 export default function CompetitionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [allCompetitions, setAllCompetitions] = useState<{
-    mysteryBoxes: Competition[];
-    instantWins: Competition[];
-    dailyFree: Competition[];
-    instantSpins: Competition[];
-  }>({
-    mysteryBoxes: [],
-    instantWins: [],
-    dailyFree: [],
-    instantSpins: []
-  });
+  const [allCompetitions, setAllCompetitions] = useState<Competition[]>([]);
 
   useEffect(() => {
     const fetchCompetitions = async () => {
@@ -49,12 +39,15 @@ export default function CompetitionsPage() {
           competitionsService.getByType('INSTANT_SPINS')
         ]);
 
-        setAllCompetitions({
-          mysteryBoxes,
-          instantWins,
-          dailyFree,
-          instantSpins
-        });
+        // Combine all competitions into a single array
+        const combined = [
+          ...mysteryBoxes.map(c => ({ ...c, category: 'Mystery Box' })),
+          ...instantWins.map(c => ({ ...c, category: 'Instant Win' })),
+          ...dailyFree.map(c => ({ ...c, category: 'Daily Free' })),
+          ...instantSpins.map(c => ({ ...c, category: 'Instant Spin' }))
+        ];
+
+        setAllCompetitions(combined);
       } catch (err) {
         console.error('Failed to fetch competitions:', err);
         setError('Failed to load competitions. Please try again later.');
@@ -66,32 +59,6 @@ export default function CompetitionsPage() {
     fetchCompetitions();
   }, []);
 
-  const competitionSections = [
-    {
-      title: 'Mystery Boxes',
-      icon: FaGift,
-      color: 'purple',
-      competitions: allCompetitions.mysteryBoxes
-    },
-    {
-      title: 'Instant Wins',
-      icon: FaBolt,
-      color: 'orange',
-      competitions: allCompetitions.instantWins
-    },
-    {
-      title: 'Daily Free',
-      icon: FaCalendarDay,
-      color: 'green',
-      competitions: allCompetitions.dailyFree
-    },
-    {
-      title: 'Instant Spins',
-      icon: FaCircle,
-      color: 'blue',
-      competitions: allCompetitions.instantSpins
-    }
-  ];
 
 
   if (loading) {
@@ -135,7 +102,7 @@ export default function CompetitionsPage() {
   return (
     <Box minH="100vh" bg="gray.50">
       <Container maxW="container.xl" py={12}>
-        <VStack spacing={12} align="stretch">
+        <VStack spacing={8} align="stretch">
           {/* Header */}
           <VStack spacing={4} textAlign="center">
             <Heading as="h1" size="2xl" color="gray.800">
@@ -144,64 +111,44 @@ export default function CompetitionsPage() {
             <Text fontSize="lg" color="gray.600" maxW="2xl">
               Browse all available competitions and win amazing prizes while supporting great causes
             </Text>
+            {allCompetitions.length > 0 && (
+              <Text fontSize="md" color="gray.500">
+                {allCompetitions.length} competition{allCompetitions.length > 1 ? 's' : ''} available
+              </Text>
+            )}
           </VStack>
 
-          {/* All Competition Sections */}
-          <VStack spacing={12} align="stretch">
-            {competitionSections.map((section) => {
-              const hasCompetitions = section.competitions.length > 0;
-
-              return (
-                <VStack key={section.title} spacing={6} align="stretch">
-                  {/* Section Header */}
-                  <Box>
-                    <Heading
-                      as="h2"
-                      size="lg"
-                      color={`${section.color}.600`}
-                      mb={2}
-                    >
-                      {section.title}
-                    </Heading>
-                    <Text color="gray.600" fontSize="sm">
-                      {hasCompetitions
-                        ? `${section.competitions.length} competition${section.competitions.length > 1 ? 's' : ''} available`
-                        : 'Coming soon'
-                      }
-                    </Text>
-                  </Box>
-
-                  {/* Competition Cards */}
-                  {hasCompetitions ? (
-                    <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
-                      {section.competitions.map((competition) => (
-                        <CompetitionCard
-                          key={competition.id}
-                          competition={competition}
-                        />
-                      ))}
-                    </SimpleGrid>
-                  ) : (
-                    <Box
-                      p={12}
-                      bg="white"
-                      borderRadius="lg"
-                      border="1px"
-                      borderColor="gray.200"
-                      textAlign="center"
-                    >
-                      <Text color="gray.500">
-                        No {section.title.toLowerCase()} available at the moment. Check back soon!
-                      </Text>
-                    </Box>
-                  )}
-
-                  {/* Divider between sections */}
-                  <Divider borderColor="gray.300" />
-                </VStack>
-              );
-            })}
-          </VStack>
+          {/* All Competition Cards */}
+          {allCompetitions.length > 0 ? (
+            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+              {allCompetitions.map((competition) => (
+                <CompetitionCard
+                  key={competition.id}
+                  competition={competition}
+                />
+              ))}
+            </SimpleGrid>
+          ) : (
+            <Box
+              p={16}
+              bg="white"
+              borderRadius="lg"
+              border="1px"
+              borderColor="gray.200"
+              textAlign="center"
+              maxW="2xl"
+              mx="auto"
+            >
+              <VStack spacing={4}>
+                <Text fontSize="lg" fontWeight="semibold" color="gray.700">
+                  No Competitions Available
+                </Text>
+                <Text color="gray.500">
+                  Check back soon for exciting new competitions!
+                </Text>
+              </VStack>
+            </Box>
+          )}
         </VStack>
       </Container>
     </Box>

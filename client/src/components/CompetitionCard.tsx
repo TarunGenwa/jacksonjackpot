@@ -15,7 +15,7 @@ import {
   Flex,
   Icon,
 } from '@chakra-ui/react';
-import { FaClock, FaTicketAlt, FaTrophy } from 'react-icons/fa';
+import { FaClock, FaTicketAlt, FaTrophy, FaGift, FaBolt, FaCalendarDay, FaCircle } from 'react-icons/fa';
 import { Competition } from '@/types/api';
 
 interface CompetitionCardProps {
@@ -93,6 +93,23 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
     }
   };
 
+  const getCategoryInfo = (category?: string) => {
+    switch (category) {
+      case 'Mystery Box':
+        return { icon: FaGift, color: 'purple' };
+      case 'Instant Win':
+        return { icon: FaBolt, color: 'orange' };
+      case 'Daily Free':
+        return { icon: FaCalendarDay, color: 'green' };
+      case 'Instant Spin':
+        return { icon: FaCircle, color: 'blue' };
+      default:
+        return { icon: FaTrophy, color: 'gray' };
+    }
+  };
+
+  const categoryInfo = getCategoryInfo((localCompetition as any).category);
+
 
   return (
     <Card
@@ -130,20 +147,40 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
               </Box>
             )}
 
-            {/* Status Badge */}
-            <Badge
+            {/* Status and Category Badges */}
+            <HStack
               position="absolute"
               top={4}
               left={4}
-              colorScheme={getStatusColor(localCompetition.status)}
-              variant="solid"
-              fontSize="sm"
-              borderRadius="md"
-              px={3}
-              py={1}
+              spacing={2}
             >
-              {localCompetition.status}
-            </Badge>
+              {(localCompetition as any).category && (
+                <Badge
+                  colorScheme={categoryInfo.color}
+                  variant="solid"
+                  fontSize="sm"
+                  borderRadius="md"
+                  px={3}
+                  py={1}
+                  display="flex"
+                  alignItems="center"
+                  gap={1}
+                >
+                  <Icon as={categoryInfo.icon} boxSize={3} />
+                  {(localCompetition as any).category}
+                </Badge>
+              )}
+              <Badge
+                colorScheme={getStatusColor(localCompetition.status)}
+                variant="solid"
+                fontSize="sm"
+                borderRadius="md"
+                px={3}
+                py={1}
+              >
+                {localCompetition.status}
+              </Badge>
+            </HStack>
 
             {/* Price Badge */}
             <Badge
