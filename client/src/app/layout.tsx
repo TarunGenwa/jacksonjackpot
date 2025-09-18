@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { WalletProvider } from "@/contexts/WalletContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import ConditionalLayout from "@/components/ConditionalLayout";
 import AdminRouteGuard from "@/components/AdminRouteGuard";
 import { ChakraProvider } from "@chakra-ui/react";
@@ -39,15 +40,17 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ChakraProvider>
-          <AuthProvider>
-            <WalletProvider>
-              <AdminRouteGuard>
-                <ConditionalLayout>
-                  {children}
-                </ConditionalLayout>
-              </AdminRouteGuard>
-            </WalletProvider>
-          </AuthProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <WalletProvider>
+                <AdminRouteGuard>
+                  <ConditionalLayout>
+                    {children}
+                  </ConditionalLayout>
+                </AdminRouteGuard>
+              </WalletProvider>
+            </AuthProvider>
+          </ThemeProvider>
         </ChakraProvider>
       </body>
     </html>
