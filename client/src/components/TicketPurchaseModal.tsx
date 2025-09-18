@@ -158,47 +158,60 @@ export default function TicketPurchaseModal({
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} size="md" closeOnOverlayClick={!isLoading}>
-      <ModalOverlay />
-      <ModalContent>
+      <ModalOverlay bg="blackAlpha.600" backdropFilter="blur(4px)" />
+      <ModalContent
+        bgGradient="linear(to-br, purple.900, blue.900)"
+        border="1px"
+        borderColor="purple.700"
+        color="white"
+        shadow="2xl"
+      >
         <ModalHeader>
           <HStack spacing={3}>
-            <Icon as={FaTicketAlt} color="blue.500" />
-            <Text>Purchase Tickets</Text>
+            <Icon as={FaTicketAlt} color="green.400" boxSize={5} />
+            <Text color="white" fontWeight="bold">Purchase Tickets</Text>
           </HStack>
         </ModalHeader>
-        <ModalCloseButton isDisabled={isLoading} />
+        <ModalCloseButton isDisabled={isLoading} color="white" _hover={{ bg: "whiteAlpha.200" }} />
 
         <ModalBody>
           <VStack spacing={6} align="stretch">
             {/* Competition Info */}
             <Box>
-              <Text fontWeight="semibold" fontSize="lg" mb={2}>
+              <Text fontWeight="semibold" fontSize="lg" mb={2} color="white">
                 {competition.title}
               </Text>
               <HStack spacing={2} mb={3}>
-                <Text fontSize="sm" color="gray.600">
+                <Text fontSize="sm" color="gray.300">
                   Supporting: {competition.charity.name}
                 </Text>
                 {competition.charity.isVerified && (
-                  <Badge colorScheme="blue" size="sm">✓ Verified</Badge>
+                  <Badge colorScheme="green" size="sm" variant="solid">✓ Verified</Badge>
                 )}
               </HStack>
-              <Text fontSize="sm" color="gray.600" noOfLines={2}>
+              <Text fontSize="sm" color="gray.300" noOfLines={2}>
                 {competition.description}
               </Text>
             </Box>
 
-            <Divider />
+            <Divider borderColor="whiteAlpha.300" />
 
             {/* Availability Status */}
-            <Alert status={availableTickets > 0 ? 'success' : 'error'} variant="subtle" borderRadius="md">
-              <AlertIcon />
+            <Alert
+              status={availableTickets > 0 ? 'success' : 'error'}
+              variant="left-accent"
+              borderRadius="md"
+              bg={availableTickets > 0 ? "green.900" : "red.900"}
+              borderColor={availableTickets > 0 ? "green.600" : "red.600"}
+              color="white"
+            >
+              <AlertIcon color={availableTickets > 0 ? "green.400" : "red.400"} />
               <VStack align="start" spacing={1}>
-                <Text fontWeight="medium">
+                <Text fontWeight="medium" color="white">
                   {availableTickets > 0 ? 'Tickets Available' : 'Sold Out'}
                 </Text>
-                <Text fontSize="sm">
-                  {availableTickets > 0 
+                <Text fontSize="sm" color="gray.300">
+                  {availableTickets > 0
                     ? `${availableTickets.toLocaleString()} of ${competition.maxTickets.toLocaleString()} tickets remaining`
                     : 'All tickets have been sold for this competition'
                   }
@@ -213,12 +226,12 @@ export default function TicketPurchaseModal({
                   <FormLabel>
                     <Flex justify="space-between" align="center" w="full">
                       <HStack spacing={2}>
-                        <Text>Number of Tickets</Text>
-                        <Badge colorScheme="blue" variant="solid" fontSize="md" px={2}>
+                        <Text color="white">Number of Tickets</Text>
+                        <Badge colorScheme="green" variant="solid" fontSize="md" px={2}>
                           {quantity}
                         </Badge>
                       </HStack>
-                      <Badge colorScheme="gray" variant="outline">
+                      <Badge colorScheme="purple" variant="outline" color="purple.300" borderColor="purple.400">
                         Max: {Math.min(availableTickets, 10)}
                       </Badge>
                     </Flex>
@@ -230,23 +243,23 @@ export default function TicketPurchaseModal({
                       min={1}
                       max={Math.min(availableTickets, 10)}
                       step={1}
-                      colorScheme="blue"
+                      colorScheme="purple"
                     >
-                      <SliderMark value={1} mt={3} ml={-2} fontSize="sm">
+                      <SliderMark value={1} mt={3} ml={-2} fontSize="sm" color="gray.300">
                         1
                       </SliderMark>
-                      <SliderMark value={Math.min(availableTickets, 10)} mt={3} ml={-2} fontSize="sm">
+                      <SliderMark value={Math.min(availableTickets, 10)} mt={3} ml={-2} fontSize="sm" color="gray.300">
                         {Math.min(availableTickets, 10)}
                       </SliderMark>
                       {Math.min(availableTickets, 10) > 5 && (
-                        <SliderMark value={Math.ceil(Math.min(availableTickets, 10) / 2)} mt={3} ml={-2} fontSize="sm">
+                        <SliderMark value={Math.ceil(Math.min(availableTickets, 10) / 2)} mt={3} ml={-2} fontSize="sm" color="gray.300">
                           {Math.ceil(Math.min(availableTickets, 10) / 2)}
                         </SliderMark>
                       )}
-                      <SliderTrack bg="gray.200">
-                        <SliderFilledTrack />
+                      <SliderTrack bg="whiteAlpha.300">
+                        <SliderFilledTrack bg="purple.400" />
                       </SliderTrack>
-                      <SliderThumb boxSize={6} bg="blue.500">
+                      <SliderThumb boxSize={6} bg="purple.500" border="2px" borderColor="white">
                         <Box color="white" fontSize="xs" fontWeight="bold">
                           {quantity}
                         </Box>
@@ -256,41 +269,41 @@ export default function TicketPurchaseModal({
                 </FormControl>
 
                 {/* Price Breakdown */}
-                <Box bg="gray.50" p={4} borderRadius="md">
+                <Box bg="whiteAlpha.100" p={4} borderRadius="md" border="1px" borderColor="whiteAlpha.200">
                   <VStack spacing={3}>
                     <Flex justify="space-between" w="full" align="center">
                       <HStack spacing={2}>
-                        <Icon as={FaCalculator} boxSize={4} color="gray.600" />
-                        <Text fontWeight="medium">Price Breakdown</Text>
+                        <Icon as={FaCalculator} boxSize={4} color="green.400" />
+                        <Text fontWeight="medium" color="white">Price Breakdown</Text>
                       </HStack>
                     </Flex>
-                    
+
                     <VStack spacing={2} w="full">
                       <Flex justify="space-between" w="full">
-                        <Text fontSize="sm" color="gray.600">
+                        <Text fontSize="sm" color="gray.300">
                           Ticket Price:
                         </Text>
-                        <Text fontSize="sm" fontWeight="medium">
+                        <Text fontSize="sm" fontWeight="medium" color="white">
                           {formatPrice(ticketPrice)}
                         </Text>
                       </Flex>
-                      
+
                       <Flex justify="space-between" w="full">
-                        <Text fontSize="sm" color="gray.600">
+                        <Text fontSize="sm" color="gray.300">
                           Quantity:
                         </Text>
-                        <Text fontSize="sm" fontWeight="medium">
+                        <Text fontSize="sm" fontWeight="medium" color="white">
                           {quantity}
                         </Text>
                       </Flex>
-                      
-                      <Divider />
-                      
+
+                      <Divider borderColor="whiteAlpha.300" />
+
                       <Flex justify="space-between" w="full">
-                        <Text fontWeight="bold" color="blue.600">
+                        <Text fontWeight="bold" color="green.400">
                           Total Cost:
                         </Text>
-                        <Text fontWeight="bold" fontSize="lg" color="blue.600">
+                        <Text fontWeight="bold" fontSize="lg" color="green.400">
                           {formatPrice(totalCost)}
                         </Text>
                       </Flex>
@@ -299,10 +312,17 @@ export default function TicketPurchaseModal({
                 </Box>
 
                 {/* Draw Date */}
-                <Alert status="info" variant="left-accent" borderRadius="md">
-                  <AlertIcon />
+                <Alert
+                  status="info"
+                  variant="left-accent"
+                  borderRadius="md"
+                  bg="blue.900"
+                  borderColor="blue.600"
+                  color="white"
+                >
+                  <AlertIcon color="blue.400" />
                   <VStack align="start" spacing={1}>
-                    <Text fontWeight="medium" fontSize="sm">
+                    <Text fontWeight="medium" fontSize="sm" color="white">
                       Draw Date: {new Date(competition.drawDate).toLocaleDateString('en-GB', {
                         weekday: 'long',
                         year: 'numeric',
@@ -316,9 +336,16 @@ export default function TicketPurchaseModal({
                 </Alert>
 
                 {error && (
-                  <Alert status="error" borderRadius="md">
-                    <AlertIcon />
-                    {error}
+                  <Alert
+                    status="error"
+                    borderRadius="md"
+                    bg="red.900"
+                    borderColor="red.600"
+                    color="white"
+                    variant="left-accent"
+                  >
+                    <AlertIcon color="red.400" />
+                    <Text color="white">{error}</Text>
                   </Alert>
                 )}
               </>
@@ -328,17 +355,28 @@ export default function TicketPurchaseModal({
 
         <ModalFooter>
           <HStack spacing={3}>
-            <Button variant="ghost" onClick={handleClose} isDisabled={isLoading}>
+            <Button
+              variant="ghost"
+              onClick={handleClose}
+              isDisabled={isLoading}
+              color="gray.300"
+              _hover={{ bg: "whiteAlpha.200", color: "white" }}
+            >
               Cancel
             </Button>
             {availableTickets > 0 && (
               <Button
-                colorScheme="blue"
+                bg="green.400"
+                color="gray.900"
+                _hover={{ bg: "green.300", transform: "translateY(-1px)" }}
+                _active={{ bg: "green.500" }}
                 onClick={handlePurchase}
                 isLoading={isLoading}
                 loadingText="Processing..."
                 leftIcon={isLoading ? <Spinner size="sm" /> : <Icon as={FaPoundSign} />}
                 size="lg"
+                fontWeight="bold"
+                shadow="md"
               >
                 Purchase {quantity} Ticket{quantity > 1 ? 's' : ''} - {formatPrice(totalCost)}
               </Button>
