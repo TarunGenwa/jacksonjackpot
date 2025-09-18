@@ -232,17 +232,20 @@ export default function CompetitionPage() {
 
           {/* Main Content - Three Sections */}
           <VStack spacing={6} align="stretch">
-            {/* Section 1: Image with Charity Info */}
-            <Card
-              shadow="2xl"
-              overflow="hidden"
-              bgGradient="linear(to-br, purple.900, blue.900)"
-              borderRadius="lg"
-              border="1px"
-              borderColor="purple.800"
-            >
-              <CardBody p={0}>
-                <Box position="relative" h="400px">
+            {/* Top Row: Image and Details Side by Side */}
+            <Flex gap={6} direction={{ base: "column", lg: "row" }}>
+              {/* Section 1: Image with Charity Info */}
+              <Card
+                flex={{ base: "1", lg: "1" }}
+                shadow="2xl"
+                overflow="hidden"
+                bgGradient="linear(to-br, purple.900, blue.900)"
+                borderRadius="lg"
+                border="1px"
+                borderColor="purple.800"
+              >
+                <CardBody p={0}>
+                  <Box position="relative" h={{ base: "400px", lg: "100%" }} minH="500px">
                   {competition.imageUrl ? (
                     <Image
                       src={competition.imageUrl}
@@ -329,6 +332,7 @@ export default function CompetitionPage() {
 
             {/* Section 2: Main Details, Stats, and Buy Button */}
             <Card
+              flex={{ base: "1", lg: "1" }}
               shadow="2xl"
               overflow="hidden"
               bgGradient="linear(to-br, purple.900, blue.900)"
@@ -471,6 +475,7 @@ export default function CompetitionPage() {
                 </VStack>
               </CardBody>
             </Card>
+            </Flex>
 
             {/* Section 3: Tabbed Content - Details, Prizes, FAQ */}
             <Card
