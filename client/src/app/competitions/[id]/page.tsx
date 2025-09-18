@@ -162,7 +162,7 @@ export default function CompetitionPage() {
 
   if (loading) {
     return (
-      <Box minH="100vh" bg="gray.900">
+      <Box minH="100vh" bg="slate.50">
         <Container maxW="container.xl" py={8}>
           <Center minH="50vh">
             <VStack spacing={4}>
@@ -177,7 +177,7 @@ export default function CompetitionPage() {
 
   if (error || !competition) {
     return (
-      <Box minH="100vh" bg="gray.900">
+      <Box minH="100vh" bg="slate.50">
         <Container maxW="container.xl" py={8}>
           <Center minH="50vh">
             <VStack spacing={4}>
@@ -203,21 +203,22 @@ export default function CompetitionPage() {
   }
 
   return (
-    <Box minH="100vh" bg="gray.900">
+    <Box minH="100vh" bg="slate.50">
       <Container maxW="container.xl" py={6}>
         <VStack spacing={6} align="stretch">
           {/* Back to Competitions Button */}
           <Button
             leftIcon={<ArrowBackIcon boxSize={6} />}
             onClick={() => router.push('/competitions')}
-            variant="ghost"
-            color="gray.300"
-            borderColor="purple.700"
+            variant="outline"
+            color="gray.700"
+            borderColor="gray.300"
             border="1px"
+            bg="white"
             _hover={{
-              bg: "purple.900",
-              borderColor: "purple.600",
-              color: "white"
+              bg: "gray.50",
+              borderColor: "gray.400",
+              color: "gray.800"
             }}
             size="lg"
             w="full"

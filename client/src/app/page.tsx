@@ -55,7 +55,7 @@ export default function Home() {
 
   if (loading) {
     return (
-      <Box minH="100vh" bg="gray.900">
+      <Box minH="100vh" bg="slate.50">
         <Container maxW="container.xl" py={8}>
           <Center minH="50vh">
             <VStack spacing={4}>
@@ -70,7 +70,7 @@ export default function Home() {
 
   if (error) {
     return (
-      <Box minH="100vh" bg="gray.900">
+      <Box minH="100vh" bg="slate.50">
         <Container maxW="container.xl" py={8}>
           <Center minH="50vh">
             <VStack spacing={4}>
@@ -92,7 +92,7 @@ export default function Home() {
   }
 
   return (
-    <Box minH="100vh" bg="gray.900">
+    <Box minH="100vh" bg="slate.50">
       {/* Hero Section */}
       <Box
         bgGradient="linear(135deg, blue.600, purple.700, pink.600)"

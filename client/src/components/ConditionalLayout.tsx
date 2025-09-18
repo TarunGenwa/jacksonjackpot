@@ -28,9 +28,9 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
 
   // Regular layout for non-admin users on non-admin routes
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#1a202c' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#f1f5f9' }}>
       <Header />
-      <main style={{ flex: 1, backgroundColor: '#1a202c' }}>
+      <main style={{ flex: 1, backgroundColor: '#f1f5f9' }}>
         {children}
       </main>
       <Footer />

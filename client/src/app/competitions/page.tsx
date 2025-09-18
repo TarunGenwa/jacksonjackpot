@@ -63,7 +63,7 @@ export default function CompetitionsPage() {
 
   if (loading) {
     return (
-      <Box minH="100vh" bg="gray.900">
+      <Box minH="100vh" bg="slate.50">
         <Container maxW="container.xl" py={8}>
           <Center minH="50vh">
             <VStack spacing={4}>
@@ -78,7 +78,7 @@ export default function CompetitionsPage() {
 
   if (error) {
     return (
-      <Box minH="100vh" bg="gray.900">
+      <Box minH="100vh" bg="slate.50">
         <Container maxW="container.xl" py={8}>
           <Center minH="50vh">
             <VStack spacing={4}>
@@ -100,24 +100,9 @@ export default function CompetitionsPage() {
   }
 
   return (
-    <Box minH="100vh" bg="gray.900">
+    <Box minH="100vh" bg="slate.50">
       <Container maxW="container.xl" py={12}>
         <VStack spacing={8} align="stretch">
-          {/* Header */}
-          <VStack spacing={4} textAlign="center">
-            <Heading as="h1" size="2xl" color="white">
-              All Competitions
-            </Heading>
-            <Text fontSize="lg" color="gray.300" maxW="2xl">
-              Browse all available competitions and win amazing prizes while supporting great causes
-            </Text>
-            {allCompetitions.length > 0 && (
-              <Text fontSize="md" color="gray.400">
-                {allCompetitions.length} competition{allCompetitions.length > 1 ? 's' : ''} available
-              </Text>
-            )}
-          </VStack>
-
           {/* All Competition Cards */}
           {allCompetitions.length > 0 ? (
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
@@ -131,7 +116,7 @@ export default function CompetitionsPage() {
           ) : (
             <Box
               p={16}
-              bg="gray.900"
+              bg="slate.50"
               borderRadius="lg"
               border="1px"
               borderColor="gray.700"
