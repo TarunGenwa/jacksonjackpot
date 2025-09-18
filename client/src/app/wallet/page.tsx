@@ -42,7 +42,7 @@ import { walletService, Wallet, Transaction } from '@/services/wallet';
 
 export default function WalletPage() {
   const { user } = useAuth();
-  const { refreshBalance } = useWallet();
+  const { refreshBalance, updateBalance } = useWallet();
   const { isOpen: isDepositOpen, onOpen: onDepositOpen, onClose: onDepositClose } = useDisclosure();
   const { isOpen: isWithdrawOpen, onOpen: onWithdrawOpen, onClose: onWithdrawClose } = useDisclosure();
   const toast = useToast();
@@ -100,7 +100,7 @@ export default function WalletPage() {
         currency: 'GBP',
         description: 'Quick deposit'
       });
-      
+
       if (response.success) {
         toast({
           title: 'Deposit successful',
@@ -109,8 +109,10 @@ export default function WalletPage() {
           duration: 3000,
           isClosable: true,
         });
-        
+
         setWalletData(response.wallet);
+        // Update the global wallet balance in the header
+        updateBalance(response.wallet.balance);
         await fetchTransactions();
       }
     } catch (error) {
@@ -154,8 +156,10 @@ export default function WalletPage() {
           duration: 3000,
           isClosable: true,
         });
-        
+
         setWalletData(response.wallet);
+        // Update the global wallet balance in the header
+        updateBalance(response.wallet.balance);
         await fetchTransactions();
         setDepositAmount('');
         onDepositClose();
