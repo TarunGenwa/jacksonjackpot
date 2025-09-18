@@ -45,6 +45,7 @@ import {
 } from '@chakra-ui/react';
 import { ArrowBackIcon, CheckCircleIcon } from '@chakra-ui/icons';
 import { FaTrophy, FaUsers, FaClock, FaTicketAlt, FaHeart, FaCheckCircle, FaQuestionCircle, FaInfoCircle, FaGift } from 'react-icons/fa';
+import { X } from 'lucide-react';
 import { Competition } from '@/types/api';
 import { competitionsService } from '@/services/competitions';
 import { useAuth } from '@/contexts/AuthContext';
@@ -55,6 +56,7 @@ export default function CompetitionPage() {
   const router = useRouter();
   const { user } = useAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isDetailsOpen, onOpen: onDetailsOpen, onClose: onDetailsClose } = useDisclosure();
   const [competition, setCompetition] = useState<Competition | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -203,7 +205,7 @@ export default function CompetitionPage() {
   }
 
   return (
-    <Box minH="100vh" bg="slate.50">
+    <Box minH="100vh" bg="slate.50" pb={{ base: "100px", lg: "0" }}>
       <Container maxW="container.xl" py={6}>
         <VStack spacing={6} align="stretch">
           {/* Back to Competitions Button */}
@@ -334,6 +336,7 @@ export default function CompetitionPage() {
             {/* Section 2: Main Details, Stats, and Buy Button */}
             <Card
               flex={{ base: "1", lg: "1" }}
+              display={{ base: "none", lg: "block" }}
               shadow="2xl"
               overflow="hidden"
               bgGradient="linear(to-br, purple.900, blue.900)"
@@ -832,6 +835,215 @@ export default function CompetitionPage() {
           </VStack>
         </VStack>
       </Container>
+
+      {/* Mobile Fixed Bottom Button */}
+      {competition && (
+        <Box
+          position="fixed"
+          bottom={0}
+          left={0}
+          right={0}
+          p={4}
+          bg="white"
+          borderTopWidth={1}
+          borderColor="gray.200"
+          display={{ base: "block", lg: "none" }}
+          zIndex={1000}
+          boxShadow="0 -4px 6px -1px rgba(0, 0, 0, 0.1)"
+        >
+          <Button
+            size="lg"
+            w="full"
+            h="56px"
+            onClick={onDetailsOpen}
+            bg="green.400"
+            color="gray.900"
+            fontSize="lg"
+            fontWeight="bold"
+            _hover={{
+              bg: "green.300",
+              transform: "translateY(-1px)",
+              boxShadow: "0 10px 20px rgba(72, 187, 120, 0.3)"
+            }}
+          >
+            {formatPrice(competition.ticketPrice)} - Buy Tickets 🎫
+          </Button>
+        </Box>
+      )}
+
+      {/* Mobile Details Overlay Modal */}
+      {competition && (
+        <Box
+          position="fixed"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          bg="blackAlpha.600"
+          display={isDetailsOpen ? "flex" : "none"}
+          alignItems="flex-end"
+          zIndex={1500}
+          onClick={onDetailsClose}
+        >
+          <Box
+            bgGradient="linear(to-br, purple.900, blue.900)"
+            w="full"
+            maxH="85vh"
+            borderTopRadius="xl"
+            onClick={(e) => e.stopPropagation()}
+            overflowY="auto"
+          >
+            {/* Modal Header */}
+            <Flex justify="space-between" align="center" p={4} borderBottom="1px" borderColor="purple.700">
+              <Heading size="md" color="white">
+                Competition Details
+              </Heading>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onDetailsClose}
+                color="gray.300"
+                _hover={{ color: "white", bg: "blackAlpha.300" }}
+              >
+                <X size={20} />
+              </Button>
+            </Flex>
+
+            {/* Modal Content */}
+            <VStack p={6} spacing={6} align="stretch">
+              {/* Title and Description */}
+              <VStack spacing={3} align="stretch">
+                <Heading as="h1" size="lg" color="white">
+                  {competition.title}
+                </Heading>
+                <Text color="gray.300" fontSize="md">
+                  {competition.description}
+                </Text>
+              </VStack>
+
+              {/* Stats Grid */}
+              <SimpleGrid columns={2} spacing={3}>
+                <Box textAlign="center" bg="blackAlpha.400" p={4} borderRadius="lg" border="1px" borderColor="green.700">
+                  <Icon as={FaTicketAlt} boxSize={6} color="green.400" mb={2} />
+                  <Text fontSize="xs" color="gray.400" mb={1}>Ticket Price</Text>
+                  <Text fontWeight="bold" color="green.400" fontSize="lg">
+                    {formatPrice(competition.ticketPrice)}
+                  </Text>
+                </Box>
+                <Box textAlign="center" bg="blackAlpha.400" p={4} borderRadius="lg" border="1px" borderColor="purple.700">
+                  <Icon as={FaTrophy} boxSize={6} color="purple.400" mb={2} />
+                  <Text fontSize="xs" color="gray.400" mb={1}>Top Prize</Text>
+                  <Text fontWeight="bold" color="purple.400" fontSize="lg">
+                    £{competition.prizes[0]?.value || '0'}
+                  </Text>
+                </Box>
+                <Box textAlign="center" bg="blackAlpha.400" p={4} borderRadius="lg" border="1px" borderColor="blue.700">
+                  <Icon as={FaUsers} boxSize={6} color="blue.400" mb={2} />
+                  <Text fontSize="xs" color="gray.400" mb={1}>Tickets Sold</Text>
+                  <Text fontWeight="bold" color="blue.400" fontSize="lg">
+                    {competition.ticketsSold}/{competition.maxTickets}
+                  </Text>
+                </Box>
+                <Box textAlign="center" bg="blackAlpha.400" p={4} borderRadius="lg" border="1px" borderColor="orange.700">
+                  <Icon as={FaClock} boxSize={6} color="orange.400" mb={2} />
+                  <Text fontSize="xs" color="gray.400" mb={1}>Time Left</Text>
+                  <Text fontWeight="bold" color="orange.400" fontSize="lg">
+                    {getRemainingTime()}
+                  </Text>
+                </Box>
+              </SimpleGrid>
+
+              {/* Progress Bar */}
+              <Box>
+                <Flex justify="space-between" mb={2}>
+                  <Text fontWeight="semibold" color="white">Sales Progress</Text>
+                  <Text color="purple.300" fontWeight="bold">{getProgressPercentage()}%</Text>
+                </Flex>
+                <Progress
+                  value={getProgressPercentage()}
+                  colorScheme="purple"
+                  size="lg"
+                  borderRadius="full"
+                  bg="blackAlpha.400"
+                />
+                <Flex justify="space-between" mt={2}>
+                  <Text fontSize="sm" color="gray.400">
+                    {competition.ticketsSold} tickets sold
+                  </Text>
+                  <Text fontSize="sm" color="gray.400">
+                    {competition.maxTickets - competition.ticketsSold} remaining
+                  </Text>
+                </Flex>
+              </Box>
+
+              {/* Purchase Section */}
+              <Box
+                bg="blackAlpha.400"
+                p={6}
+                borderRadius="lg"
+                border="2px"
+                borderColor="green.400"
+                position="relative"
+                overflow="hidden"
+              >
+                {/* Animated background effect */}
+                <Box
+                  position="absolute"
+                  top={0}
+                  left={0}
+                  right={0}
+                  bottom={0}
+                  bgGradient="linear(45deg, transparent, green.900, transparent)"
+                  opacity={0.3}
+                />
+
+                <VStack spacing={4} position="relative">
+                  <HStack justify="space-between" w="full">
+                    <VStack align="start" spacing={1}>
+                      <Text color="green.400" fontWeight="bold" fontSize="sm">ENTER NOW</Text>
+                      <Text color="white" fontSize="xl" fontWeight="bold">
+                        {formatPrice(competition.ticketPrice)} per ticket
+                      </Text>
+                    </VStack>
+                    <VStack align="end" spacing={1}>
+                      <Text color="gray.400" fontSize="sm">Draw Date</Text>
+                      <Text color="orange.400" fontWeight="semibold">
+                        {new Date(competition.drawDate).toLocaleDateString('en-GB')}
+                      </Text>
+                    </VStack>
+                  </HStack>
+
+                  <Button
+                    size="lg"
+                    w="full"
+                    h="60px"
+                    onClick={() => {
+                      onDetailsClose();
+                      handlePurchaseClick();
+                    }}
+                    bg="green.400"
+                    color="gray.900"
+                    fontSize="lg"
+                    fontWeight="bold"
+                    _hover={{
+                      bg: "green.300",
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 10px 20px rgba(72, 187, 120, 0.3)"
+                    }}
+                    isDisabled={getButtonProps().isDisabled}
+                  >
+                    {getButtonText()} 🎫
+                  </Button>
+
+                  <Text fontSize="xs" color="gray.400" textAlign="center">
+                    100% of proceeds go to {competition.charity.name}
+                  </Text>
+                </VStack>
+              </Box>
+            </VStack>
+          </Box>
+        </Box>
+      )}
 
       {/* Purchase Modal */}
       {competition && (
