@@ -121,7 +121,7 @@ export default function CompetitionPage() {
 
   const handlePurchaseClick = () => {
     if (!user) {
-      alert('Please log in to purchase tickets');
+      router.push('/login');
       return;
     }
     onOpen();

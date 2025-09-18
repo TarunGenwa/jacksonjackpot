@@ -46,7 +46,7 @@ export default function LoginPage() {
   };
 
   return (
-    <Box minH="100vh" bg="gray.50" py={12}>
+    <Box minH="100vh" bg="slate.50" py={12}>
       <Container maxW="md">
         <VStack spacing={8}>
           {/* Header */}
@@ -80,6 +80,7 @@ export default function LoginPage() {
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="Enter your email"
                         size="lg"
+                        _focus={{ borderColor: "purple.400", boxShadow: "0 0 0 1px #9f7aea" }}
                       />
                     </FormControl>
 
@@ -91,16 +92,21 @@ export default function LoginPage() {
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Enter your password"
                         size="lg"
+                        _focus={{ borderColor: "purple.400", boxShadow: "0 0 0 1px #9f7aea" }}
                       />
                     </FormControl>
 
                     <Button
                       type="submit"
-                      colorScheme="blue"
                       size="lg"
                       width="full"
                       isLoading={isLoading}
                       loadingText="Signing In..."
+                      bg="green.400"
+                      color="gray.900"
+                      _hover={{ bg: "green.300", transform: "translateY(-1px)" }}
+                      _active={{ transform: "translateY(0)" }}
+                      fontWeight="semibold"
                     >
                       Sign In
                     </Button>
@@ -116,9 +122,11 @@ export default function LoginPage() {
                   <Link href="/signup" style={{ width: '100%' }}>
                     <Button
                       variant="outline"
-                      colorScheme="blue"
                       size="lg"
                       width="full"
+                      borderColor="purple.400"
+                      color="purple.600"
+                      _hover={{ bg: "purple.50", borderColor: "purple.500" }}
                     >
                       Create New Account
                     </Button>
@@ -129,7 +137,7 @@ export default function LoginPage() {
 
                 <Flex justify="center">
                   <Link href="/">
-                    <Button variant="ghost" color="gray.600">
+                    <Button variant="ghost" color="gray.600" _hover={{ color: "gray.800", bg: "gray.100" }}>
                       ← Back to Home
                     </Button>
                   </Link>
