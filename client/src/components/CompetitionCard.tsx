@@ -214,50 +214,6 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
               {localCompetition.title}
             </Heading>
 
-            {/* Description */}
-            {localCompetition.description && (
-              <Text
-                color="gray.400"
-                fontSize="sm"
-                noOfLines={2}
-              >
-                {localCompetition.description}
-              </Text>
-            )}
-
-            {/* Stats Grid */}
-            <VStack spacing={2} align="stretch">
-              <HStack justify="space-between" py={1}>
-                <HStack spacing={1}>
-                  <Icon as={FaTrophy} boxSize={3} color="yellow.400" />
-                  <Text fontSize="xs" color="gray.400">Prize</Text>
-                </HStack>
-                <Text fontWeight="bold" color="green.400" fontSize="sm">
-                  {getPrizePool()}
-                </Text>
-              </HStack>
-
-              <HStack justify="space-between" py={1}>
-                <HStack spacing={1}>
-                  <Icon as={FaClock} boxSize={3} color="blue.400" />
-                  <Text fontSize="xs" color="gray.400">Time Left</Text>
-                </HStack>
-                <Text fontWeight="semibold" color="gray.200" fontSize="sm">
-                  {getRemainingTime()}
-                </Text>
-              </HStack>
-
-              <HStack justify="space-between" py={1}>
-                <HStack spacing={1}>
-                  <Icon as={FaTicketAlt} boxSize={3} color="purple.400" />
-                  <Text fontSize="xs" color="gray.400">Tickets</Text>
-                </HStack>
-                <Text fontWeight="semibold" color="gray.200" fontSize="sm">
-                  {localCompetition.ticketsSold} / {localCompetition.maxTickets}
-                </Text>
-              </HStack>
-            </VStack>
-
             {/* Progress Bar */}
             <Box>
               <Flex justify="space-between" mb={1}>
@@ -277,22 +233,15 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
               />
             </Box>
 
-            {/* Additional Details */}
-            <HStack spacing={4} pt={1}>
-              <VStack align="start" spacing={0}>
-                <Text fontSize="xs" color="gray.400">Draw</Text>
-                <Text fontSize="xs" fontWeight="semibold" color="gray.200">
-                  {formatDate(localCompetition.drawDate)}
-                </Text>
-              </VStack>
-              {localCompetition.charity && (
-                <VStack align="start" spacing={0}>
-                  <Text fontSize="xs" color="gray.400">Charity</Text>
-                  <Text fontSize="xs" fontWeight="semibold" color="purple.400" noOfLines={1}>
-                    {localCompetition.charity.name}
-                  </Text>
-                </VStack>
-              )}
+            {/* Prize */}
+            <HStack justify="space-between" py={1}>
+              <HStack spacing={1}>
+                <Icon as={FaTrophy} boxSize={3} color="yellow.400" />
+                <Text fontSize="xs" color="gray.400">Prize</Text>
+              </HStack>
+              <Text fontWeight="bold" color="green.400" fontSize="sm">
+                {getPrizePool()}
+              </Text>
             </HStack>
 
             {/* Action Button */}
@@ -312,7 +261,7 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
               fontWeight="semibold"
               mt={1}
             >
-              View Details
+              Enter
             </Button>
           </VStack>
         </VStack>
