@@ -62,4 +62,20 @@ export class TicketController {
     // Note: This endpoint might need admin authorization depending on requirements
     return this.ticketService.getCompetitionTickets(competitionId, page, limit);
   }
+
+  @Post(':id/claim-instant-win')
+  async claimInstantWin(
+    @Param('id') ticketId: string,
+    @Request() req: AuthRequest
+  ) {
+    return this.ticketService.claimInstantWin(ticketId, req.user.id);
+  }
+
+  @Get(':id/verify')
+  async verifyTicket(
+    @Param('id') ticketId: string,
+    @Request() req: AuthRequest
+  ) {
+    return this.ticketService.getTicketVerification(ticketId, req.user.id);
+  }
 }

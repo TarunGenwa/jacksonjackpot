@@ -75,10 +75,12 @@ model Competition {
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
 
-  charity  Charity  @relation(fields: [charityId], references: [id])
-  prizes   Prize[]
-  tickets  Ticket[]
-  winners  Winner[]
+  charity      Charity      @relation(fields: [charityId], references: [id])
+  prizes       Prize[]
+  tickets      Ticket[]
+  winners      Winner[]
+  instantWins  InstantWin[]
+  drawSeed     DrawSeed?
 
   @@index([status, isActive])
   @@index([charityId])
@@ -98,8 +100,9 @@ model Prize {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
-  competition Competition @relation(fields: [competitionId], references: [id])
+  competition Competition  @relation(fields: [competitionId], references: [id])
   winners     Winner[]
+  instantWins InstantWin[]
 
   @@unique([competitionId, position])
   @@map("prizes")
@@ -152,6 +155,7 @@ model Ticket {
   userId        String
   purchasePrice Decimal      @db.Decimal(10, 2)
   status        TicketStatus @default(ACTIVE)
+  chainEntryId  String?      @unique
   purchasedAt   DateTime     @default(now())
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
@@ -159,6 +163,7 @@ model Ticket {
   competition Competition @relation(fields: [competitionId], references: [id])
   user        User        @relation(fields: [userId], references: [id])
   winner      Winner?
+  chainEntry  HashChain?  @relation(fields: [chainEntryId], references: [id])
 
   @@index([competitionId, status])
   @@index([userId])
@@ -204,6 +209,80 @@ model Donation {
 
   @@index([charityId, status])
   @@map("donations")
+}
+
+model HashChain {
+  id           String          @id @default(uuid())
+  sequence     Int             @unique
+  type         ChainEntryType
+  timestamp    DateTime        @default(now())
+  data         Json
+  metadata     Json?
+  previousHash String?
+  hash         String          @unique
+  createdAt    DateTime        @default(now())
+
+  ticket       Ticket?
+  instantWin   InstantWin?
+
+  @@index([sequence])
+  @@index([type])
+  @@index([timestamp])
+  @@map("hash_chain")
+}
+
+model ChainCheckpoint {
+  id                 String   @id @default(uuid())
+  sequence           Int      @unique
+  hash               String
+  merkleRoot         String
+  entriesCount       Int
+  startSequence      Int
+  endSequence        Int
+  publishedHash      String?
+  publishedTimestamp DateTime?
+  createdAt          DateTime @default(now())
+
+  @@index([sequence])
+  @@map("chain_checkpoints")
+}
+
+model InstantWin {
+  id            String           @id @default(uuid())
+  competitionId String
+  prizeId       String
+  position      Int
+  encryptedData String
+  isRevealed    Boolean          @default(false)
+  isClaimed     Boolean          @default(false)
+  claimedByTicketId String?      @unique
+  chainEntryId  String?          @unique
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  competition Competition  @relation(fields: [competitionId], references: [id])
+  prize       Prize        @relation(fields: [prizeId], references: [id])
+  chainEntry  HashChain?   @relation(fields: [chainEntryId], references: [id])
+
+  @@unique([competitionId, position])
+  @@index([competitionId, isClaimed])
+  @@map("instant_wins")
+}
+
+model DrawSeed {
+  id            String       @id @default(uuid())
+  competitionId String       @unique
+  seedCommit    String
+  seedReveal    String?
+  commitTimestamp DateTime
+  revealTimestamp DateTime?
+  status        DrawSeedStatus @default(COMMITTED)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  competition Competition @relation(fields: [competitionId], references: [id])
+
+  @@map("draw_seeds")
 }
 
 enum UserRole {
@@ -269,4 +348,22 @@ enum DonationStatus {
   COMPLETED
   FAILED
   REFUNDED
+}
+
+enum ChainEntryType {
+  TICKET_PURCHASE
+  PRIZE_ALLOCATION
+  DRAW_RESULT
+  PRIZE_CLAIM
+  COMPETITION_STATE_CHANGE
+  INSTANT_WIN_REVEAL
+  SEED_COMMIT
+  SEED_REVEAL
+  CHECKPOINT
+}
+
+enum DrawSeedStatus {
+  COMMITTED
+  REVEALED
+  USED
 }

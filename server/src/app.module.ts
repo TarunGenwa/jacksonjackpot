@@ -11,6 +11,11 @@ import { CompetitionModule } from './competition/competition.module';
 import { TicketModule } from './ticket/ticket.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { AdminModule } from './admin/admin.module';
+import { HashChainModule } from './hash-chain/hash-chain.module';
+import { PrizeAllocationModule } from './prize-allocation/prize-allocation.module';
+import { InstantWinsModule } from './instant-wins/instant-wins.module';
+import { DrawModule } from './draw/draw.module';
+import { VerificationModule } from './verification/verification.module';
 
 @Module({
   imports: [
@@ -24,6 +29,11 @@ import { AdminModule } from './admin/admin.module';
     CompetitionModule,
     TicketModule,
     AdminModule,
+    HashChainModule,
+    PrizeAllocationModule,
+    InstantWinsModule,
+    DrawModule,
+    VerificationModule,
   ],
   controllers: [AppController],
   providers: [

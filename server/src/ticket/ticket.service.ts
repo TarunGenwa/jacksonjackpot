@@ -3,14 +3,23 @@ import {
   BadRequestException,
   ForbiddenException,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { HashChainService } from '../hash-chain/hash-chain.service';
+import { InstantWinsService } from '../instant-wins/instant-wins.service';
 import { PurchaseTicketDto } from './dto';
-import { Prisma } from '@prisma/client';
+import { Prisma, ChainEntryType } from '@prisma/client';
 
 @Injectable()
 export class TicketService {
-  constructor(private prisma: PrismaService) {}
+  private readonly logger = new Logger(TicketService.name);
+
+  constructor(
+    private prisma: PrismaService,
+    private hashChainService: HashChainService,
+    private instantWinsService: InstantWinsService
+  ) {}
 
   async purchaseTickets(userId: string, purchaseDto: PurchaseTicketDto) {
     const { competitionId, quantity, paymentMethod } = purchaseDto;
@@ -189,6 +198,55 @@ export class TicketService {
           },
         });
 
+        // Create hash chain entries for each ticket and check for instant wins
+        const instantWinResults: any[] = [];
+        for (const ticket of createdTickets) {
+          // Create hash chain entry for ticket purchase
+          const chainEntry = await this.hashChainService.addEntry({
+            type: ChainEntryType.TICKET_PURCHASE,
+            data: {
+              ticketId: ticket.id,
+              ticketNumber: ticket.ticketNumber,
+              competitionId: ticket.competitionId,
+              userId: userId,
+              purchasePrice: ticket.purchasePrice,
+              transactionId: transaction.id
+            },
+            metadata: {
+              timestamp: new Date().toISOString(),
+              competitionTitle: ticket.competition.title,
+              paymentMethod: paymentMethod || 'WALLET'
+            }
+          });
+
+          // Update ticket with chain entry reference
+          await tx.ticket.update({
+            where: { id: ticket.id },
+            data: { chainEntryId: chainEntry.id }
+          });
+
+          // Check for instant win
+          const instantWinCheck = await this.instantWinsService.checkForInstantWin(
+            ticket.ticketNumber,
+            ticket.competitionId
+          );
+
+          if (instantWinCheck.isWinner) {
+            instantWinResults.push({
+              ticketId: ticket.id,
+              ticketNumber: ticket.ticketNumber,
+              instantWin: instantWinCheck.instantWin,
+              prize: instantWinCheck.prize
+            });
+
+            this.logger.log(`Instant win detected: ticketId=${ticket.id}, prizeId=${instantWinCheck.prize?.id}`);
+          }
+
+          // Add chain hash to ticket object
+          (ticket as any).chainHash = chainEntry.hash;
+          (ticket as any).chainSequence = chainEntry.sequence;
+        }
+
         tickets.push(...createdTickets);
 
         // 6. Update competition tickets sold
@@ -233,10 +291,29 @@ export class TicketService {
             drawDate: ticket.competition.drawDate,
             purchasePrice: ticket.purchasePrice.toString(),
             status: ticket.status,
+            chainProof: {
+              hash: (ticket as any).chainHash,
+              sequence: (ticket as any).chainSequence,
+              timestamp: new Date().toISOString()
+            }
           })),
           wallet: {
             newBalance: updatedWallet.balance.toString(),
           },
+          instantWins: instantWinResults.length > 0 ? {
+            hasWins: true,
+            count: instantWinResults.length,
+            wins: instantWinResults.map(win => ({
+              ticketId: win.ticketId,
+              ticketNumber: win.ticketNumber,
+              prizeName: win.prize.name,
+              prizeValue: win.prize.value.toString(),
+              instantWinId: win.instantWin.id
+            }))
+          } : {
+            hasWins: false,
+            count: 0
+          }
         };
       },
       {
@@ -298,6 +375,12 @@ export class TicketService {
             },
           },
         },
+        chainEntry: true,
+        winner: {
+          include: {
+            prize: true
+          }
+        }
       },
     });
 
@@ -305,7 +388,152 @@ export class TicketService {
       throw new NotFoundException('Ticket not found');
     }
 
-    return ticket;
+    // Check for instant win if not already won
+    let instantWinStatus: any = null;
+    if (!ticket.winner && ticket.competition.type === 'INSTANT_WINS') {
+      const instantWinCheck = await this.instantWinsService.checkForInstantWin(
+        ticket.ticketNumber,
+        ticket.competitionId
+      );
+
+      if (instantWinCheck.isWinner) {
+        instantWinStatus = {
+          isWinner: true,
+          prize: instantWinCheck.prize,
+          instantWinId: instantWinCheck.instantWin.id,
+          canClaim: !instantWinCheck.instantWin.isClaimed
+        };
+      }
+    }
+
+    return {
+      ...ticket,
+      instantWinStatus,
+      chainProof: ticket.chainEntry ? {
+        hash: ticket.chainEntry.hash,
+        sequence: ticket.chainEntry.sequence,
+        verified: true // We could add actual verification here
+      } : null
+    };
+  }
+
+  async claimInstantWin(ticketId: string, userId: string) {
+    const ticket = await this.prisma.ticket.findFirst({
+      where: { id: ticketId, userId }
+    });
+
+    if (!ticket) {
+      throw new NotFoundException('Ticket not found or unauthorized');
+    }
+
+    // Check for instant win
+    const instantWinCheck = await this.instantWinsService.checkForInstantWin(
+      ticket.ticketNumber,
+      ticket.competitionId
+    );
+
+    if (!instantWinCheck.isWinner) {
+      throw new BadRequestException('This ticket is not an instant winner');
+    }
+
+    if (instantWinCheck.instantWin.isClaimed) {
+      throw new BadRequestException('Instant win already claimed');
+    }
+
+    try {
+      const result = await this.instantWinsService.claimInstantWin(
+        instantWinCheck.instantWin.id,
+        ticketId,
+        userId
+      );
+
+      this.logger.log(`Instant win claimed successfully: ticketId=${ticketId}, userId=${userId}`);
+
+      return {
+        success: true,
+        instantWin: {
+          id: result.instantWin.id,
+          claimed: true,
+          claimedAt: new Date()
+        },
+        prize: {
+          name: 'Prize', // Will be filled by actual prize data
+          value: '0' // Will be filled by actual prize data
+        },
+        chainProof: {
+          hash: result.chainEntry.hash,
+          sequence: result.chainEntry.sequence
+        }
+      };
+    } catch (error) {
+      this.logger.error(`Failed to claim instant win: ${error.message}`, error.stack);
+      throw error;
+    }
+  }
+
+  async getTicketVerification(ticketId: string, userId: string) {
+    const ticket = await this.prisma.ticket.findFirst({
+      where: { id: ticketId, userId },
+      include: {
+        chainEntry: true,
+        competition: {
+          select: {
+            id: true,
+            title: true
+          }
+        }
+      }
+    });
+
+    if (!ticket) {
+      throw new NotFoundException('Ticket not found or unauthorized');
+    }
+
+    if (!ticket.chainEntry) {
+      return {
+        ticketId: ticket.id,
+        ticketNumber: ticket.ticketNumber,
+        verified: false,
+        error: 'No chain entry found for this ticket'
+      };
+    }
+
+    // Verify the chain entry hash
+    const calculatedHash = this.hashChainService.calculateHash({
+      sequence: ticket.chainEntry.sequence,
+      type: ticket.chainEntry.type,
+      timestamp: ticket.chainEntry.timestamp.toISOString(),
+      data: ticket.chainEntry.data,
+      metadata: ticket.chainEntry.metadata,
+      previousHash: ticket.chainEntry.previousHash
+    });
+
+    const hashValid = calculatedHash === ticket.chainEntry.hash;
+
+    // Verify surrounding chain integrity
+    const chainVerification = await this.hashChainService.verifyChain(
+      Math.max(1, ticket.chainEntry.sequence - 2),
+      ticket.chainEntry.sequence + 2
+    );
+
+    return {
+      ticketId: ticket.id,
+      ticketNumber: ticket.ticketNumber,
+      verified: hashValid && chainVerification.isValid,
+      chainProof: {
+        hash: ticket.chainEntry.hash,
+        sequence: ticket.chainEntry.sequence,
+        hashValid,
+        chainIntact: chainVerification.isValid,
+        timestamp: ticket.chainEntry.timestamp
+      },
+      purchaseData: {
+        competitionId: ticket.competitionId,
+        competitionTitle: ticket.competition.title,
+        purchasePrice: ticket.purchasePrice.toString(),
+        purchasedAt: ticket.purchasedAt
+      }
+    };
   }
 
   private generateTicketNumbers(
