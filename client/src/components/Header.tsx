@@ -31,7 +31,7 @@ import {
   Icon
 } from '@chakra-ui/react';
 import { HamburgerIcon } from '@chakra-ui/icons';
-import { FaUser, FaTicketAlt, FaWallet, FaHistory, FaSignOutAlt, FaPoundSign, FaHeart, FaQuestionCircle, FaCog, FaUsers, FaTrophy } from 'react-icons/fa';
+import { FaUser, FaTicketAlt, FaWallet, FaHistory, FaSignOutAlt, FaPoundSign, FaHeart, FaQuestionCircle, FaCog, FaUsers, FaTrophy, FaShieldAlt } from 'react-icons/fa';
 import { useAuth } from '@/contexts/AuthContext';
 import { useWallet } from '@/contexts/WalletContext';
 
@@ -216,6 +216,9 @@ export default function Header() {
                         <Link href="/how-it-works">
                           <MenuItem icon={<FaQuestionCircle />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">How It Works</MenuItem>
                         </Link>
+                        <Link href="/verify">
+                          <MenuItem icon={<FaShieldAlt />} bg="gray.800" _hover={{ bg: "gray.700" }} color="gray.200">Verify Chain</MenuItem>
+                        </Link>
                       </>
                     )}
 
@@ -236,6 +239,18 @@ export default function Header() {
               ) : (
                 /* Guest User Buttons */
                 <HStack spacing={2}>
+                  {!isMobile && (
+                    <Link href="/verify">
+                      <Button
+                        variant="ghost"
+                        color="white"
+                        _hover={{ bg: "whiteAlpha.200" }}
+                        leftIcon={<FaShieldAlt />}
+                      >
+                        Verify
+                      </Button>
+                    </Link>
+                  )}
                   <Link href="/login">
                     <Button
                       variant="ghost"
@@ -366,6 +381,11 @@ export default function Header() {
                                 How It Works
                               </Button>
                             </Link>
+                            <Link href="/verify" onClick={onClose}>
+                              <Button variant="ghost" leftIcon={<FaShieldAlt />} w="full" justifyContent="flex-start" color="gray.200" _hover={{ bg: "gray.700" }}>
+                                Verify Chain
+                              </Button>
+                            </Link>
                           </Box>
                         </>
                       )}
@@ -394,6 +414,11 @@ export default function Header() {
                 <>
                   <Box borderTop="1px" borderColor="gray.200" pt={4} mt={4}>
                     <VStack spacing={2}>
+                      <Link href="/verify" onClick={onClose}>
+                        <Button variant="ghost" leftIcon={<FaShieldAlt />} w="full" color="gray.200" _hover={{ bg: "gray.700" }}>
+                          Verify Chain
+                        </Button>
+                      </Link>
                       <Link href="/login" onClick={onClose}>
                         <Button variant="ghost" w="full" color="gray.200" _hover={{ bg: "gray.700" }}>
                           Log In

@@ -391,6 +391,7 @@ export class VerificationService {
         sequence: e.sequence,
         type: e.type,
         hash: e.hash,
+        previousHash: e.previousHash,
         timestamp: e.timestamp
       }))
     };
