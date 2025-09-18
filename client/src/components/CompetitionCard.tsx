@@ -128,7 +128,7 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
       <CardBody p={0}>
         <VStack spacing={0} align="stretch">
           {/* Top - Image Section */}
-          <Box position="relative" w="full" h="180px">
+          <Box position="relative" w="full" aspectRatio={1}>
             {localCompetition.imageUrl ? (
               <Image
                 src={localCompetition.imageUrl}
