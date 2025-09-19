@@ -126,7 +126,7 @@ async function main() {
   // MYSTERY BOXES competitions
   const mysteryBox1 = await prisma.competition.create({
     data: {
-      title: 'Electronics Mystery Box',
+      title: 'Land Rover Surprise Box',
       description: 'Contains premium electronics worth up to £2000 including smartphones, tablets, headphones, and smart home gadgets. Every box guaranteed to contain items worth more than the entry fee!',
       type: CompetitionType.MYSTERYBOXES,
       charityId: charities[0].id,
@@ -138,14 +138,14 @@ async function main() {
       ticketsSold: 320,
       minTickets: 50,
       status: CompetitionStatus.ACTIVE,
-      imageUrl: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop',
+      imageUrl: 'https://ik.imagekit.io/sportfeeds/mystery-boxes/mystery-land-rover-box_5_4.png?updatedAt=1758172879453',
       termsAndConditions: 'Mystery box contents vary. Minimum value guaranteed. UK delivery only.'
     }
   });
 
   const mysteryBox2 = await prisma.competition.create({
     data: {
-      title: 'Luxury Fashion Mystery Box',
+      title: 'Top Gun Box',
       description: 'Designer clothing and accessories worth up to £1500 from top brands. Includes a mix of clothing, shoes, bags, and jewelry from premium fashion houses.',
       type: CompetitionType.MYSTERYBOXES,
       charityId: charities[1].id,
@@ -157,7 +157,7 @@ async function main() {
       ticketsSold: 180,
       minTickets: 30,
       status: CompetitionStatus.ACTIVE,
-      imageUrl: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop',
+      imageUrl: 'https://ik.imagekit.io/sportfeeds/mystery-boxes/top-gun-box-5_4.webp?updatedAt=1758172879581',
       termsAndConditions: 'Size selection required after winning. Exchange policy applies.'
     }
   });
@@ -165,7 +165,7 @@ async function main() {
   // INSTANT WINS competitions
   const instantWin1 = await prisma.competition.create({
     data: {
-      title: 'Instant Cash Prize £500',
+      title: 'Mercedes Benz Box',
       description: 'Win £500 instantly! No waiting for draws - find out immediately if you\'ve won. Multiple prizes available throughout the competition period.',
       type: CompetitionType.INSTANT_WINS,
       charityId: charities[2].id,
@@ -177,14 +177,14 @@ async function main() {
       ticketsSold: 750,
       minTickets: 100,
       status: CompetitionStatus.ACTIVE,
-      imageUrl: 'https://images.unsplash.com/photo-1607863680198-23d4b2565df0?w=400&h=300&fit=crop',
+      imageUrl: 'https://ik.imagekit.io/sportfeeds/mystery-boxes/mercedes-benz-box-5_4.webp?updatedAt=1758172879885',
       termsAndConditions: 'Instant win results shown immediately. Winners notified by email.'
     }
   });
 
   const instantWin2 = await prisma.competition.create({
     data: {
-      title: 'Instant Gadget Win',
+      title: 'Cash Box',
       description: 'Win the latest smartphone instantly! Premium devices available including iPhone 15 Pro, Samsung Galaxy S24, and Google Pixel 8 Pro.',
       type: CompetitionType.INSTANT_WINS,
       charityId: charities[3].id,
@@ -196,7 +196,7 @@ async function main() {
       ticketsSold: 120,
       minTickets: 20,
       status: CompetitionStatus.ACTIVE,
-      imageUrl: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop',
+      imageUrl: 'https://ik.imagekit.io/sportfeeds/mystery-boxes/cash-box-2-5_4.webp?updatedAt=1758171903862',
       termsAndConditions: 'Instant results. Device model may vary based on availability.'
     }
   });
@@ -204,7 +204,7 @@ async function main() {
   // DAILY FREE competitions
   const dailyFree1 = await prisma.competition.create({
     data: {
-      title: 'Daily Free Coffee Voucher',
+      title: 'The Money Machine',
       description: 'Free entry! Win a £20 coffee shop voucher daily. New winner selected every day at midnight. Multiple chances to win throughout the month.',
       type: CompetitionType.DAILY_FREE,
       charityId: charities[4].id,
@@ -216,14 +216,14 @@ async function main() {
       ticketsSold: 8500,
       minTickets: 1000,
       status: CompetitionStatus.ACTIVE,
-      imageUrl: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop',
+      imageUrl: 'https://ik.imagekit.io/sportfeeds/mystery-boxes/the-money-machine-5_4.webp?updatedAt=1758172879760',
       termsAndConditions: 'Free entry. One entry per person per day. Daily draws at midnight.'
     }
   });
 
   const dailyFree2 = await prisma.competition.create({
     data: {
-      title: 'Free Daily Lunch Draw',
+      title: 'Rush Hour Riches',
       description: 'Free entry! Win lunch for two at top restaurants daily. Choose from over 50 participating restaurants in your area.',
       type: CompetitionType.DAILY_FREE,
       charityId: charities[0].id,
@@ -235,7 +235,7 @@ async function main() {
       ticketsSold: 4200,
       minTickets: 500,
       status: CompetitionStatus.ACTIVE,
-      imageUrl: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop',
+      imageUrl: 'https://ik.imagekit.io/sportfeeds/mystery-boxes/rush-hour-riches-5_4.webp?updatedAt=1758172879884',
       termsAndConditions: 'Free entry. Restaurant subject to availability. Valid weekdays only.'
     }
   });
@@ -243,7 +243,7 @@ async function main() {
   // INSTANT SPINS competitions
   const instantSpin1 = await prisma.competition.create({
     data: {
-      title: 'Spin to Win Gaming Setup',
+      title: 'Cash Fanned Gaming Setup',
       description: 'Spin the wheel for a chance to win a complete gaming setup worth £3000! Includes gaming PC, monitor, keyboard, mouse, and gaming chair.',
       type: CompetitionType.INSTANT_SPINS,
       charityId: charities[1].id,
@@ -255,14 +255,14 @@ async function main() {
       ticketsSold: 560,
       minTickets: 80,
       status: CompetitionStatus.ACTIVE,
-      imageUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=300&fit=crop',
+      imageUrl: 'https://ik.imagekit.io/sportfeeds/mystery-boxes/cash-fanned1-5_4.jpg?updatedAt=1758172879681',
       termsAndConditions: 'Spin wheel shows instant results. Setup customization available.'
     }
   });
 
   const instantSpin2 = await prisma.competition.create({
     data: {
-      title: 'Lucky Spin Holiday Package',
+      title: 'Mystery Rolex Box',
       description: 'Spin for your chance to win a luxury weekend getaway worth £2000! Destinations include Paris, Amsterdam, Rome, and Barcelona.',
       type: CompetitionType.INSTANT_SPINS,
       charityId: charities[2].id,
@@ -274,7 +274,7 @@ async function main() {
       ticketsSold: 420,
       minTickets: 60,
       status: CompetitionStatus.ACTIVE,
-      imageUrl: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&h=300&fit=crop',
+      imageUrl: 'https://ik.imagekit.io/sportfeeds/mystery-boxes/mystery-rolex-box-5_4.webp?updatedAt=1758172883716',
       termsAndConditions: 'Spin results instant. Travel dates subject to availability.'
     }
   });

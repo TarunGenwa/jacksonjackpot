@@ -29,10 +29,12 @@ export class HashChainService {
       const sequence = latestEntry ? latestEntry.sequence + 1 : 1;
       const previousHash = latestEntry ? latestEntry.hash : null;
 
+      const timestamp = new Date().toISOString();
+
       const entryToHash = {
         sequence,
         type: entryData.type,
-        timestamp: new Date().toISOString(),
+        timestamp,
         data: entryData.data,
         metadata: entryData.metadata,
         previousHash
@@ -47,7 +49,8 @@ export class HashChainService {
           data: entryData.data,
           metadata: entryData.metadata,
           previousHash,
-          hash
+          hash,
+          timestamp: new Date(timestamp)
         }
       });
 
