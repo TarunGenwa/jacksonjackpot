@@ -77,15 +77,15 @@ export function ThemeProvider({ children, defaultMode = 'dark' }: ThemeProviderP
     }
 
     // Handle mode-specific colors
-    if (typeof value === 'object' && mode in value) {
-      return value[mode];
+    if (typeof value === 'object' && value !== null && mode in value) {
+      return (value as Record<string, string>)[mode];
     }
 
     return typeof value === 'string' ? value : fallback;
   };
 
   const getSemanticColor = (category: string, variant: string, fallback = '#000000'): string => {
-    const categoryColors = (theme.semantic as Record<string, Record<string, string>>)[category];
+    const categoryColors = (theme.semantic as Record<string, unknown>)[category] as Record<string, string>;
     if (categoryColors && variant in categoryColors) {
       const color = categoryColors[variant];
 

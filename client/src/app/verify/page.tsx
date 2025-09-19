@@ -1,6 +1,22 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+
+interface ChainData {
+  competitionId?: string;
+  ticketId?: string;
+  action?: string;
+  amount?: number;
+  userId?: string;
+  [key: string]: unknown;
+}
+
+interface ChainMetadata {
+  version?: string;
+  source?: string;
+  validated?: boolean;
+  [key: string]: unknown;
+}
 
 interface ChainEntry {
   sequence: number;
@@ -8,8 +24,8 @@ interface ChainEntry {
   hash: string;
   previousHash: string | null;
   timestamp: string;
-  data: any;
-  metadata?: any;
+  data: ChainData;
+  metadata?: ChainMetadata;
 }
 
 interface ChainIntegrity {
@@ -23,7 +39,12 @@ interface ChainIntegrity {
   checkpoints: {
     total: number;
     verified: number;
-    latest?: any;
+    latest?: {
+      hash: string;
+      sequence: number;
+      timestamp: string;
+      verified: boolean;
+    };
   };
 }
 
@@ -49,24 +70,66 @@ interface TicketVerification {
 export default function VerifyPage() {
   const [chainIntegrity, setChainIntegrity] = useState<ChainIntegrity | null>(null);
   const [recentEntries, setRecentEntries] = useState<ChainEntry[]>([]);
-  const [latestCheckpoint, setLatestCheckpoint] = useState<any>(null);
+  const [latestCheckpoint, setLatestCheckpoint] = useState<{
+    hash: string;
+    sequence: number;
+    timestamp: string;
+    verified: boolean;
+    exists: boolean;
+    verification?: {
+      isValid: boolean;
+      details?: string;
+    };
+    checkpoint: {
+      sequence: number;
+      entriesCount: number;
+      range: {
+        start: number;
+        end: number;
+      };
+      createdAt: string;
+      merkleRoot: string;
+      hash: string;
+      publishedHash?: string;
+      publishedTimestamp?: string;
+    };
+  } | null>(null);
   const [ticketVerification, setTicketVerification] = useState<TicketVerification | null>(null);
   const [ticketId, setTicketId] = useState('');
   const [competitionId, setCompetitionId] = useState('');
-  const [drawResults, setDrawResults] = useState<any>(null);
+  const [drawResults, setDrawResults] = useState<{
+    competitionId: string;
+    competitionTitle: string;
+    status: string;
+    drawDate: string;
+    seedCommitted: boolean;
+    seedRevealed: boolean;
+    verification: {
+      isValid: boolean;
+    };
+    results: {
+      winnersCount: number;
+      winners: Array<{
+        winnerId: string;
+        ticketNumber: string;
+        username: string;
+        prizeName: string;
+        prizeValue: string;
+      }>;
+    };
+    chainProof?: {
+      hash: string;
+      sequence: number;
+      timestamp: string;
+    };
+  } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('chain');
 
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
-  useEffect(() => {
-    loadChainIntegrity();
-    loadLatestCheckpoint();
-    loadVerificationReport();
-  }, []);
-
-  const loadChainIntegrity = async () => {
+  const loadChainIntegrity = useCallback(async () => {
     try {
       const response = await fetch(`${API_BASE}/api/verify/chain/integrity`);
       if (response.ok) {
@@ -76,9 +139,9 @@ export default function VerifyPage() {
     } catch (error) {
       console.error('Failed to load chain integrity:', error);
     }
-  };
+  }, [API_BASE]);
 
-  const loadLatestCheckpoint = async () => {
+  const loadLatestCheckpoint = useCallback(async () => {
     try {
       const response = await fetch(`${API_BASE}/api/verify/checkpoints/latest`);
       if (response.ok) {
@@ -88,9 +151,9 @@ export default function VerifyPage() {
     } catch (error) {
       console.error('Failed to load checkpoint:', error);
     }
-  };
+  }, [API_BASE]);
 
-  const loadVerificationReport = async () => {
+  const loadVerificationReport = useCallback(async () => {
     try {
       const response = await fetch(`${API_BASE}/api/verify/report`);
       if (response.ok) {
@@ -100,7 +163,13 @@ export default function VerifyPage() {
     } catch (error) {
       console.error('Failed to load verification report:', error);
     }
-  };
+  }, [API_BASE]);
+
+  useEffect(() => {
+    loadChainIntegrity();
+    loadLatestCheckpoint();
+    loadVerificationReport();
+  }, [loadChainIntegrity, loadLatestCheckpoint, loadVerificationReport]);
 
   const verifyTicket = async () => {
     if (!ticketId.trim()) {
@@ -493,7 +562,7 @@ export default function VerifyPage() {
                     <div>
                       <h4 className="font-semibold mb-2 text-gray-900">Winners ({drawResults.results.winnersCount})</h4>
                       <div className="space-y-2 max-h-64 overflow-y-auto">
-                        {drawResults.results.winners.map((winner: any) => (
+                        {drawResults.results.winners.map((winner) => (
                           <div key={winner.winnerId} className="border rounded p-3 bg-white">
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
                               <div>
@@ -587,7 +656,7 @@ export default function VerifyPage() {
                         {latestCheckpoint.checkpoint.publishedHash}
                       </div>
                       <p className="text-sm text-gray-600 mt-1">
-                        Published: {formatTimestamp(latestCheckpoint.checkpoint.publishedTimestamp)}
+                        Published: {latestCheckpoint.checkpoint.publishedTimestamp ? formatTimestamp(latestCheckpoint.checkpoint.publishedTimestamp) : 'N/A'}
                       </p>
                     </div>
                   )}
