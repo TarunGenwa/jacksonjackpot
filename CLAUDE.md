@@ -83,6 +83,12 @@ npm run test:e2e     # Run e2e tests
 - **Note**: All origins are allowed for development convenience
 
 ### Database Schema
+**Migration History**: All models have corresponding Prisma migrations in `server/prisma/migrations/`:
+- `20250911040912_init` - Initial User model
+- `20250911041657_add_charity_lottery_models` - Core lottery models
+- `20250913065958_add_competition_type` - Competition type enum
+- `20250919134636_add_hash_chain_models` - Hash chain and instant win models
+
 Current models:
 
 #### Core Models
