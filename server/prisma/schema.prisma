@@ -65,6 +65,7 @@ model Competition {
   endDate           DateTime
   drawDate          DateTime
   ticketPrice       Decimal            @db.Decimal(10, 2)
+  totalPrizeValue   Decimal            @default(0) @db.Decimal(10, 2)
   maxTickets        Int
   ticketsSold       Int                @default(0)
   minTickets        Int                @default(1)

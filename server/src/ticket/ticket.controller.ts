@@ -66,7 +66,7 @@ export class TicketController {
   @Post(':id/claim-instant-win')
   async claimInstantWin(
     @Param('id') ticketId: string,
-    @Request() req: AuthRequest
+    @Request() req: AuthRequest,
   ) {
     return this.ticketService.claimInstantWin(ticketId, req.user.id);
   }
@@ -74,7 +74,7 @@ export class TicketController {
   @Get(':id/verify')
   async verifyTicket(
     @Param('id') ticketId: string,
-    @Request() req: AuthRequest
+    @Request() req: AuthRequest,
   ) {
     return this.ticketService.getTicketVerification(ticketId, req.user.id);
   }

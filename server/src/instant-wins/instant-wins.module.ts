@@ -7,6 +7,6 @@ import { PrizeAllocationModule } from '../prize-allocation/prize-allocation.modu
 @Module({
   imports: [PrismaModule, HashChainModule, PrizeAllocationModule],
   providers: [InstantWinsService],
-  exports: [InstantWinsService]
+  exports: [InstantWinsService],
 })
 export class InstantWinsModule {}

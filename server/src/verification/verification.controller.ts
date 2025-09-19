@@ -20,12 +20,15 @@ export class VerificationController {
   @Get('chain/integrity')
   async verifyChainIntegrity(
     @Query('start') start?: string,
-    @Query('end') end?: string
+    @Query('end') end?: string,
   ) {
     const startSequence = start ? parseInt(start, 10) : undefined;
     const endSequence = end ? parseInt(end, 10) : undefined;
 
-    return await this.verificationService.verifyChainIntegrity(startSequence, endSequence);
+    return await this.verificationService.verifyChainIntegrity(
+      startSequence,
+      endSequence,
+    );
   }
 
   @Public()
@@ -62,7 +65,9 @@ export class VerificationController {
   @Get('admin/report')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MODERATOR)
-  async getDetailedVerificationReport(@Query('competitionId') competitionId?: string) {
+  async getDetailedVerificationReport(
+    @Query('competitionId') competitionId?: string,
+  ) {
     return await this.verificationService.getVerificationReport(competitionId);
   }
 }

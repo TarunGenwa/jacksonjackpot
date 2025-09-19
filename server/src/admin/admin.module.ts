@@ -10,6 +10,6 @@ import { CharitiesService } from './charities/charities.service';
 @Module({
   imports: [PrismaModule],
   controllers: [UsersController, CompetitionsController, CharitiesController],
-  providers: [UsersService, CompetitionsService, CharitiesService]
+  providers: [UsersService, CompetitionsService, CharitiesService],
 })
 export class AdminModule {}

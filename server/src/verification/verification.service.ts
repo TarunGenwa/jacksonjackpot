@@ -45,7 +45,7 @@ export class VerificationService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly hashChainService: HashChainService
+    private readonly hashChainService: HashChainService,
   ) {}
 
   async verifyTicket(ticketId: string): Promise<TicketVerificationResult> {
@@ -56,16 +56,16 @@ export class VerificationService {
         competition: {
           select: {
             id: true,
-            title: true
-          }
+            title: true,
+          },
         },
         user: {
           select: {
             id: true,
-            username: true
-          }
-        }
-      }
+            username: true,
+          },
+        },
+      },
     });
 
     if (!ticket) {
@@ -80,8 +80,8 @@ export class VerificationService {
         verification: {
           hashValid: false,
           chainIntact: false,
-          purchaseProven: false
-        }
+          purchaseProven: false,
+        },
       };
     }
 
@@ -91,14 +91,14 @@ export class VerificationService {
       timestamp: ticket.chainEntry.timestamp.toISOString(),
       data: ticket.chainEntry.data,
       metadata: ticket.chainEntry.metadata,
-      previousHash: ticket.chainEntry.previousHash
+      previousHash: ticket.chainEntry.previousHash,
     });
 
     const hashValid = calculatedHash === ticket.chainEntry.hash;
 
     const chainVerification = await this.hashChainService.verifyChain(
       Math.max(1, ticket.chainEntry.sequence - 5),
-      ticket.chainEntry.sequence + 5
+      ticket.chainEntry.sequence + 5,
     );
 
     const purchaseData = ticket.chainEntry.data as any;
@@ -115,7 +115,7 @@ export class VerificationService {
       verification: {
         hashValid,
         chainIntact: chainVerification.isValid,
-        purchaseProven
+        purchaseProven,
       },
       details: {
         competitionId: ticket.competitionId,
@@ -123,12 +123,15 @@ export class VerificationService {
         purchasePrice: ticket.purchasePrice.toString(),
         purchasedAt: ticket.purchasedAt,
         chainHash: ticket.chainEntry.hash,
-        sequence: ticket.chainEntry.sequence
-      }
+        sequence: ticket.chainEntry.sequence,
+      },
     };
   }
 
-  async verifyChainIntegrity(startSequence?: number, endSequence?: number): Promise<ChainIntegrityResult> {
+  async verifyChainIntegrity(
+    startSequence?: number,
+    endSequence?: number,
+  ): Promise<ChainIntegrityResult> {
     const latestEntry = await this.hashChainService.getLatestEntry();
 
     if (!latestEntry) {
@@ -137,14 +140,17 @@ export class VerificationService {
         totalEntries: 0,
         verifiedEntries: 0,
         verificationRange: { start: 0, end: 0 },
-        checkpoints: { total: 0, verified: 0 }
+        checkpoints: { total: 0, verified: 0 },
       };
     }
 
     const actualStart = startSequence || 1;
     const actualEnd = endSequence || latestEntry.sequence;
 
-    const verificationResult = await this.hashChainService.verifyChain(actualStart, actualEnd);
+    const verificationResult = await this.hashChainService.verifyChain(
+      actualStart,
+      actualEnd,
+    );
 
     const totalEntries = await this.prisma.hashChain.count();
     const verifiedRange = actualEnd - actualStart + 1;
@@ -168,13 +174,13 @@ export class VerificationService {
       errors: verificationResult.errors,
       verificationRange: {
         start: actualStart,
-        end: actualEnd
+        end: actualEnd,
       },
       checkpoints: {
         total: checkpoints.length,
         verified: verifiedCheckpoints,
-        latest: latestCheckpoint
-      }
+        latest: latestCheckpoint,
+      },
     };
   }
 
@@ -184,7 +190,7 @@ export class VerificationService {
     if (!checkpoint) {
       return {
         exists: false,
-        message: 'No checkpoints found'
+        message: 'No checkpoints found',
       };
     }
 
@@ -200,19 +206,19 @@ export class VerificationService {
         entriesCount: checkpoint.entriesCount,
         range: {
           start: checkpoint.startSequence,
-          end: checkpoint.endSequence
+          end: checkpoint.endSequence,
         },
         publishedHash: checkpoint.publishedHash,
         publishedTimestamp: checkpoint.publishedTimestamp,
-        createdAt: checkpoint.createdAt
+        createdAt: checkpoint.createdAt,
       },
-      verification
+      verification,
     };
   }
 
   async verifyCheckpoint(checkpointId: string) {
     const checkpoint = await this.prisma.chainCheckpoint.findUnique({
-      where: { id: checkpointId }
+      where: { id: checkpointId },
     });
 
     if (!checkpoint) {
@@ -223,20 +229,22 @@ export class VerificationService {
       where: {
         sequence: {
           gte: checkpoint.startSequence,
-          lte: checkpoint.endSequence
-        }
+          lte: checkpoint.endSequence,
+        },
       },
-      orderBy: { sequence: 'asc' }
+      orderBy: { sequence: 'asc' },
     });
 
     if (entries.length !== checkpoint.entriesCount) {
       return {
         isValid: false,
-        error: `Entry count mismatch: expected ${checkpoint.entriesCount}, found ${entries.length}`
+        error: `Entry count mismatch: expected ${checkpoint.entriesCount}, found ${entries.length}`,
       };
     }
 
-    const calculatedMerkleRoot = this.calculateMerkleRoot(entries.map(e => e.hash));
+    const calculatedMerkleRoot = this.calculateMerkleRoot(
+      entries.map((e) => e.hash),
+    );
     const merkleRootValid = calculatedMerkleRoot === checkpoint.merkleRoot;
 
     const lastEntry = entries[entries.length - 1];
@@ -249,7 +257,7 @@ export class VerificationService {
       entriesCount: entries.length,
       expectedEntriesCount: checkpoint.entriesCount,
       calculatedMerkleRoot,
-      storedMerkleRoot: checkpoint.merkleRoot
+      storedMerkleRoot: checkpoint.merkleRoot,
     };
   }
 
@@ -287,14 +295,14 @@ export class VerificationService {
                 id: true,
                 username: true,
                 firstName: true,
-                lastName: true
-              }
+                lastName: true,
+              },
             },
             ticket: true,
-            prize: true
-          }
-        }
-      }
+            prize: true,
+          },
+        },
+      },
     });
 
     if (!competition) {
@@ -306,14 +314,17 @@ export class VerificationService {
         type: 'DRAW_RESULT',
         data: {
           path: ['competitionId'],
-          equals: competitionId
-        }
-      }
+          equals: competitionId,
+        },
+      },
     });
 
-    const verification = drawResultEntry ?
-      await this.hashChainService.verifyChain(drawResultEntry.sequence, drawResultEntry.sequence) :
-      { isValid: false, errors: ['No draw result found in chain'] };
+    const verification = drawResultEntry
+      ? await this.hashChainService.verifyChain(
+          drawResultEntry.sequence,
+          drawResultEntry.sequence,
+        )
+      : { isValid: false, errors: ['No draw result found in chain'] };
 
     return {
       competitionId: competition.id,
@@ -325,11 +336,11 @@ export class VerificationService {
       drawExecuted: !!drawResultEntry,
       verification: {
         isValid: verification.isValid,
-        errors: verification.errors
+        errors: verification.errors,
       },
       results: {
         winnersCount: competition.winners.length,
-        winners: competition.winners.map(w => ({
+        winners: competition.winners.map((w) => ({
           winnerId: w.id,
           ticketNumber: w.ticket.ticketNumber,
           username: w.user.username,
@@ -338,29 +349,33 @@ export class VerificationService {
           prizeName: w.prize.name,
           prizeValue: w.prize.value,
           claimStatus: w.status,
-          claimedAt: w.claimedAt
-        }))
+          claimedAt: w.claimedAt,
+        })),
       },
-      chainProof: drawResultEntry ? {
-        hash: drawResultEntry.hash,
-        sequence: drawResultEntry.sequence,
-        timestamp: drawResultEntry.timestamp
-      } : null
+      chainProof: drawResultEntry
+        ? {
+            hash: drawResultEntry.hash,
+            sequence: drawResultEntry.sequence,
+            timestamp: drawResultEntry.timestamp,
+          }
+        : null,
     };
   }
 
   async getVerificationReport(competitionId?: string) {
-    const filter = competitionId ? {
-      data: {
-        path: ['competitionId'],
-        equals: competitionId
-      }
-    } : {};
+    const filter = competitionId
+      ? {
+          data: {
+            path: ['competitionId'],
+            equals: competitionId,
+          },
+        }
+      : {};
 
     const entries = await this.prisma.hashChain.findMany({
       where: filter,
       orderBy: { sequence: 'desc' },
-      take: 100
+      take: 100,
     });
 
     const integrityCheck = await this.verifyChainIntegrity();
@@ -369,9 +384,9 @@ export class VerificationService {
     const entryTypes = await this.prisma.hashChain.groupBy({
       by: ['type'],
       _count: {
-        type: true
+        type: true,
       },
-      where: filter
+      where: filter,
     });
 
     return {
@@ -379,21 +394,23 @@ export class VerificationService {
         totalEntries: entries.length,
         chainIntegrity: integrityCheck.isValid,
         latestSequence: entries[0]?.sequence || 0,
-        oldestSequence: entries[entries.length - 1]?.sequence || 0
+        oldestSequence: entries[entries.length - 1]?.sequence || 0,
       },
-      entryTypes: entryTypes.map(et => ({
+      entryTypes: entryTypes.map((et) => ({
         type: et.type,
-        count: et._count.type
+        count: et._count.type,
       })),
-      latestCheckpoint: latestCheckpoint.exists ? latestCheckpoint.checkpoint : null,
+      latestCheckpoint: latestCheckpoint.exists
+        ? latestCheckpoint.checkpoint
+        : null,
       integrityReport: integrityCheck,
-      recentEntries: entries.slice(0, 10).map(e => ({
+      recentEntries: entries.slice(0, 10).map((e) => ({
         sequence: e.sequence,
         type: e.type,
         hash: e.hash,
         previousHash: e.previousHash,
-        timestamp: e.timestamp
-      }))
+        timestamp: e.timestamp,
+      })),
     };
   }
 }

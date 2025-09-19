@@ -6,6 +6,6 @@ import { HashChainModule } from '../hash-chain/hash-chain.module';
 @Module({
   imports: [PrismaModule, HashChainModule],
   providers: [PrizeAllocationService],
-  exports: [PrizeAllocationService]
+  exports: [PrizeAllocationService],
 })
 export class PrizeAllocationModule {}

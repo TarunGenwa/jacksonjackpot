@@ -23,47 +23,52 @@ export class HashChainService {
   constructor(private readonly prisma: PrismaService) {}
 
   async addEntry(entryData: ChainEntryData): Promise<any> {
-    return await this.prisma.$transaction(async (prisma) => {
-      const latestEntry = await this.getLatestEntry(prisma);
+    return await this.prisma.$transaction(
+      async (prisma) => {
+        const latestEntry = await this.getLatestEntry(prisma);
 
-      const sequence = latestEntry ? latestEntry.sequence + 1 : 1;
-      const previousHash = latestEntry ? latestEntry.hash : null;
+        const sequence = latestEntry ? latestEntry.sequence + 1 : 1;
+        const previousHash = latestEntry ? latestEntry.hash : null;
 
-      const timestamp = new Date().toISOString();
+        const timestamp = new Date().toISOString();
 
-      const entryToHash = {
-        sequence,
-        type: entryData.type,
-        timestamp,
-        data: entryData.data,
-        metadata: entryData.metadata,
-        previousHash
-      };
-
-      const hash = this.calculateHash(entryToHash);
-
-      const newEntry = await prisma.hashChain.create({
-        data: {
+        const entryToHash = {
           sequence,
           type: entryData.type,
+          timestamp,
           data: entryData.data,
           metadata: entryData.metadata,
           previousHash,
-          hash,
-          timestamp: new Date(timestamp)
+        };
+
+        const hash = this.calculateHash(entryToHash);
+
+        const newEntry = await prisma.hashChain.create({
+          data: {
+            sequence,
+            type: entryData.type,
+            data: entryData.data,
+            metadata: entryData.metadata,
+            previousHash,
+            hash,
+            timestamp: new Date(timestamp),
+          },
+        });
+
+        if (sequence % this.CHECKPOINT_INTERVAL === 0) {
+          await this.createCheckpoint(sequence, prisma);
         }
-      });
 
-      if (sequence % this.CHECKPOINT_INTERVAL === 0) {
-        await this.createCheckpoint(sequence, prisma);
-      }
+        this.logger.log(
+          `Added chain entry: sequence=${sequence}, type=${entryData.type}, hash=${hash}`,
+        );
 
-      this.logger.log(`Added chain entry: sequence=${sequence}, type=${entryData.type}, hash=${hash}`);
-
-      return newEntry;
-    }, {
-      isolationLevel: Prisma.TransactionIsolationLevel.Serializable
-    });
+        return newEntry;
+      },
+      {
+        isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+      },
+    );
   }
 
   calculateHash(entry: any): string {
@@ -73,16 +78,16 @@ export class HashChainService {
       timestamp: entry.timestamp,
       data: entry.data,
       metadata: entry.metadata,
-      previousHash: entry.previousHash
+      previousHash: entry.previousHash,
     });
 
-    return crypto
-      .createHash('sha256')
-      .update(dataToHash)
-      .digest('hex');
+    return crypto.createHash('sha256').update(dataToHash).digest('hex');
   }
 
-  async verifyChain(startSequence?: number, endSequence?: number): Promise<VerificationResult> {
+  async verifyChain(
+    startSequence?: number,
+    endSequence?: number,
+  ): Promise<VerificationResult> {
     const errors: string[] = [];
 
     const whereClause: Prisma.HashChainWhereInput = {};
@@ -99,7 +104,7 @@ export class HashChainService {
 
     const entries = await this.prisma.hashChain.findMany({
       where: whereClause,
-      orderBy: { sequence: 'asc' }
+      orderBy: { sequence: 'asc' },
     });
 
     if (entries.length === 0) {
@@ -111,12 +116,16 @@ export class HashChainService {
     for (const entry of entries) {
       if (previousEntry) {
         if (entry.previousHash !== previousEntry.hash) {
-          errors.push(`Chain broken at sequence ${entry.sequence}: previous hash mismatch`);
+          errors.push(
+            `Chain broken at sequence ${entry.sequence}: previous hash mismatch`,
+          );
           return { isValid: false, errors, brokenAtSequence: entry.sequence };
         }
 
         if (entry.sequence !== previousEntry.sequence + 1) {
-          errors.push(`Sequence gap detected between ${previousEntry.sequence} and ${entry.sequence}`);
+          errors.push(
+            `Sequence gap detected between ${previousEntry.sequence} and ${entry.sequence}`,
+          );
           return { isValid: false, errors, brokenAtSequence: entry.sequence };
         }
       }
@@ -127,7 +136,7 @@ export class HashChainService {
         timestamp: entry.timestamp.toISOString(),
         data: entry.data,
         metadata: entry.metadata,
-        previousHash: entry.previousHash
+        previousHash: entry.previousHash,
       });
 
       if (calculatedHash !== entry.hash) {
@@ -138,14 +147,16 @@ export class HashChainService {
       previousEntry = entry;
     }
 
-    this.logger.log(`Chain verification successful for sequences ${startSequence || 'start'} to ${endSequence || 'end'}`);
+    this.logger.log(
+      `Chain verification successful for sequences ${startSequence || 'start'} to ${endSequence || 'end'}`,
+    );
     return { isValid: true };
   }
 
   async getLatestEntry(prisma?: any) {
     const db = prisma || this.prisma;
     return await db.hashChain.findFirst({
-      orderBy: { sequence: 'desc' }
+      orderBy: { sequence: 'desc' },
     });
   }
 
@@ -159,18 +170,20 @@ export class HashChainService {
       where: {
         sequence: {
           gte: startSequence,
-          lte: endSequence
-        }
+          lte: endSequence,
+        },
       },
-      orderBy: { sequence: 'asc' }
+      orderBy: { sequence: 'asc' },
     });
 
     if (entries.length === 0) {
-      this.logger.warn(`No entries found for checkpoint at sequence ${sequence}`);
+      this.logger.warn(
+        `No entries found for checkpoint at sequence ${sequence}`,
+      );
       return;
     }
 
-    const merkleRoot = this.calculateMerkleRoot(entries.map(e => e.hash));
+    const merkleRoot = this.calculateMerkleRoot(entries.map((e) => e.hash));
     const lastEntry = entries[entries.length - 1];
 
     const checkpoint = await db.chainCheckpoint.create({
@@ -180,11 +193,13 @@ export class HashChainService {
         merkleRoot,
         entriesCount: entries.length,
         startSequence,
-        endSequence
-      }
+        endSequence,
+      },
     });
 
-    this.logger.log(`Created checkpoint at sequence ${sequence}: merkleRoot=${merkleRoot}`);
+    this.logger.log(
+      `Created checkpoint at sequence ${sequence}: merkleRoot=${merkleRoot}`,
+    );
 
     return checkpoint;
   }
@@ -213,13 +228,13 @@ export class HashChainService {
   async getCheckpoints(limit: number = 10) {
     return await this.prisma.chainCheckpoint.findMany({
       orderBy: { sequence: 'desc' },
-      take: limit
+      take: limit,
     });
   }
 
   async getLatestCheckpoint() {
     return await this.prisma.chainCheckpoint.findFirst({
-      orderBy: { sequence: 'desc' }
+      orderBy: { sequence: 'desc' },
     });
   }
 
@@ -228,14 +243,14 @@ export class HashChainService {
       where: { id: checkpointId },
       data: {
         publishedHash,
-        publishedTimestamp: new Date()
-      }
+        publishedTimestamp: new Date(),
+      },
     });
   }
 
   async getEntryByHash(hash: string) {
     return await this.prisma.hashChain.findUnique({
-      where: { hash }
+      where: { hash },
     });
   }
 
@@ -243,7 +258,7 @@ export class HashChainService {
     return await this.prisma.hashChain.findMany({
       where: { type },
       orderBy: { sequence: 'desc' },
-      take: limit
+      take: limit,
     });
   }
 }

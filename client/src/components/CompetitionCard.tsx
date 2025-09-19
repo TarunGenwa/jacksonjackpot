@@ -49,10 +49,7 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
   };
 
   const getPrizePool = () => {
-    const ticketPrice = parseFloat(localCompetition.ticketPrice);
-    const ticketsSold = localCompetition.ticketsSold;
-    const prizePool = ticketPrice * ticketsSold;
-    return formatPrizePool(prizePool.toString());
+    return formatPrizePool(localCompetition.totalPrizeValue);
   };
 
 

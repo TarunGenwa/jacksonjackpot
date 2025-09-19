@@ -8,6 +8,6 @@ import { HashChainModule } from '../hash-chain/hash-chain.module';
   imports: [PrismaModule, HashChainModule],
   providers: [VerificationService],
   controllers: [VerificationController],
-  exports: [VerificationService]
+  exports: [VerificationService],
 })
 export class VerificationModule {}

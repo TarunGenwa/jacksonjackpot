@@ -74,10 +74,7 @@ export class CharitiesController {
   }
 
   @Put(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateData: any,
-  ) {
+  async update(@Param('id') id: string, @Body() updateData: any) {
     return this.charitiesService.update(id, updateData);
   }
 
@@ -89,7 +86,7 @@ export class CharitiesController {
   @Put(':id/verification')
   async updateVerification(
     @Param('id') id: string,
-    @Body() data: { isVerified: boolean }
+    @Body() data: { isVerified: boolean },
   ) {
     return this.charitiesService.updateVerification(id, data.isVerified);
   }

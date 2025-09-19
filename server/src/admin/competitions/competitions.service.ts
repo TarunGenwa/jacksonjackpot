@@ -164,9 +164,8 @@ export class CompetitionsService {
       }),
     ]);
 
-    const avgTicketsPerCompetition = totalCompetitions > 0
-      ? totalTicketsSold / totalCompetitions
-      : 0;
+    const avgTicketsPerCompetition =
+      totalCompetitions > 0 ? totalTicketsSold / totalCompetitions : 0;
 
     return {
       totalCompetitions,
@@ -174,10 +173,13 @@ export class CompetitionsService {
       completedCompetitions,
       totalTicketsSold,
       avgTicketsPerCompetition: Math.round(avgTicketsPerCompetition),
-      competitionsByStatus: competitionsByStatus.reduce((acc, curr) => {
-        acc[curr.status] = curr._count;
-        return acc;
-      }, {} as Record<string, number>),
+      competitionsByStatus: competitionsByStatus.reduce(
+        (acc, curr) => {
+          acc[curr.status] = curr._count;
+          return acc;
+        },
+        {} as Record<string, number>,
+      ),
     };
   }
 }

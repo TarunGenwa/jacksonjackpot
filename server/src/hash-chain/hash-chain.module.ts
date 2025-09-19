@@ -5,6 +5,6 @@ import { PrismaModule } from '../prisma/prisma.module';
 @Module({
   imports: [PrismaModule],
   providers: [HashChainService],
-  exports: [HashChainService]
+  exports: [HashChainService],
 })
 export class HashChainModule {}

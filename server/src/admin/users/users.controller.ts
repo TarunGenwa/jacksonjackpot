@@ -72,7 +72,8 @@ export class UsersController {
   @Put(':id')
   async update(
     @Param('id') id: string,
-    @Body() updateData: {
+    @Body()
+    updateData: {
       email?: string;
       username?: string;
       firstName?: string;
@@ -85,10 +86,7 @@ export class UsersController {
   }
 
   @Put(':id/role')
-  async updateRole(
-    @Param('id') id: string,
-    @Body('role') role: UserRole,
-  ) {
+  async updateRole(@Param('id') id: string, @Body('role') role: UserRole) {
     if (!Object.values(UserRole).includes(role)) {
       throw new BadRequestException('Invalid role');
     }

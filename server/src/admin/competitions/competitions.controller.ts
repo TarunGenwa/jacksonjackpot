@@ -74,10 +74,7 @@ export class CompetitionsController {
   }
 
   @Put(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateData: any,
-  ) {
+  async update(@Param('id') id: string, @Body() updateData: any) {
     return this.competitionsService.update(id, updateData);
   }
 

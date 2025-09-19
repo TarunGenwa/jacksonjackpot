@@ -9,6 +9,6 @@ import { HashChainModule } from '../hash-chain/hash-chain.module';
   imports: [PrismaModule, PrizeAllocationModule, HashChainModule],
   providers: [DrawService],
   controllers: [DrawController],
-  exports: [DrawService]
+  exports: [DrawService],
 })
 export class DrawModule {}

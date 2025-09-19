@@ -25,38 +25,51 @@ export class InstantWinsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly hashChainService: HashChainService,
-    private readonly prizeAllocationService: PrizeAllocationService
+    private readonly prizeAllocationService: PrizeAllocationService,
   ) {
     this.encryptionKey = crypto.scryptSync(
       process.env.INSTANT_WIN_SECRET || 'default-secret-change-in-production',
       'salt',
-      32
+      32,
     );
   }
 
-  async generateInstantWins(competitionId: string, totalTickets: number, instantWinPercentage: number = 5) {
+  async generateInstantWins(
+    competitionId: string,
+    totalTickets: number,
+    instantWinPercentage: number = 5,
+  ) {
     return await this.prisma.$transaction(async (prisma) => {
       const competition = await prisma.competition.findUnique({
         where: { id: competitionId },
         include: {
           prizes: {
             where: { position: { gte: 100 } },
-            orderBy: { position: 'asc' }
-          }
-        }
+            orderBy: { position: 'asc' },
+          },
+        },
       });
 
       if (!competition) {
         throw new Error('Competition not found');
       }
 
-      const numberOfInstantWins = Math.floor((totalTickets * instantWinPercentage) / 100);
-      const winningPositions = this.generateRandomPositions(numberOfInstantWins, totalTickets);
+      const numberOfInstantWins = Math.floor(
+        (totalTickets * instantWinPercentage) / 100,
+      );
+      const winningPositions = this.generateRandomPositions(
+        numberOfInstantWins,
+        totalTickets,
+      );
 
       const instantWins: any[] = [];
       const availablePrizes = [...competition.prizes];
 
-      for (let i = 0; i < winningPositions.length && i < availablePrizes.length; i++) {
+      for (
+        let i = 0;
+        i < winningPositions.length && i < availablePrizes.length;
+        i++
+      ) {
         const position = winningPositions[i];
         const prize = availablePrizes[i % availablePrizes.length];
 
@@ -64,7 +77,7 @@ export class InstantWinsService {
           position,
           prizeId: prize.id,
           competitionId,
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
         });
 
         const instantWin = await prisma.instantWin.create({
@@ -72,8 +85,8 @@ export class InstantWinsService {
             competitionId,
             prizeId: prize.id,
             position,
-            encryptedData
-          }
+            encryptedData,
+          },
         });
 
         instantWins.push(instantWin);
@@ -86,36 +99,41 @@ export class InstantWinsService {
           action: 'INSTANT_WINS_GENERATED',
           instantWinsCount: instantWins.length,
           totalTickets,
-          percentage: instantWinPercentage
+          percentage: instantWinPercentage,
         },
         metadata: {
           timestamp: new Date().toISOString(),
-          positionsHash: this.hashPositions(winningPositions)
-        }
+          positionsHash: this.hashPositions(winningPositions),
+        },
       });
 
-      this.logger.log(`Generated ${instantWins.length} instant wins for competition ${competitionId}`);
+      this.logger.log(
+        `Generated ${instantWins.length} instant wins for competition ${competitionId}`,
+      );
 
       return {
         instantWins: instantWins.length,
-        chainEntry
+        chainEntry,
       };
     });
   }
 
-  async checkForInstantWin(ticketNumber: string, competitionId: string): Promise<InstantWinCheckResult> {
+  async checkForInstantWin(
+    ticketNumber: string,
+    competitionId: string,
+  ): Promise<InstantWinCheckResult> {
     const ticketPosition = this.getTicketPosition(ticketNumber);
 
     const instantWin = await this.prisma.instantWin.findUnique({
       where: {
         competitionId_position: {
           competitionId,
-          position: ticketPosition
-        }
+          position: ticketPosition,
+        },
       },
       include: {
-        prize: true
-      }
+        prize: true,
+      },
     });
 
     if (!instantWin || instantWin.isClaimed) {
@@ -125,104 +143,119 @@ export class InstantWinsService {
     const decryptedData = this.decryptWinData(instantWin.encryptedData);
 
     if (decryptedData.position !== ticketPosition) {
-      this.logger.error(`Position mismatch for instant win: expected ${ticketPosition}, got ${decryptedData.position}`);
+      this.logger.error(
+        `Position mismatch for instant win: expected ${ticketPosition}, got ${decryptedData.position}`,
+      );
       return { isWinner: false };
     }
 
     return {
       isWinner: true,
       instantWin,
-      prize: instantWin.prize
+      prize: instantWin.prize,
     };
   }
 
-  async claimInstantWin(instantWinId: string, ticketId: string, userId: string) {
-    return await this.prisma.$transaction(async (prisma) => {
-      const instantWin = await prisma.instantWin.findUnique({
-        where: { id: instantWinId },
-        include: {
-          prize: true,
-          competition: true
+  async claimInstantWin(
+    instantWinId: string,
+    ticketId: string,
+    userId: string,
+  ) {
+    return await this.prisma.$transaction(
+      async (prisma) => {
+        const instantWin = await prisma.instantWin.findUnique({
+          where: { id: instantWinId },
+          include: {
+            prize: true,
+            competition: true,
+          },
+        });
+
+        if (!instantWin) {
+          throw new Error('Instant win not found');
         }
-      });
 
-      if (!instantWin) {
-        throw new Error('Instant win not found');
-      }
-
-      if (instantWin.isClaimed) {
-        throw new Error('Instant win already claimed');
-      }
-
-      const ticket = await prisma.ticket.findUnique({
-        where: { id: ticketId }
-      });
-
-      if (!ticket) {
-        throw new Error('Ticket not found');
-      }
-
-      if (ticket.userId !== userId) {
-        throw new Error('Unauthorized: ticket does not belong to user');
-      }
-
-      const ticketPosition = this.getTicketPosition(ticket.ticketNumber);
-      if (ticketPosition !== instantWin.position) {
-        throw new Error('Ticket position does not match instant win position');
-      }
-
-      const prizeAllocation = await this.prizeAllocationService.allocatePrize({
-        competitionId: instantWin.competitionId,
-        ticketId,
-        prizeId: instantWin.prizeId,
-        userId,
-        isInstantWin: true
-      });
-
-      const updatedInstantWin = await prisma.instantWin.update({
-        where: { id: instantWinId },
-        data: {
-          isClaimed: true,
-          claimedByTicketId: ticketId,
-          chainEntryId: prizeAllocation.chainEntry.id
+        if (instantWin.isClaimed) {
+          throw new Error('Instant win already claimed');
         }
-      });
 
-      await this.revealInstantWin(instantWinId, prisma);
+        const ticket = await prisma.ticket.findUnique({
+          where: { id: ticketId },
+        });
 
-      const chainEntry = await this.hashChainService.addEntry({
-        type: ChainEntryType.INSTANT_WIN_REVEAL,
-        data: {
-          instantWinId,
-          ticketId,
-          userId,
-          prizeId: instantWin.prizeId,
-          competitionId: instantWin.competitionId,
-          position: instantWin.position
-        },
-        metadata: {
-          timestamp: new Date().toISOString(),
-          prizeName: instantWin.prize.name,
-          prizeValue: instantWin.prize.value
+        if (!ticket) {
+          throw new Error('Ticket not found');
         }
-      });
 
-      this.logger.log(`Instant win claimed: id=${instantWinId}, ticketId=${ticketId}, chainHash=${chainEntry.hash}`);
+        if (ticket.userId !== userId) {
+          throw new Error('Unauthorized: ticket does not belong to user');
+        }
 
-      return {
-        instantWin: updatedInstantWin,
-        prizeAllocation,
-        chainEntry
-      };
-    }, {
-      isolationLevel: Prisma.TransactionIsolationLevel.Serializable
-    });
+        const ticketPosition = this.getTicketPosition(ticket.ticketNumber);
+        if (ticketPosition !== instantWin.position) {
+          throw new Error(
+            'Ticket position does not match instant win position',
+          );
+        }
+
+        const prizeAllocation = await this.prizeAllocationService.allocatePrize(
+          {
+            competitionId: instantWin.competitionId,
+            ticketId,
+            prizeId: instantWin.prizeId,
+            userId,
+            isInstantWin: true,
+          },
+        );
+
+        const updatedInstantWin = await prisma.instantWin.update({
+          where: { id: instantWinId },
+          data: {
+            isClaimed: true,
+            claimedByTicketId: ticketId,
+            chainEntryId: prizeAllocation.chainEntry.id,
+          },
+        });
+
+        await this.revealInstantWin(instantWinId, prisma);
+
+        const chainEntry = await this.hashChainService.addEntry({
+          type: ChainEntryType.INSTANT_WIN_REVEAL,
+          data: {
+            instantWinId,
+            ticketId,
+            userId,
+            prizeId: instantWin.prizeId,
+            competitionId: instantWin.competitionId,
+            position: instantWin.position,
+          },
+          metadata: {
+            timestamp: new Date().toISOString(),
+            prizeName: instantWin.prize.name,
+            prizeValue: instantWin.prize.value,
+          },
+        });
+
+        this.logger.log(
+          `Instant win claimed: id=${instantWinId}, ticketId=${ticketId}, chainHash=${chainEntry.hash}`,
+        );
+
+        return {
+          instantWin: updatedInstantWin,
+          prizeAllocation,
+          chainEntry,
+        };
+      },
+      {
+        isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+      },
+    );
   }
 
   private async revealInstantWin(instantWinId: string, prisma: any) {
     await prisma.instantWin.update({
       where: { id: instantWinId },
-      data: { isRevealed: true }
+      data: { isRevealed: true },
     });
   }
 
@@ -266,7 +299,11 @@ export class InstantWinsService {
   private decryptWinData(encryptedData: string): any {
     const [ivHex, encrypted] = encryptedData.split(':');
     const iv = Buffer.from(ivHex, 'hex');
-    const decipher = crypto.createDecipheriv('aes-256-cbc', this.encryptionKey, iv);
+    const decipher = crypto.createDecipheriv(
+      'aes-256-cbc',
+      this.encryptionKey,
+      iv,
+    );
 
     let decrypted = decipher.update(encrypted, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
@@ -286,9 +323,12 @@ export class InstantWinsService {
       .digest('hex');
   }
 
-  async getInstantWinsForCompetition(competitionId: string, includeRevealed: boolean = false) {
+  async getInstantWinsForCompetition(
+    competitionId: string,
+    includeRevealed: boolean = false,
+  ) {
     const where: Prisma.InstantWinWhereInput = {
-      competitionId
+      competitionId,
     };
 
     if (!includeRevealed) {
@@ -298,9 +338,9 @@ export class InstantWinsService {
     return await this.prisma.instantWin.findMany({
       where,
       include: {
-        prize: true
+        prize: true,
       },
-      orderBy: { position: 'asc' }
+      orderBy: { position: 'asc' },
     });
   }
 
@@ -308,8 +348,8 @@ export class InstantWinsService {
     return await this.prisma.instantWin.count({
       where: {
         competitionId,
-        isClaimed: false
-      }
+        isClaimed: false,
+      },
     });
   }
 }

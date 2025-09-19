@@ -1,6 +1,18 @@
-import { Controller, Post, Get, Body, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { DrawService } from './draw.service';
-import type { CommitSeedDto, RevealSeedDto, ExecuteDrawDto } from './draw.service';
+import type {
+  CommitSeedDto,
+  RevealSeedDto,
+  ExecuteDrawDto,
+} from './draw.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';

@@ -99,10 +99,7 @@ export class UsersService {
     return userWithoutPassword;
   }
 
-  async updateUser(
-    id: string,
-    data: Prisma.UserUpdateInput,
-  ) {
+  async updateUser(id: string, data: Prisma.UserUpdateInput) {
     try {
       const user = await this.prisma.user.update({
         where: { id },
@@ -160,32 +157,36 @@ export class UsersService {
   }
 
   async getUserStatistics() {
-    const [totalUsers, activeUsers, adminUsers, usersByRole, recentUsers] = await Promise.all([
-      this.prisma.user.count(),
-      this.prisma.user.count({ where: { isActive: true } }),
-      this.prisma.user.count({ where: { role: 'ADMIN' } }),
-      this.prisma.user.groupBy({
-        by: ['role'],
-        _count: true,
-      }),
-      this.prisma.user.count({
-        where: {
-          createdAt: {
-            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Last 7 days
+    const [totalUsers, activeUsers, adminUsers, usersByRole, recentUsers] =
+      await Promise.all([
+        this.prisma.user.count(),
+        this.prisma.user.count({ where: { isActive: true } }),
+        this.prisma.user.count({ where: { role: 'ADMIN' } }),
+        this.prisma.user.groupBy({
+          by: ['role'],
+          _count: true,
+        }),
+        this.prisma.user.count({
+          where: {
+            createdAt: {
+              gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Last 7 days
+            },
           },
-        },
-      }),
-    ]);
+        }),
+      ]);
 
     return {
       totalUsers,
       activeUsers,
       inactiveUsers: totalUsers - activeUsers,
       adminUsers,
-      usersByRole: usersByRole.reduce((acc, curr) => {
-        acc[curr.role] = curr._count;
-        return acc;
-      }, {} as Record<string, number>),
+      usersByRole: usersByRole.reduce(
+        (acc, curr) => {
+          acc[curr.role] = curr._count;
+          return acc;
+        },
+        {} as Record<string, number>,
+      ),
       recentUsers,
     };
   }
