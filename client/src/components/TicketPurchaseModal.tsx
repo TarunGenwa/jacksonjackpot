@@ -13,7 +13,6 @@ import {
   VStack,
   HStack,
   Text,
-  Input,
   FormControl,
   FormLabel,
   Alert,
@@ -120,9 +119,9 @@ export default function TicketPurchaseModal({
       onPurchaseSuccess?.();
       onClose();
       
-    } catch (err: any) {
+    } catch (err) {
       console.error('Purchase failed:', err);
-      const errorMessage = err.message || 'Purchase failed. Please try again.';
+      const errorMessage = err instanceof Error ? err.message : 'Purchase failed. Please try again.';
       setError(errorMessage);
       
       toast({
@@ -150,12 +149,6 @@ export default function TicketPurchaseModal({
       style: 'currency',
       currency: 'GBP'
     }).format(price);
-  };
-
-  const getAvailabilityColor = () => {
-    if (availableTickets === 0) return 'red';
-    if (availableTickets < 100) return 'orange';
-    return 'green';
   };
 
   return (

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import { walletService } from '@/services/wallet';
 
@@ -20,7 +20,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const refreshBalance = async () => {
+  const refreshBalance = useCallback(async () => {
     if (!user) {
       setBalance(null);
       return;
@@ -38,7 +38,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user]);
 
   const updateBalance = (newBalance: string) => {
     setBalance(newBalance);
@@ -46,7 +46,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     refreshBalance();
-  }, [user]);
+  }, [refreshBalance]);
 
   const value = {
     balance,

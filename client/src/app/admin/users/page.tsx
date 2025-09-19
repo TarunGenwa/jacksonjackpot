@@ -6,9 +6,7 @@ import {
   Filter,
   ChevronLeft,
   ChevronRight,
-  Edit,
   Trash2,
-  Shield,
   UserCheck,
   UserX,
   Eye
@@ -45,38 +43,39 @@ export default function UsersManagement() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalUsers, setTotalUsers] = useState(0);
   const itemsPerPage = 10;
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const data = await adminApi.getUsers({
+          page: currentPage,
+          limit: itemsPerPage,
+          search: searchTerm || undefined,
+          role: roleFilter || undefined,
+          isActive: statusFilter || undefined,
+        }) as { users: User[]; total: number };
+
+        setUsers(data.users);
+        setTotalUsers(data.total);
+        setTotalPages(Math.ceil(data.total / itemsPerPage));
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchUsers();
-  }, [currentPage, searchTerm, roleFilter, statusFilter]);
-
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const data = await adminApi.getUsers({
-        page: currentPage,
-        limit: itemsPerPage,
-        search: searchTerm || undefined,
-        role: roleFilter || undefined,
-        isActive: statusFilter || undefined,
-      });
-
-      setUsers(data.users);
-      setTotalUsers(data.total);
-      setTotalPages(Math.ceil(data.total / itemsPerPage));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [currentPage, searchTerm, roleFilter, statusFilter, refreshKey]);
 
   const handleToggleStatus = async (userId: string) => {
     try {
       await adminApi.toggleUserStatus(userId);
-      await fetchUsers();
+      setRefreshKey(prev => prev + 1);
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to update user status');
     }
@@ -85,7 +84,7 @@ export default function UsersManagement() {
   const handleRoleChange = async (userId: string, newRole: string) => {
     try {
       await adminApi.updateUserRole(userId, newRole);
-      await fetchUsers();
+      setRefreshKey(prev => prev + 1);
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to update user role');
     }
@@ -96,7 +95,7 @@ export default function UsersManagement() {
 
     try {
       await adminApi.deleteUser(userId);
-      await fetchUsers();
+      setRefreshKey(prev => prev + 1);
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to delete user');
     }

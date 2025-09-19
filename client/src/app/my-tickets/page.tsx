@@ -363,7 +363,7 @@ export default function MyTicketsPage() {
             </Text>
             {searchTerm && (
               <Badge colorScheme="blue" variant="subtle" px={3} py={1}>
-                Search: "{searchTerm}"
+                Search: &ldquo;{searchTerm}&rdquo;
               </Badge>
             )}
           </Flex>

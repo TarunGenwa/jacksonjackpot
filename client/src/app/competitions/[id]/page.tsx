@@ -721,7 +721,7 @@ export default function CompetitionPage() {
                             <AccordionIcon color="purple.400" />
                           </AccordionButton>
                           <AccordionPanel pb={4} bg="blackAlpha.400" borderBottomRadius="lg" color="gray.300">
-                            Simply click the "Buy Tickets" button above, select how many tickets you'd like, and complete your purchase securely. You'll receive an email confirmation with your ticket numbers.
+                            Simply click the &ldquo;Buy Tickets&rdquo; button above, select how many tickets you&apos;d like, and complete your purchase securely. You&apos;ll receive an email confirmation with your ticket numbers.
                           </AccordionPanel>
                         </AccordionItem>
 
@@ -801,7 +801,7 @@ export default function CompetitionPage() {
                             _expanded={{ bg: "purple.900", borderBottomRadius: 0 }}
                           >
                             <Box flex="1" textAlign="left" color="white" fontWeight="semibold">
-                              How will I know if I've won?
+                              How will I know if I&apos;ve won?
                             </Box>
                             <AccordionIcon color="purple.400" />
                           </AccordionButton>
@@ -823,7 +823,7 @@ export default function CompetitionPage() {
                             <AccordionIcon color="purple.400" />
                           </AccordionButton>
                           <AccordionPanel pb={4} bg="blackAlpha.400" borderBottomRadius="lg" color="gray.300">
-                            As per our terms and conditions, all ticket sales are final and non-refundable. This ensures fairness for all participants and maximizes the charity's fundraising.
+                            As per our terms and conditions, all ticket sales are final and non-refundable. This ensures fairness for all participants and maximizes the charity&apos;s fundraising.
                           </AccordionPanel>
                         </AccordionItem>
                       </Accordion>

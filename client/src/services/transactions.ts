@@ -14,7 +14,7 @@ export interface Transaction {
   referenceNumber?: string;
   paymentProvider?: string;
   providerTransactionId?: string;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
   failureReason?: string;
   refundedAmount?: string;
   refundedAt?: string;

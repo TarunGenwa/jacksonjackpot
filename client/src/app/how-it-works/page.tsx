@@ -114,7 +114,7 @@ export default function HowItWorksPage() {
               How Jackson Jackpot Works
             </Heading>
             <Text fontSize="lg" color="gray.600" maxW="3xl">
-              Win amazing prizes while supporting incredible charities. It's simple, secure, and makes a real difference.
+              Win amazing prizes while supporting incredible charities. It&apos;s simple, secure, and makes a real difference.
             </Text>
           </VStack>
 
@@ -208,7 +208,7 @@ export default function HowItWorksPage() {
                 </Heading>
                 <Text fontSize="lg" color="gray.700" maxW="2xl">
                   Every ticket you purchase directly supports registered charities across the UK. 
-                  Together, we're making a real difference in communities nationwide.
+                  Together, we&apos;re making a real difference in communities nationwide.
                 </Text>
                 
                 <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8} w="full" maxW="2xl">

@@ -4,10 +4,6 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import {
   ArrowLeft,
-  Heart,
-  Mail,
-  Globe,
-  Building,
   Shield,
   Calendar,
   Edit2,
@@ -62,6 +58,7 @@ export default function CharityDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -76,41 +73,41 @@ export default function CharityDetailPage() {
   });
 
   useEffect(() => {
+    const fetchCharity = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const charityData = await adminApi.getCharityById(charityId) as CharityDetail;
+        setCharity(charityData);
+        setFormData({
+          name: charityData.name,
+          description: charityData.description,
+          logoUrl: charityData.logoUrl || '',
+          website: charityData.website || '',
+          email: charityData.email,
+          taxId: charityData.taxId || '',
+          isActive: charityData.isActive,
+          bankAccountName: charityData.bankAccountName || '',
+          bankAccountNumber: charityData.bankAccountNumber || '',
+          bankSortCode: charityData.bankSortCode || '',
+        });
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load charity');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (charityId) {
       fetchCharity();
     }
-  }, [charityId]);
-
-  const fetchCharity = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const charityData = await adminApi.getCharityById(charityId);
-      setCharity(charityData);
-      setFormData({
-        name: charityData.name,
-        description: charityData.description,
-        logoUrl: charityData.logoUrl || '',
-        website: charityData.website || '',
-        email: charityData.email,
-        taxId: charityData.taxId || '',
-        isActive: charityData.isActive,
-        bankAccountName: charityData.bankAccountName || '',
-        bankAccountNumber: charityData.bankAccountNumber || '',
-        bankSortCode: charityData.bankSortCode || '',
-      });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load charity');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [charityId, refreshKey]);
 
   const handleSave = async () => {
     try {
       await adminApi.updateCharity(charityId, formData);
       setEditing(false);
-      await fetchCharity();
+      setRefreshKey(prev => prev + 1);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update charity');
     }
@@ -137,7 +134,7 @@ export default function CharityDetailPage() {
   const handleVerificationToggle = async () => {
     try {
       await adminApi.updateCharityVerification(charityId, !charity?.isVerified);
-      await fetchCharity();
+      setRefreshKey(prev => prev + 1);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update verification status');
     }

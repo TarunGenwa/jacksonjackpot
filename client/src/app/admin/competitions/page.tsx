@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import {
   Search,
   Filter,
@@ -19,6 +20,7 @@ import {
   Image as ImageIcon
 } from 'lucide-react';
 import { adminApi } from '@/services/adminApi';
+import { Prize } from '@/types/admin';
 
 interface Competition {
   id: string;
@@ -36,7 +38,7 @@ interface Competition {
     name: string;
     logoUrl?: string;
   };
-  prizes: any[];
+  prizes: Prize[];
   _count: {
     tickets: number;
     winners: number;
@@ -67,42 +69,34 @@ export default function CompetitionsManagement() {
   const [deleteModal, setDeleteModal] = useState<DeleteModalData>({ competitionId: null, competitionTitle: '', isOpen: false });
   const [editFormData, setEditFormData] = useState<Partial<Competition>>({});
   const [savingEdit, setSavingEdit] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   const itemsPerPage = 12;
 
   useEffect(() => {
+    const fetchCompetitions = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const data = await adminApi.getCompetitions({
+          page: currentPage,
+          limit: itemsPerPage,
+          search: searchTerm || undefined,
+          status: statusFilter || undefined,
+        }) as { competitions: Competition[]; total: number };
+
+        setCompetitions(data.competitions);
+        setTotalCompetitions(data.total);
+        setTotalPages(Math.ceil(data.total / itemsPerPage));
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchCompetitions();
-  }, [currentPage, searchTerm, statusFilter]);
-
-  const fetchCompetitions = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const data = await adminApi.getCompetitions({
-        page: currentPage,
-        limit: itemsPerPage,
-        search: searchTerm || undefined,
-        status: statusFilter || undefined,
-      });
-
-      setCompetitions(data.competitions);
-      setTotalCompetitions(data.total);
-      setTotalPages(Math.ceil(data.total / itemsPerPage));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleStatusChange = async (competitionId: string, newStatus: string) => {
-    try {
-      await adminApi.updateCompetitionStatus(competitionId, newStatus);
-      await fetchCompetitions();
-    } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to update status');
-    }
-  };
+  }, [currentPage, searchTerm, statusFilter, refreshKey]);
 
   const handleDeleteCompetition = async () => {
     if (!deleteModal.competitionId) return;
@@ -110,7 +104,7 @@ export default function CompetitionsManagement() {
     try {
       await adminApi.deleteCompetition(deleteModal.competitionId);
       setDeleteModal({ competitionId: null, competitionTitle: '', isOpen: false });
-      await fetchCompetitions();
+      setRefreshKey(prev => prev + 1);
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to delete competition');
     }
@@ -150,7 +144,7 @@ export default function CompetitionsManagement() {
       };
 
       await adminApi.updateCompetition(editModal.competition.id, formattedData);
-      await fetchCompetitions();
+      setRefreshKey(prev => prev + 1);
       closeEditModal();
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to update competition');
@@ -245,14 +239,13 @@ export default function CompetitionsManagement() {
             {/* Competition Image */}
             <div className="relative w-full h-48 bg-gray-100 rounded-t-lg overflow-hidden">
               {competition.imageUrl ? (
-                <img
+                <Image
                   src={competition.imageUrl}
                   alt={competition.title}
+                  width={400}
+                  height={300}
                   className="w-full h-full object-contain"
                   style={{ backgroundColor: '#f9fafb' }}
-                  onError={(e) => {
-                    e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2UyZThmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzY0NzQ4YiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
-                  }}
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
@@ -441,13 +434,12 @@ export default function CompetitionsManagement() {
                   />
                   {editFormData.imageUrl && (
                     <div className="mt-2">
-                      <img
+                      <Image
                         src={editFormData.imageUrl}
                         alt="Competition preview"
+                        width={400}
+                        height={128}
                         className="w-full h-32 object-cover rounded-lg"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
                       />
                     </div>
                   )}
@@ -580,7 +572,7 @@ export default function CompetitionsManagement() {
               <div className="mb-6">
                 <p className="text-gray-700">
                   Are you sure you want to delete the competition
-                  <span className="font-semibold">"{deleteModal.competitionTitle}"</span>?
+                  <span className="font-semibold">&ldquo;{deleteModal.competitionTitle}&rdquo;</span>?
                   This will permanently remove all associated data including tickets and winners.
                 </p>
               </div>

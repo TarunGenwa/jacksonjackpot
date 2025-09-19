@@ -69,8 +69,8 @@ class ApiClient {
           }
         }
         
-        const error = new Error(errorMessage);
-        (error as any).status = response.status;
+        const error = new Error(errorMessage) as Error & { status?: number };
+        error.status = response.status;
         throw error;
       }
       
@@ -92,7 +92,7 @@ class ApiClient {
     return this.request<T>(endpoint, { method: 'GET' });
   }
 
-  async post<T>(endpoint: string, data?: any): Promise<T> {
+  async post<T>(endpoint: string, data?: unknown): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,

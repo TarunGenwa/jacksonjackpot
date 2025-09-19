@@ -18,8 +18,12 @@ import {
 import { FaClock, FaTicketAlt, FaTrophy, FaGift, FaBolt, FaCalendarDay, FaCircle } from 'react-icons/fa';
 import { Competition } from '@/types/api';
 
+interface CompetitionWithCategory extends Competition {
+  category?: string;
+}
+
 interface CompetitionCardProps {
-  competition: Competition;
+  competition: CompetitionWithCategory;
 }
 
 export default function CompetitionCard({ competition }: CompetitionCardProps) {
@@ -37,28 +41,6 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
   const formatPrizePool = (price: string) => {
     const amount = parseFloat(price);
     return `£${amount % 1 === 0 ? amount.toString() : amount.toFixed(2)}`;
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-GB', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    });
-  };
-
-  const getRemainingTime = () => {
-    const now = new Date();
-    const drawDate = new Date(localCompetition.drawDate);
-    const diffMs = drawDate.getTime() - now.getTime();
-    
-    if (diffMs <= 0) return 'Draw closed';
-    
-    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    
-    if (days > 0) return `${days}d ${hours}h left`;
-    return `${hours}h left`;
   };
 
   const getProgressPercentage = () => {
@@ -108,7 +90,7 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
     }
   };
 
-  const categoryInfo = getCategoryInfo((localCompetition as any).category);
+  const categoryInfo = getCategoryInfo(localCompetition.category);
 
 
   return (
@@ -156,7 +138,7 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
               left={4}
               spacing={2}
             >
-              {(localCompetition as any).category && (
+              {localCompetition.category && (
                 <Badge
                   colorScheme={categoryInfo.color}
                   variant="solid"
@@ -169,7 +151,7 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
                   gap={1}
                 >
                   <Icon as={categoryInfo.icon} boxSize={3} />
-                  {(localCompetition as any).category}
+                  {localCompetition.category}
                 </Badge>
               )}
               <Badge

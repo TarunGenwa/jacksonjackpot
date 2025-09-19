@@ -4,10 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import {
   ArrowLeft,
-  User,
-  Mail,
   Calendar,
-  Shield,
   Wallet,
   Activity,
   Edit2,
@@ -17,6 +14,7 @@ import {
 import { adminApi } from '@/services/adminApi';
 import LoadingSpinner from '@/components/admin/LoadingSpinner';
 import ErrorAlert from '@/components/admin/ErrorAlert';
+import { Ticket, Transaction, Winner } from '@/types/admin';
 
 interface UserDetail {
   id: string;
@@ -34,9 +32,9 @@ interface UserDetail {
     currency: string;
     isLocked: boolean;
   };
-  tickets: any[];
-  transactions: any[];
-  winners: any[];
+  tickets: Ticket[];
+  transactions: Transaction[];
+  winners: Winner[];
 }
 
 export default function UserDetailPage() {
@@ -48,6 +46,7 @@ export default function UserDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -58,37 +57,37 @@ export default function UserDetailPage() {
   });
 
   useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const userData = await adminApi.getUserById(userId) as UserDetail;
+        setUser(userData);
+        setFormData({
+          firstName: userData.firstName || '',
+          lastName: userData.lastName || '',
+          email: userData.email,
+          username: userData.username,
+          role: userData.role,
+          isActive: userData.isActive,
+        });
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load user');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (userId) {
       fetchUser();
     }
-  }, [userId]);
-
-  const fetchUser = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const userData = await adminApi.getUserById(userId);
-      setUser(userData);
-      setFormData({
-        firstName: userData.firstName || '',
-        lastName: userData.lastName || '',
-        email: userData.email,
-        username: userData.username,
-        role: userData.role,
-        isActive: userData.isActive,
-      });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load user');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [userId, refreshKey]);
 
   const handleSave = async () => {
     try {
       await adminApi.updateUser(userId, formData);
       setEditing(false);
-      await fetchUser(); // Refresh user data
+      setRefreshKey(prev => prev + 1); // Refresh user data
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update user');
     }
@@ -249,7 +248,7 @@ export default function UserDetailPage() {
                 {editing ? (
                   <select
                     value={formData.role}
-                    onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value as 'USER' | 'ADMIN' | 'MODERATOR' })}
                     className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="USER">User</option>

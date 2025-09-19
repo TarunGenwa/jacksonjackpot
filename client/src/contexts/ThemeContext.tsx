@@ -65,11 +65,11 @@ export function ThemeProvider({ children, defaultMode = 'dark' }: ThemeProviderP
 
   const getColor = (path: string, fallback = '#000000'): string => {
     const keys = path.split('.');
-    let value: any = theme.colors;
+    let value: unknown = theme.colors;
 
     for (const key of keys) {
       if (value && typeof value === 'object' && key in value) {
-        value = value[key];
+        value = (value as Record<string, unknown>)[key];
       } else {
         console.warn(`Color path "${path}" not found in theme`);
         return fallback;
@@ -85,7 +85,7 @@ export function ThemeProvider({ children, defaultMode = 'dark' }: ThemeProviderP
   };
 
   const getSemanticColor = (category: string, variant: string, fallback = '#000000'): string => {
-    const categoryColors = (theme.semantic as any)[category];
+    const categoryColors = (theme.semantic as Record<string, Record<string, string>>)[category];
     if (categoryColors && variant in categoryColors) {
       const color = categoryColors[variant];
 

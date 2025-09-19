@@ -91,7 +91,7 @@ export default function TransactionHistoryPage() {
     const matchesSearch = searchTerm === '' ||
                          transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (transaction.referenceNumber && transaction.referenceNumber.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                         (transaction.metadata?.competitionTitle && transaction.metadata.competitionTitle.toLowerCase().includes(searchTerm.toLowerCase()));
+                         (transaction.metadata?.competitionTitle && (transaction.metadata.competitionTitle as string).toLowerCase().includes(searchTerm.toLowerCase()));
 
     return matchesSearch;
   });
@@ -293,7 +293,7 @@ export default function TransactionHistoryPage() {
             </Text>
             {searchTerm && (
               <Badge colorScheme="blue" variant="subtle" px={3} py={1}>
-                Search: "{searchTerm}"
+                Search: &ldquo;{searchTerm}&rdquo;
               </Badge>
             )}
           </Flex>
@@ -346,9 +346,9 @@ export default function TransactionHistoryPage() {
                         {transaction.description}
                       </Text>
                       
-                      {transaction.metadata?.competitionTitle && (
+                      {typeof transaction.metadata?.competitionTitle === 'string' && (
                         <Text fontSize="sm" color="blue.600" noOfLines={1}>
-                          {transaction.metadata.competitionTitle}
+                          {transaction.metadata.competitionTitle as string}
                         </Text>
                       )}
                       
@@ -411,9 +411,9 @@ export default function TransactionHistoryPage() {
                               <Text fontWeight="medium" noOfLines={1}>
                                 {transaction.description}
                               </Text>
-                              {transaction.competitionTitle && (
+                              {typeof transaction.metadata?.competitionTitle === 'string' && (
                                 <Text fontSize="sm" color="blue.600" noOfLines={1}>
-                                  {transaction.competitionTitle}
+                                  {transaction.metadata.competitionTitle as string}
                                 </Text>
                               )}
                               {transaction.paymentProvider && (
@@ -426,9 +426,9 @@ export default function TransactionHistoryPage() {
                           <Td>
                             <Text 
                               fontWeight="bold" 
-                              color={transaction.amount > 0 ? 'green.600' : 'red.600'}
+                              color={Number(transaction.amount) > 0 ? 'green.600' : 'red.600'}
                             >
-                              {transaction.amount > 0 ? '+' : ''}{formatAmount(transaction.amount)}
+                              {Number(transaction.amount) > 0 ? '+' : ''}{formatAmount(transaction.amount)}
                             </Text>
                           </Td>
                           <Td>

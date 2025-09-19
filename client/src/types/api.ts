@@ -7,6 +7,7 @@ export interface Charity {
   email: string;
   phone?: string;
   address?: string;
+  taxId?: string;
   isVerified: boolean;
   createdAt: string;
   updatedAt: string;
@@ -42,7 +43,9 @@ export interface Competition {
   charity: {
     id: string;
     name: string;
+    description?: string;
     logoUrl?: string;
+    website?: string;
     isVerified: boolean;
   };
   prizes: Prize[];

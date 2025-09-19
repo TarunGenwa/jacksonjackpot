@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import {
   Users,
   Trophy,
   Heart,
-  TrendingUp,
   Activity,
   DollarSign,
   Award,
@@ -53,7 +53,7 @@ export default function AdminDashboard() {
         adminApi.getCharityStatistics()
       ]);
 
-      setStatistics({ users, competitions, charities });
+      setStatistics({ users, competitions, charities } as Statistics);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -156,7 +156,7 @@ export default function AdminDashboard() {
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-xl font-semibold text-gray-800 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <a
+          <Link
             href="/admin/users"
             className="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50 transition-colors"
           >
@@ -165,8 +165,8 @@ export default function AdminDashboard() {
               <p className="font-medium text-gray-800">Manage Users</p>
               <p className="text-sm text-gray-500">View and manage user accounts</p>
             </div>
-          </a>
-          <a
+          </Link>
+          <Link
             href="/admin/competitions"
             className="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50 transition-colors"
           >
@@ -175,8 +175,8 @@ export default function AdminDashboard() {
               <p className="font-medium text-gray-800">Competitions</p>
               <p className="text-sm text-gray-500">Manage lottery competitions</p>
             </div>
-          </a>
-          <a
+          </Link>
+          <Link
             href="/admin/charities"
             className="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50 transition-colors"
           >
@@ -185,7 +185,7 @@ export default function AdminDashboard() {
               <p className="font-medium text-gray-800">Charities</p>
               <p className="text-sm text-gray-500">Manage charity organizations</p>
             </div>
-          </a>
+          </Link>
         </div>
       </div>
 

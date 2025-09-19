@@ -1,3 +1,5 @@
+import { UserUpdateData, CompetitionUpdateData, CharityUpdateData } from '@/types/admin';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 interface ApiError {
@@ -63,7 +65,7 @@ class AdminApiService {
     return this.handleResponse(response);
   }
 
-  async updateUser(id: string, data: any) {
+  async updateUser(id: string, data: UserUpdateData) {
     const response = await fetch(
       `${API_BASE_URL}/admin/users/${id}`,
       {
@@ -147,7 +149,7 @@ class AdminApiService {
     return this.handleResponse(response);
   }
 
-  async updateCompetition(id: string, data: any) {
+  async updateCompetition(id: string, data: CompetitionUpdateData) {
     const response = await fetch(
       `${API_BASE_URL}/admin/competitions/${id}`,
       {
@@ -220,7 +222,7 @@ class AdminApiService {
     return this.handleResponse(response);
   }
 
-  async updateCharity(id: string, data: any) {
+  async updateCharity(id: string, data: CharityUpdateData) {
     const response = await fetch(
       `${API_BASE_URL}/admin/charities/${id}`,
       {
