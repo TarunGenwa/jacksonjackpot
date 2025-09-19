@@ -76,12 +76,11 @@ npm run test:e2e     # Run e2e tests
 - SSL enabled for secure connections
 
 ### CORS Configuration
-- CORS origins are configurable via environment variables
-- Set `CORS_ORIGINS` environment variable with comma-separated origins
-- Example: `CORS_ORIGINS=http://localhost:3000,https://yourdomain.com`
-- Defaults to `http://localhost:3000,http://127.0.0.1:3000` if not specified
+- CORS is enabled for all origins (`origin: true`)
 - Supports credentials and common HTTP methods
+- Allows headers: Content-Type, Authorization, X-Requested-With, Accept
 - Configured in `server/src/main.ts`
+- **Note**: All origins are allowed for development convenience
 
 ### Database Schema
 Current models:
@@ -145,7 +144,7 @@ Current models:
   - `server/tsconfig.json` - TypeScript configuration
   - `server/eslint.config.mjs` - ESLint configuration
   - `server/.prettierrc` - Prettier configuration
-  - `server/.env` - Environment variables (database URL, port, CORS origins)
+  - `server/.env` - Environment variables (database URL, port, JWT secrets)
   - `server/.env.example` - Template for environment variables
   - `server/prisma/schema.prisma` - Prisma database schema
   - `server/prisma/migrations/` - Database migration files
