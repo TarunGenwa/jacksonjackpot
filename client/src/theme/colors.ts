@@ -220,7 +220,7 @@ export type SemanticColors = typeof theme.semantic;
 // Helper function to get color value by path
 export const getColor = (path: string): string => {
   const keys = path.split('.');
-  let value: any = theme;
+  let value: unknown = theme;
 
   for (const key of keys) {
     if (value && typeof value === 'object' && key in value) {
@@ -238,7 +238,7 @@ export const getColor = (path: string): string => {
 export const getSemanticColor = (category: keyof SemanticColors, variant: string): string => {
   const categoryColors = theme.semantic[category];
   if (categoryColors && variant in categoryColors) {
-    return (categoryColors as any)[variant];
+    return (categoryColors as Record<string, string>)[variant];
   }
   console.warn(`Semantic color "${category}.${variant}" not found`);
   return '#000000';

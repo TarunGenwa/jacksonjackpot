@@ -43,39 +43,40 @@ export default function CharitiesManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCharities, setTotalCharities] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
   const itemsPerPage = 10;
 
   useEffect(() => {
+    const fetchCharities = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const data = await adminApi.getCharities({
+          page: currentPage,
+          limit: itemsPerPage,
+          search: searchTerm || undefined,
+          isVerified: verifiedFilter || undefined,
+          isActive: activeFilter || undefined,
+        }) as { charities: Charity[]; total: number };
+
+        setCharities(data.charities);
+        setTotalCharities(data.total);
+        setTotalPages(Math.ceil(data.total / itemsPerPage));
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchCharities();
-  }, [currentPage, searchTerm, verifiedFilter, activeFilter]);
-
-  const fetchCharities = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const data = await adminApi.getCharities({
-        page: currentPage,
-        limit: itemsPerPage,
-        search: searchTerm || undefined,
-        isVerified: verifiedFilter || undefined,
-        isActive: activeFilter || undefined,
-      });
-
-      setCharities(data.charities);
-      setTotalCharities(data.total);
-      setTotalPages(Math.ceil(data.total / itemsPerPage));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [currentPage, searchTerm, verifiedFilter, activeFilter, refreshKey]);
 
   const handleToggleVerification = async (charityId: string) => {
     try {
       await adminApi.toggleCharityVerification(charityId);
-      await fetchCharities();
+      setRefreshKey(prev => prev + 1);
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to update verification');
     }
@@ -84,7 +85,7 @@ export default function CharitiesManagement() {
   const handleToggleActive = async (charityId: string) => {
     try {
       await adminApi.toggleCharityActive(charityId);
-      await fetchCharities();
+      setRefreshKey(prev => prev + 1);
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to update status');
     }
@@ -95,7 +96,7 @@ export default function CharitiesManagement() {
 
     try {
       await adminApi.deleteCharity(charityId);
-      await fetchCharities();
+      setRefreshKey(prev => prev + 1);
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to delete charity');
     }

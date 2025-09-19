@@ -1,8 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
 import {
   Box,
   Flex,
@@ -27,8 +25,7 @@ import {
   DrawerContent,
   DrawerCloseButton,
   useBreakpointValue,
-  Spinner,
-  Icon
+  Spinner
 } from '@chakra-ui/react';
 import { HamburgerIcon } from '@chakra-ui/icons';
 import { FaUser, FaTicketAlt, FaWallet, FaHistory, FaSignOutAlt, FaPoundSign, FaHeart, FaQuestionCircle, FaCog, FaUsers, FaTrophy } from 'react-icons/fa';

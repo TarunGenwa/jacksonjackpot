@@ -38,8 +38,8 @@ export default function LoginPage() {
     try {
       await login(email, password);
       router.push('/'); // Redirect to home page after successful login
-    } catch (err: any) {
-      setError(err.message || 'Login failed. Please try again.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -117,7 +117,7 @@ export default function LoginPage() {
                 
                 <VStack spacing={4} w="full">
                   <Text fontSize="sm" color="gray.600">
-                    Don't have an account?
+                    Don&apos;t have an account?
                   </Text>
                   <Link href="/signup" style={{ width: '100%' }}>
                     <Button

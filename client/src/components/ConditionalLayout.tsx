@@ -14,7 +14,6 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
   const { user } = useAuth();
 
   const isAdminRoute = pathname.startsWith('/admin');
-  const shouldShowRegularLayout = !isAdminRoute && user?.role !== 'ADMIN';
 
   if (isAdminRoute) {
     // Admin routes handle their own layout

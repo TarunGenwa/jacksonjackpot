@@ -4,15 +4,9 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import {
   ArrowLeft,
-  Trophy,
-  Calendar,
-  Users,
-  DollarSign,
-  Award,
   Edit2,
   Save,
-  X,
-  Eye
+  X
 } from 'lucide-react';
 import { adminApi } from '@/services/adminApi';
 import LoadingSpinner from '@/components/admin/LoadingSpinner';
@@ -84,6 +78,7 @@ export default function CompetitionDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -96,33 +91,33 @@ export default function CompetitionDetailPage() {
   });
 
   useEffect(() => {
+    const fetchCompetition = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const competitionData = await adminApi.getCompetitionById(competitionId) as CompetitionDetail;
+        setCompetition(competitionData);
+        setFormData({
+          title: competitionData.title,
+          description: competitionData.description,
+          status: competitionData.status,
+          ticketPrice: competitionData.ticketPrice,
+          maxTickets: competitionData.maxTickets,
+          startDate: competitionData.startDate.split('T')[0],
+          endDate: competitionData.endDate.split('T')[0],
+          drawDate: competitionData.drawDate.split('T')[0],
+        });
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load competition');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (competitionId) {
       fetchCompetition();
     }
-  }, [competitionId]);
-
-  const fetchCompetition = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const competitionData = await adminApi.getCompetitionById(competitionId);
-      setCompetition(competitionData);
-      setFormData({
-        title: competitionData.title,
-        description: competitionData.description,
-        status: competitionData.status,
-        ticketPrice: competitionData.ticketPrice,
-        maxTickets: competitionData.maxTickets,
-        startDate: competitionData.startDate.split('T')[0],
-        endDate: competitionData.endDate.split('T')[0],
-        drawDate: competitionData.drawDate.split('T')[0],
-      });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load competition');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [competitionId, refreshKey]);
 
   const handleSave = async () => {
     try {
@@ -132,7 +127,7 @@ export default function CompetitionDetailPage() {
         maxTickets: Number(formData.maxTickets),
       });
       setEditing(false);
-      await fetchCompetition();
+      setRefreshKey(prev => prev + 1);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update competition');
     }
