@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import InstantWinSpinner from './InstantWinSpinner';
 import {
   Modal,
   ModalOverlay,
@@ -57,6 +58,8 @@ export default function TicketPurchaseModal({
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showInstantWinSpinner, setShowInstantWinSpinner] = useState(false);
+  const [purchasedTickets, setPurchasedTickets] = useState<any[]>([]);
 
   const ticketPrice = parseFloat(competition.ticketPrice);
   const totalCost = ticketPrice * quantity;
@@ -96,28 +99,41 @@ export default function TicketPurchaseModal({
         updateBalance(result.wallet.newBalance);
       }
 
-      toast({
-        title: 'Purchase Successful! 🎉',
-        description: `You've successfully purchased ${quantity} ticket${quantity > 1 ? 's' : ''} for ${competition.title}`,
-        status: 'success',
-        duration: 6000,
-        isClosable: true,
-      });
+      // Store purchased tickets for instant win reveal
+      setPurchasedTickets(result.tickets);
 
-      // Show ticket numbers in a follow-up toast
-      const ticketNumbers = result.tickets.map(t => t.ticketNumber).join(', ');
-      setTimeout(() => {
+      // Check if any tickets have instant wins
+      const hasInstantWins = result.tickets.some((ticket: any) => ticket.instantWin?.prize);
+
+      if (hasInstantWins || result.tickets.length > 0) {
+        // Show instant win spinner for all purchased tickets
+        setShowInstantWinSpinner(true);
+        onClose(); // Close purchase modal
+      } else {
+        // No instant wins, show regular success message
         toast({
-          title: 'Your Ticket Numbers',
-          description: `Ticket${quantity > 1 ? 's' : ''}: ${ticketNumbers}`,
-          status: 'info',
-          duration: 8000,
+          title: 'Purchase Successful! 🎉',
+          description: `You've successfully purchased ${quantity} ticket${quantity > 1 ? 's' : ''} for ${competition.title}`,
+          status: 'success',
+          duration: 6000,
           isClosable: true,
         });
-      }, 1000);
 
-      onPurchaseSuccess?.();
-      onClose();
+        // Show ticket numbers in a follow-up toast
+        const ticketNumbers = result.tickets.map(t => t.ticketNumber).join(', ');
+        setTimeout(() => {
+          toast({
+            title: 'Your Ticket Numbers',
+            description: `Ticket${quantity > 1 ? 's' : ''}: ${ticketNumbers}`,
+            status: 'info',
+            duration: 8000,
+            isClosable: true,
+          });
+        }, 1000);
+
+        onPurchaseSuccess?.();
+        onClose();
+      }
       
     } catch (err) {
       console.error('Purchase failed:', err);
@@ -151,8 +167,36 @@ export default function TicketPurchaseModal({
     }).format(price);
   };
 
+  const handleInstantWinComplete = () => {
+    // Show success message after instant win reveal
+    toast({
+      title: 'Purchase Complete! 🎉',
+      description: `You've successfully purchased ${purchasedTickets.length} ticket${purchasedTickets.length > 1 ? 's' : ''}`,
+      status: 'success',
+      duration: 6000,
+      isClosable: true,
+    });
+
+    // Show ticket numbers
+    const ticketNumbers = purchasedTickets.map(t => t.ticketNumber).join(', ');
+    setTimeout(() => {
+      toast({
+        title: 'Your Ticket Numbers',
+        description: `Ticket${purchasedTickets.length > 1 ? 's' : ''}: ${ticketNumbers}`,
+        status: 'info',
+        duration: 8000,
+        isClosable: true,
+      });
+    }, 1000);
+
+    setShowInstantWinSpinner(false);
+    setPurchasedTickets([]);
+    onPurchaseSuccess?.();
+  };
+
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} size="md" closeOnOverlayClick={!isLoading}>
+    <>
+      <Modal isOpen={isOpen} onClose={handleClose} size="md" closeOnOverlayClick={!isLoading}>
       <ModalOverlay bg="blackAlpha.600" backdropFilter="blur(4px)" />
       <ModalContent
         bgGradient={getColor('gradients.secondary')}
@@ -380,5 +424,17 @@ export default function TicketPurchaseModal({
         </ModalFooter>
       </ModalContent>
     </Modal>
+
+    {/* Instant Win Spinner Modal */}
+    <InstantWinSpinner
+      isOpen={showInstantWinSpinner}
+      onClose={() => {
+        setShowInstantWinSpinner(false);
+        setPurchasedTickets([]);
+      }}
+      tickets={purchasedTickets}
+      onComplete={handleInstantWinComplete}
+    />
+  </>
   );
 }
