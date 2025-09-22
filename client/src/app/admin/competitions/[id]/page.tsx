@@ -125,10 +125,18 @@ export default function CompetitionDetailPage() {
 
   const handleSave = async () => {
     try {
+      // Convert date strings to ISO DateTime format
+      const formatDateToISO = (dateString: string) => {
+        return new Date(dateString + 'T00:00:00.000Z').toISOString();
+      };
+
       await adminApi.updateCompetition(competitionId, {
         ...formData,
         ticketPrice: Number(formData.ticketPrice),
         maxTickets: Number(formData.maxTickets),
+        startDate: formatDateToISO(formData.startDate),
+        endDate: formatDateToISO(formData.endDate),
+        drawDate: formatDateToISO(formData.drawDate),
       });
       setEditing(false);
       setRefreshKey(prev => prev + 1);

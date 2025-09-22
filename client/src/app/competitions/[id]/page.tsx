@@ -44,7 +44,7 @@ import {
   ListIcon,
 } from '@chakra-ui/react';
 import { ArrowBackIcon, CheckCircleIcon } from '@chakra-ui/icons';
-import { FaTrophy, FaUsers, FaClock, FaTicketAlt, FaHeart, FaCheckCircle, FaQuestionCircle, FaInfoCircle, FaGift } from 'react-icons/fa';
+import { FaTrophy, FaUsers, FaClock, FaTicketAlt, FaHeart, FaCheckCircle, FaQuestionCircle, FaInfoCircle, FaGift, FaCoins } from 'react-icons/fa';
 import { X } from 'lucide-react';
 import { Competition } from '@/types/api';
 import { competitionsService } from '@/services/competitions';
@@ -356,43 +356,6 @@ export default function CompetitionPage() {
                     </Text>
                   </VStack>
 
-                  {/* Stats Grid */}
-                  <SimpleGrid columns={{ base: 2, md: 4 }} spacing={3}>
-                    <Box textAlign="center" bg="blackAlpha.400" p={4} borderRadius="lg" border="1px" borderColor="green.700">
-                      <Icon as={FaTicketAlt} boxSize={6} color="green.400" mb={2} />
-                      <Text fontSize="xs" color="gray.400" mb={1}>Ticket Price</Text>
-                      <Text fontWeight="bold" color="green.400" fontSize="lg">
-                        {formatPrice(competition.ticketPrice)}
-                      </Text>
-                    </Box>
-                    <Box textAlign="center" bg="blackAlpha.400" p={4} borderRadius="lg" border="1px" borderColor="purple.700">
-                      <Icon as={FaTrophy} boxSize={6} color="purple.400" mb={2} />
-                      <Text fontSize="xs" color="gray.400" mb={1}>
-                        {competition.prizes.find(p => p.type === 'DRAW') ? 'Draw Prize' : 'Top Prize'}
-                      </Text>
-                      <Text fontWeight="bold" color="purple.400" fontSize="lg">
-                        £{competition.prizes.find(p => p.type === 'DRAW')
-                          ? (competition.prizes.find(p => p.type === 'DRAW')!.value / 100).toFixed(2)
-                          : competition.prizes[0]
-                          ? (competition.prizes[0].value / 100).toFixed(2)
-                          : '0'}
-                      </Text>
-                    </Box>
-                    <Box textAlign="center" bg="blackAlpha.400" p={4} borderRadius="lg" border="1px" borderColor="blue.700">
-                      <Icon as={FaUsers} boxSize={6} color="blue.400" mb={2} />
-                      <Text fontSize="xs" color="gray.400" mb={1}>Tickets Sold</Text>
-                      <Text fontWeight="bold" color="blue.400" fontSize="lg">
-                        {competition.ticketsSold}/{competition.maxTickets}
-                      </Text>
-                    </Box>
-                    <Box textAlign="center" bg="blackAlpha.400" p={4} borderRadius="lg" border="1px" borderColor="orange.700">
-                      <Icon as={FaClock} boxSize={6} color="orange.400" mb={2} />
-                      <Text fontSize="xs" color="gray.400" mb={1}>Time Left</Text>
-                      <Text fontWeight="bold" color="orange.400" fontSize="lg">
-                        {getRemainingTime()}
-                      </Text>
-                    </Box>
-                  </SimpleGrid>
 
                   {/* Progress Bar */}
                   <Box>
@@ -439,20 +402,43 @@ export default function CompetitionPage() {
                     />
 
                     <VStack spacing={4} position="relative">
-                      <HStack justify="space-between" w="full">
-                        <VStack align="start" spacing={1}>
-                          <Text color="green.400" fontWeight="bold" fontSize="sm">ENTER NOW</Text>
-                          <Text color="white" fontSize="2xl" fontWeight="bold">
-                            {formatPrice(competition.ticketPrice)} per ticket
-                          </Text>
-                        </VStack>
-                        <VStack align="end" spacing={1}>
-                          <Text color="gray.400" fontSize="sm">Draw Date</Text>
-                          <Text color="orange.400" fontWeight="semibold">
-                            {new Date(competition.drawDate).toLocaleDateString('en-GB')}
-                          </Text>
-                        </VStack>
-                      </HStack>
+                      <VStack spacing={3} w="full">
+                        <HStack justify="space-between" w="full">
+                          <VStack align="start" spacing={1}>
+                            <Text color="green.400" fontWeight="bold" fontSize="sm">ENTER NOW</Text>
+                            <Text color="white" fontSize="2xl" fontWeight="bold">
+                              {formatPrice(competition.ticketPrice)} per ticket
+                            </Text>
+                          </VStack>
+                          <VStack align="end" spacing={1}>
+                            <Text color="gray.400" fontSize="sm">Time Left</Text>
+                            <Text color="orange.400" fontWeight="bold" fontSize="lg">
+                              {getRemainingTime()}
+                            </Text>
+                          </VStack>
+                        </HStack>
+
+                        <HStack justify="space-between" w="full" bg="blackAlpha.200" p={3} borderRadius="md">
+                          <VStack align="start" spacing={0}>
+                            <Text color="yellow.400" fontSize="sm" fontWeight="semibold">
+                              {competition.prizes.find(p => p.type === 'DRAW') ? 'Draw Prize' : 'Top Prize'}
+                            </Text>
+                            <Text color="white" fontWeight="bold" fontSize="lg">
+                              £{competition.prizes.find(p => p.type === 'DRAW')
+                                ? (competition.prizes.find(p => p.type === 'DRAW')!.value / 100).toFixed(2)
+                                : competition.prizes[0]
+                                ? (competition.prizes[0].value / 100).toFixed(2)
+                                : '0'}
+                            </Text>
+                          </VStack>
+                          <VStack align="end" spacing={0}>
+                            <Text color="purple.400" fontSize="sm" fontWeight="semibold">Draw Date</Text>
+                            <Text color="gray.300" fontWeight="semibold">
+                              {new Date(competition.drawDate).toLocaleDateString('en-GB')}
+                            </Text>
+                          </VStack>
+                        </HStack>
+                      </VStack>
 
                       <Button
                         size="lg"
@@ -478,7 +464,7 @@ export default function CompetitionPage() {
                       </Button>
 
                       <Text fontSize="xs" color="gray.400" textAlign="center">
-                        100% of proceeds go to {competition.charity.name}
+                        20% of proceeds go to {competition.charity.name}
                       </Text>
                     </VStack>
                   </Box>
@@ -497,19 +483,8 @@ export default function CompetitionPage() {
               borderColor="purple.800"
             >
               <CardBody p={6}>
-                <Tabs variant="soft-rounded" colorScheme="purple">
+                <Tabs variant="soft-rounded" colorScheme="purple" defaultIndex={0}>
                   <TabList mb={4}>
-                    <Tab
-                      _selected={{
-                        bg: "purple.600",
-                        color: "white",
-                      }}
-                      color="gray.300"
-                      mr={2}
-                    >
-                      <Icon as={FaInfoCircle} mr={2} />
-                      Details
-                    </Tab>
                     <Tab
                       _selected={{
                         bg: "purple.600",
@@ -527,6 +502,17 @@ export default function CompetitionPage() {
                         color: "white",
                       }}
                       color="gray.300"
+                      mr={2}
+                    >
+                      <Icon as={FaInfoCircle} mr={2} />
+                      Details
+                    </Tab>
+                    <Tab
+                      _selected={{
+                        bg: "purple.600",
+                        color: "white",
+                      }}
+                      color="gray.300"
                     >
                       <Icon as={FaQuestionCircle} mr={2} />
                       FAQ
@@ -534,7 +520,7 @@ export default function CompetitionPage() {
                   </TabList>
 
                   <TabPanels>
-                    {/* Details Tab */}
+                    {/* Prizes Tab */}
                     <TabPanel px={0}>
                       <VStack spacing={4} align="stretch">
                         <Box bg="blackAlpha.400" p={5} borderRadius="lg">
@@ -624,6 +610,21 @@ export default function CompetitionPage() {
                       <VStack spacing={6} align="stretch">
                         {competition.prizes && competition.prizes.length > 0 ? (
                           <>
+                            <HStack justify="space-between" w="full" bg="blackAlpha.400" p={4} borderRadius="lg" border="1px" borderColor="purple.600">
+                              <VStack align="start" spacing={1}>
+                                <Text color="purple.400" fontSize="sm" fontWeight="semibold">Total Prizes</Text>
+                                <Text color="white" fontWeight="bold" fontSize="xl">
+                                  {competition.prizes.length} prizes
+                                </Text>
+                              </VStack>
+                              <VStack align="end" spacing={1}>
+                                <Text color="green.400" fontSize="sm" fontWeight="semibold">Combined Value</Text>
+                                <Text color="green.400" fontWeight="bold" fontSize="xl">
+                                  £{(competition.prizes.reduce((sum, p) => sum + ((p.value / 100) * p.quantity), 0)).toFixed(2)}
+                                </Text>
+                              </VStack>
+                            </HStack>
+
                             <Text color="gray.300" mb={2}>
                               This competition features {competition.prizes.filter(p => p.type === 'DRAW').length > 0 ? 'a main draw prize' : 'no draw prize'} and {competition.prizes.filter(p => p.type === 'INSTANT_WIN').length} instant win prizes!
                             </Text>
@@ -1015,43 +1016,6 @@ export default function CompetitionPage() {
                 </Text>
               </VStack>
 
-              {/* Stats Grid */}
-              <SimpleGrid columns={2} spacing={3}>
-                <Box textAlign="center" bg="blackAlpha.400" p={4} borderRadius="lg" border="1px" borderColor="green.700">
-                  <Icon as={FaTicketAlt} boxSize={6} color="green.400" mb={2} />
-                  <Text fontSize="xs" color="gray.400" mb={1}>Ticket Price</Text>
-                  <Text fontWeight="bold" color="green.400" fontSize="lg">
-                    {formatPrice(competition.ticketPrice)}
-                  </Text>
-                </Box>
-                <Box textAlign="center" bg="blackAlpha.400" p={4} borderRadius="lg" border="1px" borderColor="purple.700">
-                  <Icon as={FaTrophy} boxSize={6} color="purple.400" mb={2} />
-                  <Text fontSize="xs" color="gray.400" mb={1}>
-                    {competition.prizes.find(p => p.type === 'DRAW') ? 'Draw Prize' : 'Top Prize'}
-                  </Text>
-                  <Text fontWeight="bold" color="purple.400" fontSize="lg">
-                    £{competition.prizes.find(p => p.type === 'DRAW')
-                      ? (competition.prizes.find(p => p.type === 'DRAW')!.value / 100).toFixed(2)
-                      : competition.prizes[0]
-                      ? (competition.prizes[0].value / 100).toFixed(2)
-                      : '0'}
-                  </Text>
-                </Box>
-                <Box textAlign="center" bg="blackAlpha.400" p={4} borderRadius="lg" border="1px" borderColor="blue.700">
-                  <Icon as={FaUsers} boxSize={6} color="blue.400" mb={2} />
-                  <Text fontSize="xs" color="gray.400" mb={1}>Tickets Sold</Text>
-                  <Text fontWeight="bold" color="blue.400" fontSize="lg">
-                    {competition.ticketsSold}/{competition.maxTickets}
-                  </Text>
-                </Box>
-                <Box textAlign="center" bg="blackAlpha.400" p={4} borderRadius="lg" border="1px" borderColor="orange.700">
-                  <Icon as={FaClock} boxSize={6} color="orange.400" mb={2} />
-                  <Text fontSize="xs" color="gray.400" mb={1}>Time Left</Text>
-                  <Text fontWeight="bold" color="orange.400" fontSize="lg">
-                    {getRemainingTime()}
-                  </Text>
-                </Box>
-              </SimpleGrid>
 
               {/* Progress Bar */}
               <Box>
