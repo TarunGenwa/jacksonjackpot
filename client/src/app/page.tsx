@@ -95,7 +95,7 @@ export default function Home() {
     <Box minH="100vh" bg="slate.50">
       {/* Hero Section */}
       <Box
-        bgGradient="linear(135deg, blue.600, purple.700, pink.600)"
+        bg="#360D3A"
         color="white"
         py={20}
         textAlign="center"

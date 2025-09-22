@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import {
   Box,
   VStack,
@@ -21,13 +21,14 @@ import {
 } from '@chakra-ui/react';
 import { keyframes } from '@emotion/react';
 import { FaTrophy, FaGift, FaCoins, FaStar } from 'react-icons/fa';
+import { IconType } from 'react-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface InstantPrize {
   id: string;
   name: string;
   value: number;
-  icon: any;
+  icon: IconType;
   color: string;
   isWin: boolean;
   description?: string;
@@ -49,11 +50,6 @@ interface InstantWinSpinnerProps {
   onComplete?: () => void;
 }
 
-const spinAnimation = keyframes`
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
-`;
-
 const pulseGlow = keyframes`
   0% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
   50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.6); }
@@ -66,7 +62,7 @@ export default function InstantWinSpinner({
   tickets,
   onComplete
 }: InstantWinSpinnerProps) {
-  const { getColor, getSemanticColor } = useTheme();
+  const { getColor, getThemeColor } = useTheme();
   const toast = useToast();
   const [currentTicketIndex, setCurrentTicketIndex] = useState(0);
   const [isSpinning, setIsSpinning] = useState(false);
@@ -76,10 +72,10 @@ export default function InstantWinSpinner({
 
   const generatePrizePool = (hasWin: boolean): InstantPrize[] => {
     const commonPrizes: InstantPrize[] = [
-      { id: '1', name: 'Better Luck Next Time', value: 0, icon: FaStar, color: 'gray.400', isWin: false },
-      { id: '2', name: 'Try Again', value: 0, icon: FaStar, color: 'gray.400', isWin: false },
-      { id: '3', name: 'Almost There', value: 0, icon: FaStar, color: 'gray.400', isWin: false },
-      { id: '4', name: 'Keep Playing', value: 0, icon: FaStar, color: 'gray.400', isWin: false },
+      { id: '1', name: 'Better Luck Next Time', value: 0, icon: FaStar, color: getThemeColor('text.muted'), isWin: false },
+      { id: '2', name: 'Try Again', value: 0, icon: FaStar, color: getThemeColor('text.muted'), isWin: false },
+      { id: '3', name: 'Almost There', value: 0, icon: FaStar, color: getThemeColor('text.muted'), isWin: false },
+      { id: '4', name: 'Keep Playing', value: 0, icon: FaStar, color: getThemeColor('text.muted'), isWin: false },
     ];
 
     let winningPrize: InstantPrize | null = null;
@@ -91,7 +87,7 @@ export default function InstantWinSpinner({
         name: prize.name,
         value: prize.value,
         icon: prize.value > 100 ? FaTrophy : prize.value > 50 ? FaGift : FaCoins,
-        color: prize.value > 100 ? 'yellow.400' : prize.value > 50 ? 'purple.400' : 'green.400',
+        color: prize.value > 100 ? getThemeColor('semantic.warning.light') : prize.value > 50 ? getThemeColor('brand.electricViolet') : getThemeColor('semantic.success.light'),
         isWin: true,
         description: prize.description
       };
@@ -177,18 +173,18 @@ export default function InstantWinSpinner({
       closeOnOverlayClick={!isSpinning}
       isCentered
     >
-      <ModalOverlay bg="blackAlpha.800" backdropFilter="blur(8px)" />
+      <ModalOverlay bg={getThemeColor('ui.overlay.dark')} backdropFilter="blur(8px)" />
       <ModalContent
-        bgGradient={getColor('gradients.secondary')}
+        bg={getThemeColor('brand.valentino')}
         border="2px"
         borderColor={getColor('primary.600')}
         color={getColor('text.primary')}
         shadow="2xl"
         maxW="900px"
       >
-        <ModalHeader borderBottom="1px" borderColor="whiteAlpha.200">
+        <ModalHeader borderBottom="1px" borderColor={getThemeColor('ui.border.light')}>
           <VStack spacing={2} align="center">
-            <Text fontSize="2xl" fontWeight="bold" bgGradient="linear(to-r, yellow.400, orange.400)" bgClip="text">
+            <Text fontSize="2xl" fontWeight="bold" color={getThemeColor('brand.razzmatazz')}>
               Instant Prize Reveal
             </Text>
             <HStack spacing={3}>
@@ -226,8 +222,8 @@ export default function InstantWinSpinner({
                   overflow="hidden"
                   borderRadius="lg"
                   border="3px solid"
-                  borderColor={revealedPrize?.isWin ? 'yellow.400' : getColor('primary.500')}
-                  bg="blackAlpha.400"
+                  borderColor={revealedPrize?.isWin ? getThemeColor('semantic.warning.light') : getColor('primary.500')}
+                  bg={getThemeColor('ui.overlay.medium')}
                   animation={revealedPrize?.isWin ? `${pulseGlow} 2s infinite` : undefined}
                 >
                   <Center
@@ -277,10 +273,10 @@ export default function InstantWinSpinner({
                         justify="center"
                         minW="150px"
                         h="150px"
-                        bg={prize.isWin ? 'yellow.900' : 'whiteAlpha.100'}
+                        bg={prize.isWin ? getThemeColor('semantic.warning.dark') : getThemeColor('ui.overlay.light')}
                         borderRadius="lg"
                         border="2px solid"
-                        borderColor={prize.isWin ? 'yellow.400' : 'whiteAlpha.300'}
+                        borderColor={prize.isWin ? getThemeColor('semantic.warning.light') : getThemeColor('ui.border.light')}
                         p={4}
                         position="relative"
                         _hover={{ transform: isSpinning ? 'none' : 'scale(1.05)' }}
@@ -291,7 +287,7 @@ export default function InstantWinSpinner({
                           fontSize="sm"
                           fontWeight="bold"
                           textAlign="center"
-                          color={prize.isWin ? 'yellow.200' : getColor('text.primary')}
+                          color={prize.isWin ? getThemeColor('semantic.warning.light') : getColor('text.primary')}
                         >
                           {prize.name}
                         </Text>
@@ -313,10 +309,10 @@ export default function InstantWinSpinner({
                 {revealedPrize && (
                   <Box
                     p={6}
-                    bg={revealedPrize.isWin ? 'yellow.900' : 'whiteAlpha.100'}
+                    bg={revealedPrize.isWin ? getThemeColor('semantic.warning.dark') : getThemeColor('ui.overlay.light')}
                     borderRadius="lg"
                     border="2px solid"
-                    borderColor={revealedPrize.isWin ? 'yellow.400' : 'whiteAlpha.300'}
+                    borderColor={revealedPrize.isWin ? getThemeColor('semantic.warning.light') : getThemeColor('ui.border.light')}
                     w="full"
                     textAlign="center"
                   >
@@ -330,7 +326,7 @@ export default function InstantWinSpinner({
                         {revealedPrize.name}
                       </Text>
                       {revealedPrize.value > 0 && (
-                        <Text fontSize="3xl" fontWeight="bold" color="green.400">
+                        <Text fontSize="3xl" fontWeight="bold" color={getThemeColor('semantic.success.light')}>
                           £{revealedPrize.value}
                         </Text>
                       )}
@@ -345,7 +341,7 @@ export default function InstantWinSpinner({
               </>
             ) : (
               <Box textAlign="center" py={8}>
-                <Icon as={FaTrophy} boxSize={20} color="yellow.400" mb={4} />
+                <Icon as={FaTrophy} boxSize={20} color={getThemeColor('semantic.warning.light')} mb={4} />
                 <Text fontSize="2xl" fontWeight="bold" mb={2} color={getColor('text.primary')}>
                   All Tickets Revealed!
                 </Text>
@@ -357,7 +353,7 @@ export default function InstantWinSpinner({
           </VStack>
         </ModalBody>
 
-        <ModalFooter borderTop="1px" borderColor="whiteAlpha.200">
+        <ModalFooter borderTop="1px" borderColor={getThemeColor('ui.border.light')}>
           <HStack spacing={3}>
             {!allRevealed && (
               <>

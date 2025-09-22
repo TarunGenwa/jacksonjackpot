@@ -1,31 +1,31 @@
 export const theme = {
   colors: {
-    // Primary brand colors
+    // Primary brand colors - EPL Valentino Purple
     primary: {
-      50: '#f0e6ff',
-      100: '#d4bfff',
-      200: '#b899ff',
-      300: '#9c72ff',
-      400: '#804cff',
-      500: '#6b46c1', // Main purple
-      600: '#553c9a',
-      700: '#3f2f72',
-      800: '#2a224a',
-      900: '#1a1a2e', // Dark purple
+      50: '#F3E9F4',
+      100: '#E1C8E3',
+      200: '#CDA3D1',
+      300: '#B87EBF',
+      400: '#A862B1',
+      500: '#9846A3',
+      600: '#803D9B',
+      700: '#68348F',
+      800: '#4E2A7F',
+      900: '#360D3A', // EPL Valentino
     },
 
-    // Secondary brand colors
+    // Secondary brand colors - EPL Electric Violet
     secondary: {
-      50: '#e6f7ff',
-      100: '#bae7ff',
-      200: '#91d5ff',
-      300: '#69c0ff',
-      400: '#40a9ff',
-      500: '#1890ff', // Main blue
-      600: '#096dd9',
-      700: '#0050b3',
-      800: '#003a8c',
-      900: '#1e3a8a', // Dark blue
+      50: '#F0E6FF',
+      100: '#D9BFFF',
+      200: '#C195FF',
+      300: '#A96BFF',
+      400: '#9F53FF',
+      500: '#963CFF', // EPL Electric Violet
+      600: '#8636E6',
+      700: '#6F2DCC',
+      800: '#5924B3',
+      900: '#421A99',
     },
 
     // Success colors (green)
@@ -56,18 +56,18 @@ export const theme = {
       900: '#451a03',
     },
 
-    // Error colors (red)
+    // Error/Accent colors - EPL Razzmatazz Red
     error: {
-      50: '#fef2f2',
-      100: '#fee2e2',
-      200: '#fecaca',
-      300: '#fca5a5',
-      400: '#f87171',
-      500: '#ef4444', // Main red
-      600: '#dc2626',
-      700: '#b91c1c',
-      800: '#991b1b',
-      900: '#7f1d1d',
+      50: '#FFE0EC',
+      100: '#FFB3D0',
+      200: '#FF80B1',
+      300: '#FF4D93',
+      400: '#FF267A',
+      500: '#E90052', // EPL Razzmatazz
+      600: '#CC0048',
+      700: '#A6003A',
+      800: '#80002D',
+      900: '#590020',
     },
 
     // Neutral colors (gray)
@@ -86,16 +86,16 @@ export const theme = {
 
     // Background colors
     background: {
-      light: '#ffffff',
-      dark: '#1a1a2e',
-      darker: '#16213e',
+      light: '#FFFFFF', // EPL White
+      dark: '#360D3A', // EPL Valentino
+      darker: '#1A061D', // Darker Valentino variant
       card: {
-        light: '#ffffff',
-        dark: '#2d3748',
+        light: '#FFFFFF',
+        dark: 'rgba(54, 13, 58, 0.3)', // Valentino with opacity
       },
       modal: {
         light: 'rgba(255, 255, 255, 0.95)',
-        dark: 'rgba(26, 26, 46, 0.95)',
+        dark: 'rgba(54, 13, 58, 0.95)', // Valentino with opacity
       },
     },
 
@@ -118,8 +118,8 @@ export const theme = {
     // Border colors
     border: {
       light: '#e2e8f0',
-      dark: '#4a5568',
-      focus: '#6b46c1',
+      dark: '#963CFF', // EPL Electric Violet
+      focus: '#E90052', // EPL Razzmatazz
     },
 
     // Status colors
@@ -139,18 +139,27 @@ export const theme = {
       moderator: '#ed8936',
     },
 
-    // Gradient colors
-    gradients: {
-      primary: 'linear(to-r, purple.900, blue.900, purple.900)',
-      secondary: 'linear(to-br, purple.900, blue.900)',
-      header: 'linear(to-r, purple.900, blue.900, purple.900)',
-      card: 'linear(to-br, purple.700, blue.700)',
+    // Solid colors for backgrounds (no gradients)
+    solidColors: {
+      primary: '#360D3A', // EPL Valentino
+      secondary: '#963CFF', // EPL Electric Violet
+      accent: '#E90052', // EPL Razzmatazz
+      header: '#360D3A', // Solid Valentino for headers
+      card: '#360D3A', // Solid Valentino for cards
+      cardHover: '#4E2A7F', // Lighter Valentino for hover
       button: {
-        primary: 'linear(to-r, purple.500, blue.500)',
-        success: 'linear(to-r, green.500, green.400)',
+        primary: '#963CFF', // Electric Violet
+        primaryHover: '#8636E6',
+        accent: '#E90052', // Razzmatazz
+        accentHover: '#CC0048',
+        success: '#48bb78',
+        successHover: '#38a169',
       },
-      text: {
-        brand: 'linear(to-r, cyan.400, blue.400, purple.400)',
+      surface: {
+        dark: '#360D3A', // Valentino
+        darker: '#1A061D', // Darker variant
+        light: '#FFFFFF', // White
+        elevated: '#4E2A7F', // Elevated surface
       },
     },
   },

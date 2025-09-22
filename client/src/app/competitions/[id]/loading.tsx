@@ -11,10 +11,13 @@ import {
   Flex,
   Divider,
 } from '@chakra-ui/react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function Loading() {
+  const { getThemeColor } = useTheme();
+
   return (
-    <Box minH="100vh" bg="gray.50">
+    <Box minH="100vh" bg="white">
       <Container maxW="container.xl" py={12}>
         <VStack spacing={8} align="stretch">
           {/* Breadcrumb Skeleton */}
@@ -86,7 +89,7 @@ export default function Loading() {
               <Divider />
 
               {/* Purchase Section */}
-              <Card bg="blue.50">
+              <Card bg={getThemeColor('ui.card.bg')}>
                 <CardBody>
                   <VStack spacing={4}>
                     <Skeleton height="24px" width="200px" />
@@ -112,7 +115,7 @@ export default function Loading() {
             <CardBody>
               <VStack spacing={4} align="stretch">
                 {/* Tab Headers */}
-                <HStack spacing={6} borderBottom="1px" borderColor="gray.200" pb={2}>
+                <HStack spacing={6} borderBottom="1px" borderColor={getThemeColor('ui.border.base')} pb={2}>
                   <Skeleton height="20px" width="80px" />
                   <Skeleton height="20px" width="60px" />
                   <Skeleton height="20px" width="100px" />

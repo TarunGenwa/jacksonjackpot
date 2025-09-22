@@ -299,7 +299,7 @@ export default function WalletPage() {
           </VStack>
 
           {/* Wallet Balance */}
-          <Card shadow="xl" bg="gradient-to-r" bgGradient="linear(to-r, blue.500, purple.600)">
+          <Card shadow="xl" bg="#360D3A">
             <CardBody p={8}>
               <VStack spacing={6} textAlign="center" color="white">
                 <Text fontSize="lg" opacity={0.9}>

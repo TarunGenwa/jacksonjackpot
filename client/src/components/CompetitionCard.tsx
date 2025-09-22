@@ -99,7 +99,7 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
       overflow="hidden"
       cursor="pointer"
       onClick={handleCardClick}
-      bgGradient="linear(to-br, purple.900, blue.900)"
+      bg="#360D3A"
       borderRadius="lg"
       border="1px"
       borderColor="purple.800"
@@ -119,7 +119,7 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
               <Box
                 w="full"
                 h="full"
-                bgGradient="linear(to-br, purple.700, blue.700)"
+                bg="#4E2A7F"
                 display="flex"
                 alignItems="center"
                 justifyContent="center"

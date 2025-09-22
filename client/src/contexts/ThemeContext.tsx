@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { theme, ThemeColors, SemanticColors } from '@/theme';
+import { themeConfig, ThemeConfig } from '@/theme/theme.config';
 
 export type ThemeMode = 'light' | 'dark';
 
@@ -11,8 +12,15 @@ interface ThemeContextType {
   setTheme: (mode: ThemeMode) => void;
   colors: ThemeColors;
   semantic: SemanticColors;
+  config: ThemeConfig;
   getColor: (path: string, fallback?: string) => string;
   getSemanticColor: (category: string, variant: string, fallback?: string) => string;
+  getThemeColor: (path: string, fallback?: string) => string;
+  getFont: (type: 'heading' | 'body' | 'mono') => string;
+  getFontSize: (size: keyof ThemeConfig['typography']['fontSizes']) => string;
+  getSpacing: (size: keyof ThemeConfig['spacing']) => string;
+  getBorderRadius: (size: keyof ThemeConfig['borders']['radius']) => string;
+  getShadow: (size: keyof ThemeConfig['shadows']) => string;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -100,14 +108,74 @@ export function ThemeProvider({ children, defaultMode = 'dark' }: ThemeProviderP
     return fallback;
   };
 
+  // New theme config accessor
+  const getThemeColor = (path: string, fallback = '#000000'): string => {
+    const keys = path.split('.');
+    let value: unknown = themeConfig.colors;
+
+    for (const key of keys) {
+      if (value && typeof value === 'object' && key in value) {
+        value = (value as Record<string, unknown>)[key];
+      } else {
+        console.warn(`Theme color path "${path}" not found`);
+        return fallback;
+      }
+    }
+
+    // Handle mode-specific colors
+    if (typeof value === 'object' && value !== null) {
+      const obj = value as Record<string, unknown>;
+      if (mode in obj) {
+        return obj[mode] as string;
+      }
+      if ('DEFAULT' in obj) {
+        return obj.DEFAULT as string;
+      }
+    }
+
+    return typeof value === 'string' ? value : fallback;
+  };
+
+  // Typography helpers
+  const getFont = (type: 'heading' | 'body' | 'mono'): string => {
+    return themeConfig.typography.fonts[type];
+  };
+
+  const getFontSize = (size: keyof ThemeConfig['typography']['fontSizes']): string => {
+    return themeConfig.typography.fontSizes[size];
+  };
+
+  // Spacing helper
+  const getSpacing = (size: keyof ThemeConfig['spacing']): string => {
+    return themeConfig.spacing[size];
+  };
+
+  // Border radius helper
+  const getBorderRadius = (size: keyof ThemeConfig['borders']['radius']): string => {
+    return themeConfig.borders.radius[size];
+  };
+
+  // Shadow helper
+  const getShadow = (size: keyof ThemeConfig['shadows']): string => {
+    const shadow = themeConfig.shadows[size];
+    return typeof shadow === 'string' ? shadow : String(shadow);
+  };
+
   const value: ThemeContextType = {
     mode,
     toggleTheme,
     setTheme,
     colors: theme.colors,
     semantic: theme.semantic,
+    config: themeConfig,
     getColor,
     getSemanticColor,
+    getThemeColor,
+    getFont,
+    getFontSize,
+    getSpacing,
+    getBorderRadius,
+    getShadow,
   };
 
   return (

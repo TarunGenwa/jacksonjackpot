@@ -38,6 +38,17 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useWallet } from '@/contexts/WalletContext';
 import { useTheme } from '@/contexts/ThemeContext';
 
+interface TicketWithInstantWin {
+  ticketNumber: string;
+  instantWin?: {
+    prize?: {
+      name: string;
+      value: number;
+      description?: string;
+    };
+  };
+}
+
 interface TicketPurchaseModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -53,13 +64,13 @@ export default function TicketPurchaseModal({
 }: TicketPurchaseModalProps) {
   const { user } = useAuth();
   const { updateBalance } = useWallet();
-  const { getColor, getSemanticColor } = useTheme();
+  const { getColor, getSemanticColor, getThemeColor } = useTheme();
   const toast = useToast();
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showInstantWinSpinner, setShowInstantWinSpinner] = useState(false);
-  const [purchasedTickets, setPurchasedTickets] = useState<any[]>([]);
+  const [purchasedTickets, setPurchasedTickets] = useState<TicketWithInstantWin[]>([]);
 
   const ticketPrice = parseFloat(competition.ticketPrice);
   const totalCost = ticketPrice * quantity;
@@ -103,7 +114,7 @@ export default function TicketPurchaseModal({
       setPurchasedTickets(result.tickets);
 
       // Check if any tickets have instant wins
-      const hasInstantWins = result.tickets.some((ticket: any) => ticket.instantWin?.prize);
+      const hasInstantWins = result.tickets.some((ticket: TicketWithInstantWin) => ticket.instantWin?.prize);
 
       if (hasInstantWins || result.tickets.length > 0) {
         // Show instant win spinner for all purchased tickets
@@ -197,9 +208,9 @@ export default function TicketPurchaseModal({
   return (
     <>
       <Modal isOpen={isOpen} onClose={handleClose} size="md" closeOnOverlayClick={!isLoading}>
-      <ModalOverlay bg="blackAlpha.600" backdropFilter="blur(4px)" />
+      <ModalOverlay bg={getThemeColor('ui.overlay.dark')} backdropFilter="blur(4px)" />
       <ModalContent
-        bgGradient={getColor('gradients.secondary')}
+        bg={getThemeColor('brand.valentino')}
         border="1px"
         borderColor={getColor('primary.700')}
         color={getColor('text.primary')}
@@ -211,7 +222,7 @@ export default function TicketPurchaseModal({
             <Text color={getColor('text.primary')} fontWeight="bold">Purchase Tickets</Text>
           </HStack>
         </ModalHeader>
-        <ModalCloseButton isDisabled={isLoading} color={getColor('text.primary')} _hover={{ bg: "whiteAlpha.200" }} />
+        <ModalCloseButton isDisabled={isLoading} color={getColor('text.primary')} _hover={{ bg: getThemeColor('ui.hover.base') }} />
 
         <ModalBody>
           <VStack spacing={6} align="stretch">
@@ -233,7 +244,7 @@ export default function TicketPurchaseModal({
               </Text>
             </Box>
 
-            <Divider borderColor="whiteAlpha.300" />
+            <Divider borderColor={getThemeColor('ui.border.light')} />
 
             {/* Availability Status */}
             <Alert
@@ -295,7 +306,7 @@ export default function TicketPurchaseModal({
                           {Math.ceil(Math.min(availableTickets, 10) / 2)}
                         </SliderMark>
                       )}
-                      <SliderTrack bg="whiteAlpha.300">
+                      <SliderTrack bg={getThemeColor('ui.background.elevated')}>
                         <SliderFilledTrack bg={getColor('primary.400')} />
                       </SliderTrack>
                       <SliderThumb boxSize={6} bg={getColor('primary.500')} border="2px" borderColor={getColor('text.primary')}>
@@ -308,7 +319,7 @@ export default function TicketPurchaseModal({
                 </FormControl>
 
                 {/* Price Breakdown */}
-                <Box bg="whiteAlpha.100" p={4} borderRadius="md" border="1px" borderColor="whiteAlpha.200">
+                <Box bg={getThemeColor('ui.overlay.light')} p={4} borderRadius="md" border="1px" borderColor={getThemeColor('ui.border.light')}>
                   <VStack spacing={3}>
                     <Flex justify="space-between" w="full" align="center">
                       <HStack spacing={2}>
@@ -336,7 +347,7 @@ export default function TicketPurchaseModal({
                         </Text>
                       </Flex>
 
-                      <Divider borderColor="whiteAlpha.300" />
+                      <Divider borderColor={getThemeColor('ui.border.light')} />
 
                       <Flex justify="space-between" w="full">
                         <Text fontWeight="bold" color={getColor('success.400')}>

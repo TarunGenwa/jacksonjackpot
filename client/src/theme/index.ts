@@ -1,15 +1,21 @@
 export { theme, getColor, getSemanticColor } from './colors';
 export type { ThemeColors, SemanticColors } from './colors';
 
-// Export commonly used color combinations
+// Export commonly used color combinations with EPL branding
 export const commonColors = {
   // Button variants
   buttons: {
     primary: {
-      bg: '#6b46c1',
-      color: '#ffffff',
-      hover: '#553c9a',
-      active: '#3f2f72',
+      bg: '#963CFF', // EPL Electric Violet
+      color: '#FFFFFF',
+      hover: '#8636E6',
+      active: '#6F2DCC',
+    },
+    accent: {
+      bg: '#E90052', // EPL Razzmatazz
+      color: '#FFFFFF',
+      hover: '#CC0048',
+      active: '#A6003A',
     },
     success: {
       bg: '#48bb78',
@@ -19,38 +25,38 @@ export const commonColors = {
     },
     ghost: {
       bg: 'transparent',
-      color: '#ffffff',
-      hover: 'rgba(255, 255, 255, 0.2)',
+      color: '#FFFFFF',
+      hover: 'rgba(150, 60, 255, 0.2)', // Electric Violet with opacity
     },
   },
 
   // Card variants
   cards: {
     primary: {
-      bg: 'linear(to-br, purple.900, blue.900)',
-      border: '#553c9a',
-      hoverBorder: '#9f7aea',
+      bg: '#360D3A', // Solid EPL Valentino
+      border: '#963CFF', // Electric Violet
+      hoverBorder: '#E90052', // Razzmatazz on hover
     },
     secondary: {
-      bg: '#2d3748',
-      border: '#4a5568',
-      hoverBorder: '#6b7280',
+      bg: '#4E2A7F', // Lighter Valentino variant
+      border: '#963CFF',
+      hoverBorder: '#E90052',
     },
   },
 
   // Text variants
   text: {
-    primary: '#ffffff',
-    secondary: '#a0aec0',
-    muted: '#6b7280',
-    accent: '#48bb78',
+    primary: '#FFFFFF',
+    secondary: '#D9BFFF', // Light Electric Violet
+    muted: '#A96BFF', // Medium Electric Violet
+    accent: '#E90052', // EPL Razzmatazz
   },
 
   // Status variants
   status: {
     success: '#48bb78',
-    error: '#e53e3e',
+    error: '#E90052', // EPL Razzmatazz
     warning: '#ed8936',
-    info: '#3182ce',
+    info: '#963CFF', // EPL Electric Violet
   },
 } as const;
