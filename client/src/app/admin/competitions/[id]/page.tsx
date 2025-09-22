@@ -12,6 +12,7 @@ import { adminApi } from '@/services/adminApi';
 import LoadingSpinner from '@/components/admin/LoadingSpinner';
 import ErrorAlert from '@/components/admin/ErrorAlert';
 import DrawManagement from '@/components/admin/DrawManagement';
+import PrizeManagement from '@/components/admin/PrizeManagement';
 
 interface CompetitionDetail {
   id: string;
@@ -379,29 +380,12 @@ export default function CompetitionDetailPage() {
             </div>
           </div>
 
-          {/* Prizes */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Prizes</h3>
-            <div className="space-y-4">
-              {competition.prizes.map((prize) => (
-                <div key={prize.id} className="border rounded-lg p-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="font-medium text-gray-900">{prize.name}</h4>
-                      <p className="text-sm text-gray-600 mt-1">{prize.description}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium text-gray-900">£{(prize.value / 100).toFixed(2)}</p>
-                      <p className="text-sm text-gray-600">Position {prize.position}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-              {competition.prizes.length === 0 && (
-                <p className="text-gray-500 text-center py-4">No prizes configured</p>
-              )}
-            </div>
-          </div>
+          {/* Prize Management */}
+          <PrizeManagement
+            competitionId={competition.id}
+            prizes={competition.prizes}
+            onPrizeUpdate={() => setRefreshKey(prev => prev + 1)}
+          />
         </div>
 
         {/* Sidebar */}

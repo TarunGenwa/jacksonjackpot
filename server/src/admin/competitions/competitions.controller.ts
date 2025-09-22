@@ -93,4 +93,46 @@ export class CompetitionsController {
   async delete(@Param('id') id: string) {
     return this.competitionsService.delete(id);
   }
+
+  @Get(':id/prizes')
+  async getPrizes(@Param('id') id: string) {
+    return this.competitionsService.getPrizes(id);
+  }
+
+  @Post(':id/prizes')
+  async createPrize(
+    @Param('id') id: string,
+    @Body() prizeData: {
+      name: string;
+      description?: string;
+      value: number;
+      position: number;
+      quantity?: number;
+    },
+  ) {
+    return this.competitionsService.createPrize(id, prizeData);
+  }
+
+  @Put(':id/prizes/:prizeId')
+  async updatePrize(
+    @Param('id') id: string,
+    @Param('prizeId') prizeId: string,
+    @Body() prizeData: {
+      name?: string;
+      description?: string;
+      value?: number;
+      position?: number;
+      quantity?: number;
+    },
+  ) {
+    return this.competitionsService.updatePrize(id, prizeId, prizeData);
+  }
+
+  @Delete(':id/prizes/:prizeId')
+  async deletePrize(
+    @Param('id') id: string,
+    @Param('prizeId') prizeId: string,
+  ) {
+    return this.competitionsService.deletePrize(id, prizeId);
+  }
 }

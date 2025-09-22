@@ -59,16 +59,32 @@ export default function DrawManagement({
   const [seedInput, setSeedInput] = useState('');
   const [generatedSeed, setGeneratedSeed] = useState('');
   const [showSeedInput, setShowSeedInput] = useState(false);
-  const [validationResult, setValidationResult] = useState<any>(null);
+  const [validationResult, setValidationResult] = useState<{
+    valid: boolean;
+    error?: string;
+    drawSeed?: { committed: boolean; revealed: boolean };
+    winnersCount?: number;
+  } | null>(null);
 
   useEffect(() => {
-    fetchDrawStatus();
+    const loadDrawStatus = async () => {
+      try {
+        setLoading(true);
+        const status = await adminApi.getDrawStatus(competitionId) as DrawStatus;
+        setDrawStatus(status);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch draw status');
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadDrawStatus();
   }, [competitionId]);
 
   const fetchDrawStatus = async () => {
     try {
       setLoading(true);
-      const status = await adminApi.getDrawStatus(competitionId);
+      const status = await adminApi.getDrawStatus(competitionId) as DrawStatus;
       setDrawStatus(status);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch draw status');
@@ -98,7 +114,7 @@ export default function DrawManagement({
     try {
       setLoading(true);
       setError(null);
-      const result = await adminApi.commitDrawSeed(competitionId, seedInput);
+      const result = await adminApi.commitDrawSeed(competitionId, seedInput) as { commitHash: string };
       setSuccess(`Seed committed successfully! Hash: ${result.commitHash.substring(0, 16)}...`);
       setSeedInput('');
       setGeneratedSeed('');
@@ -121,7 +137,7 @@ export default function DrawManagement({
     try {
       setLoading(true);
       setError(null);
-      const result = await adminApi.revealDrawSeed(competitionId, seedInput);
+      await adminApi.revealDrawSeed(competitionId, seedInput);
       setSuccess('Seed revealed successfully!');
       setSeedInput('');
       setShowSeedInput(false);
@@ -142,7 +158,7 @@ export default function DrawManagement({
     try {
       setLoading(true);
       setError(null);
-      const result = await adminApi.executeDraw(competitionId);
+      const result = await adminApi.executeDraw(competitionId) as { winnersCount: number };
       setSuccess(`Draw executed successfully! ${result.winnersCount} winner(s) selected.`);
       await fetchDrawStatus();
       if (onStatusUpdate) onStatusUpdate();
@@ -157,7 +173,12 @@ export default function DrawManagement({
     try {
       setLoading(true);
       setError(null);
-      const result = await adminApi.validateDrawIntegrity(competitionId);
+      const result = await adminApi.validateDrawIntegrity(competitionId) as {
+        valid: boolean;
+        error?: string;
+        drawSeed?: { committed: boolean; revealed: boolean };
+        winnersCount?: number;
+      };
       setValidationResult(result);
       if (result.valid) {
         setSuccess('Draw integrity validated successfully!');
@@ -285,7 +306,7 @@ export default function DrawManagement({
                           {generatedSeed && (
                             <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded-lg">
                               <p className="text-xs text-yellow-800">
-                                <strong>Important:</strong> Save this seed securely! You'll need it to reveal and execute the draw.
+                                <strong>Important:</strong> Save this seed securely! You&apos;ll need it to reveal and execute the draw.
                               </p>
                             </div>
                           )}

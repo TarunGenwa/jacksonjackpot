@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma, CompetitionStatus } from '@prisma/client';
 
@@ -181,5 +181,123 @@ export class CompetitionsService {
         {} as Record<string, number>,
       ),
     };
+  }
+
+  async getPrizes(competitionId: string) {
+    const competition = await this.prisma.competition.findUnique({
+      where: { id: competitionId },
+      include: {
+        prizes: {
+          orderBy: { position: 'asc' },
+        },
+      },
+    });
+
+    if (!competition) {
+      throw new NotFoundException(`Competition with ID ${competitionId} not found`);
+    }
+
+    return competition.prizes;
+  }
+
+  async createPrize(
+    competitionId: string,
+    prizeData: {
+      name: string;
+      description?: string;
+      value: number;
+      position: number;
+      quantity?: number;
+    },
+  ) {
+    const competition = await this.prisma.competition.findUnique({
+      where: { id: competitionId },
+    });
+
+    if (!competition) {
+      throw new NotFoundException(`Competition with ID ${competitionId} not found`);
+    }
+
+    try {
+      const prize = await this.prisma.prize.create({
+        data: {
+          name: prizeData.name,
+          description: prizeData.description || '',
+          value: prizeData.value,
+          position: prizeData.position,
+          quantity: prizeData.quantity || 1,
+          competitionId,
+        },
+      });
+      return prize;
+    } catch (error) {
+      if (error.code === 'P2002') {
+        throw new BadRequestException(
+          `A prize with position ${prizeData.position} already exists for this competition`,
+        );
+      }
+      throw error;
+    }
+  }
+
+  async updatePrize(
+    competitionId: string,
+    prizeId: string,
+    prizeData: {
+      name?: string;
+      description?: string;
+      value?: number;
+      position?: number;
+      quantity?: number;
+    },
+  ) {
+    const prize = await this.prisma.prize.findFirst({
+      where: {
+        id: prizeId,
+        competitionId,
+      },
+    });
+
+    if (!prize) {
+      throw new NotFoundException(
+        `Prize with ID ${prizeId} not found for competition ${competitionId}`,
+      );
+    }
+
+    try {
+      const updatedPrize = await this.prisma.prize.update({
+        where: { id: prizeId },
+        data: prizeData,
+      });
+      return updatedPrize;
+    } catch (error) {
+      if (error.code === 'P2002') {
+        throw new BadRequestException(
+          `A prize with position ${prizeData.position} already exists for this competition`,
+        );
+      }
+      throw error;
+    }
+  }
+
+  async deletePrize(competitionId: string, prizeId: string) {
+    const prize = await this.prisma.prize.findFirst({
+      where: {
+        id: prizeId,
+        competitionId,
+      },
+    });
+
+    if (!prize) {
+      throw new NotFoundException(
+        `Prize with ID ${prizeId} not found for competition ${competitionId}`,
+      );
+    }
+
+    await this.prisma.prize.delete({
+      where: { id: prizeId },
+    });
+
+    return { message: `Prize with ID ${prizeId} has been deleted` };
   }
 }

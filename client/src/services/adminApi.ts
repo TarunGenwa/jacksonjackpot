@@ -184,6 +184,62 @@ class AdminApiService {
     return this.handleResponse(response);
   }
 
+  // Prize Management API
+  async getCompetitionPrizes(competitionId: string) {
+    const response = await fetch(
+      `${API_BASE_URL}/admin/competitions/${competitionId}/prizes`,
+      { headers: this.getAuthHeaders() }
+    );
+    return this.handleResponse(response);
+  }
+
+  async createPrize(competitionId: string, prizeData: {
+    name: string;
+    description?: string;
+    value: number;
+    position: number;
+    quantity?: number;
+  }) {
+    const response = await fetch(
+      `${API_BASE_URL}/admin/competitions/${competitionId}/prizes`,
+      {
+        method: 'POST',
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(prizeData),
+      }
+    );
+    return this.handleResponse(response);
+  }
+
+  async updatePrize(competitionId: string, prizeId: string, prizeData: {
+    name?: string;
+    description?: string;
+    value?: number;
+    position?: number;
+    quantity?: number;
+  }) {
+    const response = await fetch(
+      `${API_BASE_URL}/admin/competitions/${competitionId}/prizes/${prizeId}`,
+      {
+        method: 'PUT',
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(prizeData),
+      }
+    );
+    return this.handleResponse(response);
+  }
+
+  async deletePrize(competitionId: string, prizeId: string) {
+    const response = await fetch(
+      `${API_BASE_URL}/admin/competitions/${competitionId}/prizes/${prizeId}`,
+      {
+        method: 'DELETE',
+        headers: this.getAuthHeaders(),
+      }
+    );
+    return this.handleResponse(response);
+  }
+
   // Charities API
   async getCharities(params?: {
     page?: number;
