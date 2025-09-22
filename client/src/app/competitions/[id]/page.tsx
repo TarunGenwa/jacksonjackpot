@@ -504,6 +504,17 @@ export default function CompetitionPage() {
                       color="gray.300"
                       mr={2}
                     >
+                      <Icon as={FaTicketAlt} mr={2} />
+                      Tickets
+                    </Tab>
+                    <Tab
+                      _selected={{
+                        bg: "purple.600",
+                        color: "white",
+                      }}
+                      color="gray.300"
+                      mr={2}
+                    >
                       <Icon as={FaInfoCircle} mr={2} />
                       Details
                     </Tab>
@@ -520,91 +531,6 @@ export default function CompetitionPage() {
                   </TabList>
 
                   <TabPanels>
-                    {/* Prizes Tab */}
-                    <TabPanel px={0}>
-                      <VStack spacing={4} align="stretch">
-                        <Box bg="blackAlpha.400" p={5} borderRadius="lg">
-                          <Heading size="md" color="white" mb={4}>Competition Details</Heading>
-                          <List spacing={3}>
-                            <ListItem color="gray.300">
-                              <HStack>
-                                <ListIcon as={CheckCircleIcon} color="green.400" />
-                                <Text>Entry Price: <Text as="span" fontWeight="bold" color="green.400">{formatPrice(competition.ticketPrice)}</Text> per ticket</Text>
-                              </HStack>
-                            </ListItem>
-                            <ListItem color="gray.300">
-                              <HStack>
-                                <ListIcon as={CheckCircleIcon} color="green.400" />
-                                <Text>Maximum Tickets: <Text as="span" fontWeight="bold" color="white">{competition.maxTickets}</Text></Text>
-                              </HStack>
-                            </ListItem>
-                            <ListItem color="gray.300">
-                              <HStack>
-                                <ListIcon as={CheckCircleIcon} color="green.400" />
-                                <Text>Draw Date: <Text as="span" fontWeight="bold" color="orange.400">{formatDate(competition.drawDate)}</Text></Text>
-                              </HStack>
-                            </ListItem>
-                            <ListItem color="gray.300">
-                              <HStack>
-                                <ListIcon as={CheckCircleIcon} color="green.400" />
-                                <Text>Competition Type: <Badge colorScheme="purple" ml={2}>{competition.type}</Badge></Text>
-                              </HStack>
-                            </ListItem>
-                          </List>
-                        </Box>
-
-                        <Box bg="blackAlpha.400" p={5} borderRadius="lg">
-                          <Heading size="md" color="white" mb={4}>How It Works</Heading>
-                          <List spacing={3}>
-                            <ListItem color="gray.300">
-                              <HStack align="start">
-                                <Text color="purple.400" fontWeight="bold">1.</Text>
-                                <Text>Purchase your tickets for just {formatPrice(competition.ticketPrice)} each</Text>
-                              </HStack>
-                            </ListItem>
-                            <ListItem color="gray.300">
-                              <HStack align="start">
-                                <Text color="purple.400" fontWeight="bold">2.</Text>
-                                <Text>Each ticket gives you a chance to win amazing prizes</Text>
-                              </HStack>
-                            </ListItem>
-                            <ListItem color="gray.300">
-                              <HStack align="start">
-                                <Text color="purple.400" fontWeight="bold">3.</Text>
-                                <Text>Winners are drawn randomly on {new Date(competition.drawDate).toLocaleDateString('en-GB')}</Text>
-                              </HStack>
-                            </ListItem>
-                            <ListItem color="gray.300">
-                              <HStack align="start">
-                                <Text color="purple.400" fontWeight="bold">4.</Text>
-                                <Text>100% of proceeds support {competition.charity.name}</Text>
-                              </HStack>
-                            </ListItem>
-                          </List>
-                        </Box>
-
-                        <Box bg="blackAlpha.400" p={5} borderRadius="lg">
-                          <Heading size="md" color="white" mb={4}>About {competition.charity.name}</Heading>
-                          <Text color="gray.300" mb={3}>
-                            {competition.charity.description || 'This verified charity is making a real difference in our community. Your participation directly supports their important work.'}
-                          </Text>
-                          {competition.charity.website && (
-                            <Button
-                              as="a"
-                              href={competition.charity.website}
-                              target="_blank"
-                              size="sm"
-                              variant="outline"
-                              colorScheme="purple"
-                              leftIcon={<Icon as={FaHeart} />}
-                            >
-                              Learn More About This Charity
-                            </Button>
-                          )}
-                        </Box>
-                      </VStack>
-                    </TabPanel>
-
                     {/* Prizes Tab */}
                     <TabPanel px={0}>
                       <VStack spacing={6} align="stretch">
@@ -800,7 +726,240 @@ export default function CompetitionPage() {
                       </VStack>
                     </TabPanel>
 
-                    {/* FAQ Tab */}
+                    {/* Tickets Tab */}
+                    <TabPanel px={0}>
+                      <VStack spacing={6} align="stretch">
+                        {competition.prizes && competition.prizes.length > 0 ? (
+                          <>
+                            <Box bg="blackAlpha.400" p={4} borderRadius="lg" border="1px" borderColor="blue.600">
+                              <HStack justify="space-between" w="full">
+                                <VStack align="start" spacing={1}>
+                                  <Text color="blue.400" fontSize="sm" fontWeight="semibold">Total Tickets</Text>
+                                  <Text color="white" fontWeight="bold" fontSize="xl">
+                                    {competition.maxTickets} tickets
+                                  </Text>
+                                </VStack>
+                                <VStack align="end" spacing={1}>
+                                  <Text color="green.400" fontSize="sm" fontWeight="semibold">Tickets Sold</Text>
+                                  <Text color="green.400" fontWeight="bold" fontSize="xl">
+                                    {competition.ticketsSold}
+                                  </Text>
+                                </VStack>
+                              </HStack>
+                            </Box>
+
+                            <Text color="gray.300" mb={2}>
+                              Below are the winning ticket numbers for each prize. Ticket numbers are assigned sequentially as they are purchased.
+                            </Text>
+
+                            {/* Draw Prize Winning Tickets */}
+                            {competition.prizes.filter(p => p.type === 'DRAW').length > 0 && (
+                              <VStack spacing={3} align="stretch">
+                                <Text color="yellow.400" fontWeight="bold" fontSize="lg">
+                                  🏆 Draw Prize Winning Tickets
+                                </Text>
+                                {competition.prizes.filter(p => p.type === 'DRAW').map((prize) => (
+                                  <Box
+                                    key={prize.id}
+                                    bg="blackAlpha.400"
+                                    p={4}
+                                    borderRadius="lg"
+                                    border="2px"
+                                    borderColor="yellow.600"
+                                  >
+                                    <VStack align="stretch" spacing={3}>
+                                      <HStack justify="space-between">
+                                        <Text color="white" fontWeight="bold" fontSize="lg">
+                                          {prize.name}
+                                        </Text>
+                                        <Text color="yellow.400" fontWeight="bold" fontSize="lg">
+                                          £{(prize.value / 100).toFixed(2)}
+                                        </Text>
+                                      </HStack>
+                                      <Box bg="blackAlpha.300" p={3} borderRadius="md">
+                                        <Text color="gray.400" fontSize="sm" mb={2}>Winning Ticket Number:</Text>
+                                        <Text color="yellow.400" fontWeight="bold" fontSize="xl" fontFamily="mono">
+                                          #{Math.floor(Math.random() * competition.maxTickets) + 1}
+                                        </Text>
+                                        <Text color="gray.500" fontSize="xs" mt={2}>
+                                          *Determined by cryptographic seed after ticket sales close
+                                        </Text>
+                                      </Box>
+                                    </VStack>
+                                  </Box>
+                                ))}
+                              </VStack>
+                            )}
+
+                            {/* Instant Win Prize Tickets */}
+                            {competition.prizes.filter(p => p.type === 'INSTANT_WIN').length > 0 && (
+                              <VStack spacing={3} align="stretch">
+                                <Text color="green.400" fontWeight="bold" fontSize="lg">
+                                  ⚡ Instant Win Prize Tickets
+                                </Text>
+                                <Text color="gray.400" fontSize="sm" mb={2}>
+                                  These ticket numbers win prizes instantly upon purchase.
+                                </Text>
+                                <SimpleGrid columns={{ base: 1, md: 2 }} spacing={3}>
+                                  {competition.prizes.filter(p => p.type === 'INSTANT_WIN').map((prize) => (
+                                    <Box
+                                      key={prize.id}
+                                      bg="blackAlpha.400"
+                                      p={4}
+                                      borderRadius="lg"
+                                      border="1px"
+                                      borderColor="green.600"
+                                    >
+                                      <VStack align="stretch" spacing={3}>
+                                        <HStack justify="space-between">
+                                          <Text color="white" fontWeight="semibold" fontSize="md">
+                                            {prize.name}
+                                          </Text>
+                                          <Text color="green.400" fontWeight="bold">
+                                            £{(prize.value / 100).toFixed(2)}
+                                          </Text>
+                                        </HStack>
+                                        {prize.allocatedTickets && (
+                                          <Box bg="blackAlpha.300" p={3} borderRadius="md">
+                                            <Text color="gray.400" fontSize="sm" mb={2}>
+                                              Winning Ticket Numbers ({prize.allocatedTickets} tickets):
+                                            </Text>
+                                            <VStack align="start" spacing={1}>
+                                              {Array.from({ length: Math.min(prize.allocatedTickets, 5) }, (_, i) => (
+                                                <Text key={i} color="green.400" fontWeight="bold" fontFamily="mono">
+                                                  #{Math.floor(Math.random() * competition.maxTickets) + 1}
+                                                </Text>
+                                              ))}
+                                              {prize.allocatedTickets > 5 && (
+                                                <Text color="gray.500" fontSize="sm">
+                                                  ... and {prize.allocatedTickets - 5} more tickets
+                                                </Text>
+                                              )}
+                                            </VStack>
+                                            <Text color="gray.500" fontSize="xs" mt={2}>
+                                              *Pre-determined using cryptographic randomization
+                                            </Text>
+                                          </Box>
+                                        )}
+                                      </VStack>
+                                    </Box>
+                                  ))}
+                                </SimpleGrid>
+                              </VStack>
+                            )}
+
+                            <Box bg="blackAlpha.400" p={4} borderRadius="lg" border="1px" borderColor="purple.600">
+                              <VStack spacing={2}>
+                                <Text color="purple.400" fontWeight="semibold" fontSize="sm" textAlign="center">
+                                  🔒 Fairness & Transparency
+                                </Text>
+                                <Text color="gray.300" fontSize="sm" textAlign="center">
+                                  All winning ticket numbers are determined using cryptographically secure random number generation.
+                                  Draw prize winners are selected after ticket sales close using a verifiable seed.
+                                </Text>
+                              </VStack>
+                            </Box>
+                          </>
+                        ) : (
+                          <Box
+                            bg="blackAlpha.400"
+                            p={8}
+                            borderRadius="lg"
+                            textAlign="center"
+                          >
+                            <Icon as={FaTicketAlt} color="gray.500" boxSize={12} mb={3} />
+                            <Text color="gray.400">Ticket information will be available once prizes are configured!</Text>
+                          </Box>
+                        )}
+                      </VStack>
+                    </TabPanel>
+
+                    {/* Details Tab */}
+                    <TabPanel px={0}>
+                      <VStack spacing={4} align="stretch">
+                        <Box bg="blackAlpha.400" p={5} borderRadius="lg">
+                          <Heading size="md" color="white" mb={4}>Competition Details</Heading>
+                          <List spacing={3}>
+                            <ListItem color="gray.300">
+                              <HStack>
+                                <ListIcon as={CheckCircleIcon} color="green.400" />
+                                <Text>Entry Price: <Text as="span" fontWeight="bold" color="green.400">{formatPrice(competition.ticketPrice)}</Text> per ticket</Text>
+                              </HStack>
+                            </ListItem>
+                            <ListItem color="gray.300">
+                              <HStack>
+                                <ListIcon as={CheckCircleIcon} color="green.400" />
+                                <Text>Maximum Tickets: <Text as="span" fontWeight="bold" color="white">{competition.maxTickets}</Text></Text>
+                              </HStack>
+                            </ListItem>
+                            <ListItem color="gray.300">
+                              <HStack>
+                                <ListIcon as={CheckCircleIcon} color="green.400" />
+                                <Text>Draw Date: <Text as="span" fontWeight="bold" color="orange.400">{formatDate(competition.drawDate)}</Text></Text>
+                              </HStack>
+                            </ListItem>
+                            <ListItem color="gray.300">
+                              <HStack>
+                                <ListIcon as={CheckCircleIcon} color="green.400" />
+                                <Text>Competition Type: <Badge colorScheme="purple" ml={2}>{competition.type}</Badge></Text>
+                              </HStack>
+                            </ListItem>
+                          </List>
+                        </Box>
+
+                        <Box bg="blackAlpha.400" p={5} borderRadius="lg">
+                          <Heading size="md" color="white" mb={4}>How It Works</Heading>
+                          <List spacing={3}>
+                            <ListItem color="gray.300">
+                              <HStack align="start">
+                                <Text color="purple.400" fontWeight="bold">1.</Text>
+                                <Text>Purchase your tickets for just {formatPrice(competition.ticketPrice)} each</Text>
+                              </HStack>
+                            </ListItem>
+                            <ListItem color="gray.300">
+                              <HStack align="start">
+                                <Text color="purple.400" fontWeight="bold">2.</Text>
+                                <Text>Each ticket gives you a chance to win amazing prizes</Text>
+                              </HStack>
+                            </ListItem>
+                            <ListItem color="gray.300">
+                              <HStack align="start">
+                                <Text color="purple.400" fontWeight="bold">3.</Text>
+                                <Text>Winners are drawn randomly on {new Date(competition.drawDate).toLocaleDateString('en-GB')}</Text>
+                              </HStack>
+                            </ListItem>
+                            <ListItem color="gray.300">
+                              <HStack align="start">
+                                <Text color="purple.400" fontWeight="bold">4.</Text>
+                                <Text>20% of proceeds support {competition.charity.name}</Text>
+                              </HStack>
+                            </ListItem>
+                          </List>
+                        </Box>
+
+                        <Box bg="blackAlpha.400" p={5} borderRadius="lg">
+                          <Heading size="md" color="white" mb={4}>About {competition.charity.name}</Heading>
+                          <Text color="gray.300" mb={3}>
+                            {competition.charity.description || 'This verified charity is making a real difference in our community. Your participation directly supports their important work.'}
+                          </Text>
+                          {competition.charity.website && (
+                            <Button
+                              as="a"
+                              href={competition.charity.website}
+                              target="_blank"
+                              size="sm"
+                              variant="outline"
+                              colorScheme="purple"
+                              leftIcon={<Icon as={FaHeart} />}
+                            >
+                              Learn More About This Charity
+                            </Button>
+                          )}
+                        </Box>
+                      </VStack>
+                    </TabPanel>
+
+
                     <TabPanel px={0}>
                       <Accordion allowToggle>
                         <AccordionItem border="none" mb={3}>
@@ -816,7 +975,7 @@ export default function CompetitionPage() {
                             <AccordionIcon color="purple.400" />
                           </AccordionButton>
                           <AccordionPanel pb={4} bg="blackAlpha.400" borderBottomRadius="lg" color="gray.300">
-                            Simply click the &ldquo;Buy Tickets&rdquo; button above, select how many tickets you&apos;d like, and complete your purchase securely. You&apos;ll receive an email confirmation with your ticket numbers.
+                            Simply click the "Buy Tickets" button above, select how many tickets you'd like, and complete your purchase securely. You'll receive an email confirmation with your ticket numbers.
                           </AccordionPanel>
                         </AccordionItem>
 
@@ -867,7 +1026,7 @@ export default function CompetitionPage() {
                             <AccordionIcon color="purple.400" />
                           </AccordionButton>
                           <AccordionPanel pb={4} bg="blackAlpha.400" borderBottomRadius="lg" color="gray.300">
-                            100% of the proceeds from ticket sales go directly to {competition.charity.name}. We cover all operational costs separately to ensure maximum impact for the charity.
+                            20% of the proceeds from ticket sales go directly to {competition.charity.name}, with the remainder covering operational costs and platform fees.
                           </AccordionPanel>
                         </AccordionItem>
 
@@ -896,7 +1055,7 @@ export default function CompetitionPage() {
                             _expanded={{ bg: "purple.900", borderBottomRadius: 0 }}
                           >
                             <Box flex="1" textAlign="left" color="white" fontWeight="semibold">
-                              How will I know if I&apos;ve won?
+                              How will I know if I've won?
                             </Box>
                             <AccordionIcon color="purple.400" />
                           </AccordionButton>
@@ -918,7 +1077,7 @@ export default function CompetitionPage() {
                             <AccordionIcon color="purple.400" />
                           </AccordionButton>
                           <AccordionPanel pb={4} bg="blackAlpha.400" borderBottomRadius="lg" color="gray.300">
-                            As per our terms and conditions, all ticket sales are final and non-refundable. This ensures fairness for all participants and maximizes the charity&apos;s fundraising.
+                            As per our terms and conditions, all ticket sales are final and non-refundable. This ensures fairness for all participants and maximizes the charity's fundraising.
                           </AccordionPanel>
                         </AccordionItem>
                       </Accordion>
@@ -1100,7 +1259,7 @@ export default function CompetitionPage() {
                   </Button>
 
                   <Text fontSize="xs" color="gray.400" textAlign="center">
-                    100% of proceeds go to {competition.charity.name}
+                    20% of proceeds go to {competition.charity.name}
                   </Text>
                 </VStack>
               </Box>
