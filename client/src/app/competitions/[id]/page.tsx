@@ -60,6 +60,7 @@ export default function CompetitionPage() {
   const [competition, setCompetition] = useState<Competition | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showAllTickets, setShowAllTickets] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const fetchCompetition = async () => {
@@ -118,6 +119,13 @@ export default function CompetitionPage() {
   const getProgressPercentage = () => {
     if (!competition || competition.maxTickets === 0) return 0;
     return Math.round((competition.ticketsSold / competition.maxTickets) * 100);
+  };
+
+  const toggleShowAllTickets = (prizeId: string) => {
+    setShowAllTickets(prev => ({
+      ...prev,
+      [prizeId]: !prev[prizeId]
+    }));
   };
 
 
@@ -825,15 +833,40 @@ export default function CompetitionPage() {
                                               Winning Ticket Numbers ({prize.allocatedTickets} tickets):
                                             </Text>
                                             <VStack align="start" spacing={1}>
-                                              {Array.from({ length: Math.min(prize.allocatedTickets, 5) }, (_, i) => (
+                                              {Array.from({
+                                                length: showAllTickets[prize.id]
+                                                  ? prize.allocatedTickets
+                                                  : Math.min(prize.allocatedTickets, 5)
+                                              }, (_, i) => (
                                                 <Text key={i} color="green.400" fontWeight="bold" fontFamily="mono">
                                                   #{Math.floor(Math.random() * competition.maxTickets) + 1}
                                                 </Text>
                                               ))}
-                                              {prize.allocatedTickets > 5 && (
-                                                <Text color="gray.500" fontSize="sm">
-                                                  ... and {prize.allocatedTickets - 5} more tickets
-                                                </Text>
+                                              {prize.allocatedTickets > 5 && !showAllTickets[prize.id] && (
+                                                <Button
+                                                  size="sm"
+                                                  variant="ghost"
+                                                  colorScheme="blue"
+                                                  fontSize="sm"
+                                                  h="auto"
+                                                  p={1}
+                                                  onClick={() => toggleShowAllTickets(prize.id)}
+                                                >
+                                                  Show all {prize.allocatedTickets} tickets
+                                                </Button>
+                                              )}
+                                              {prize.allocatedTickets > 5 && showAllTickets[prize.id] && (
+                                                <Button
+                                                  size="sm"
+                                                  variant="ghost"
+                                                  colorScheme="blue"
+                                                  fontSize="sm"
+                                                  h="auto"
+                                                  p={1}
+                                                  onClick={() => toggleShowAllTickets(prize.id)}
+                                                >
+                                                  Show less
+                                                </Button>
                                               )}
                                             </VStack>
                                             <Text color="gray.500" fontSize="xs" mt={2}>
