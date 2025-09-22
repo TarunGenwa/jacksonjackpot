@@ -107,7 +107,7 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
       <CardBody p={0}>
         <VStack spacing={0} align="stretch">
           {/* Top - Image Section */}
-          <Box position="relative" w="full" aspectRatio={1}>
+          <Box position="relative" w="full" aspectRatio={16/9}>
             {localCompetition.imageUrl ? (
               <Image
                 src={localCompetition.imageUrl}
@@ -181,13 +181,13 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
           </Box>
 
           {/* Bottom - Content */}
-          <VStack p={4} spacing={3} align="stretch">
+          <VStack p={3} spacing={2} align="stretch">
             {/* Title */}
             <Heading
               as="h3"
-              size="md"
+              size="sm"
               color="white"
-              lineHeight="1.3"
+              lineHeight="1.2"
               noOfLines={2}
             >
               {localCompetition.title}
@@ -212,20 +212,20 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
               />
             </Box>
 
-            {/* Prize */}
+            {/* Prizes */}
             <HStack justify="space-between" py={1}>
               <HStack spacing={1}>
                 <Icon as={FaTrophy} boxSize={3} color="yellow.400" />
-                <Text fontSize="xs" color="gray.400">Prize</Text>
+                <Text fontSize="xs" color="gray.400">Total Prizes Value</Text>
               </HStack>
               <Text fontWeight="bold" color="green.400" fontSize="sm">
-                {getPrizePool()}
+                £{(localCompetition.prizes.reduce((sum, prize) => sum + (prize.value * prize.quantity), 0) / 100).toFixed(2)}
               </Text>
             </HStack>
 
             {/* Action Button */}
             <Button
-              size="md"
+              size="sm"
               bg="green.400"
               color="gray.900"
               _hover={{
@@ -235,10 +235,9 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
               variant="solid"
               w="full"
               onClick={handleViewDetailsClick}
-              fontSize="sm"
-              h="40px"
+              fontSize="xs"
+              h="32px"
               fontWeight="semibold"
-              mt={1}
             >
               Enter
             </Button>
