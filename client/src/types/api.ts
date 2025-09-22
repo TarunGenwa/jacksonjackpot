@@ -17,9 +17,11 @@ export interface Prize {
   id: string;
   name: string;
   description?: string;
-  value: string;
-  position: number;
+  value: number;
+  type: 'DRAW' | 'INSTANT_WIN';
+  position?: number;
   quantity: number;
+  allocatedTickets?: number;
   imageUrl?: string;
 }
 

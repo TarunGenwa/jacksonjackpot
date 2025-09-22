@@ -36,8 +36,10 @@ interface CompetitionDetail {
     name: string;
     description: string;
     value: number;
-    position: number;
+    type: 'DRAW' | 'INSTANT_WIN';
+    position?: number;
     quantity: number;
+    allocatedTickets?: number;
   }>;
   tickets: Array<{
     id: string;

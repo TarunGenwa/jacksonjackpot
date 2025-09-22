@@ -90,16 +90,18 @@ model Competition {
 }
 
 model Prize {
-  id            String      @id @default(uuid())
-  competitionId String
-  name          String
-  description   String
-  value         Decimal     @db.Decimal(10, 2)
-  position      Int
-  imageUrl      String?
-  quantity      Int         @default(1)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id               String      @id @default(uuid())
+  competitionId    String
+  name             String
+  description      String
+  value            Decimal     @db.Decimal(10, 2)
+  type             PrizeType   @default(DRAW)
+  position         Int?        // Only used for DRAW prizes (1 = main draw prize)
+  imageUrl         String?
+  quantity         Int         @default(1)
+  allocatedTickets Int?        // For INSTANT_WIN prizes: number of tickets that can win this prize
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
 
   competition Competition  @relation(fields: [competitionId], references: [id])
   winners     Winner[]
@@ -367,4 +369,9 @@ enum DrawSeedStatus {
   COMMITTED
   REVEALED
   USED
+}
+
+enum PrizeType {
+  DRAW
+  INSTANT_WIN
 }

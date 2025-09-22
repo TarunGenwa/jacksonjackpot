@@ -106,8 +106,10 @@ export class CompetitionsController {
       name: string;
       description?: string;
       value: number;
-      position: number;
+      type: 'DRAW' | 'INSTANT_WIN';
+      position?: number; // Only for DRAW prizes
       quantity?: number;
+      allocatedTickets?: number; // Only for INSTANT_WIN prizes
     },
   ) {
     return this.competitionsService.createPrize(id, prizeData);
@@ -121,8 +123,10 @@ export class CompetitionsController {
       name?: string;
       description?: string;
       value?: number;
+      type?: 'DRAW' | 'INSTANT_WIN';
       position?: number;
       quantity?: number;
+      allocatedTickets?: number;
     },
   ) {
     return this.competitionsService.updatePrize(id, prizeId, prizeData);

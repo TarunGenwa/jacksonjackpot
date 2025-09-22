@@ -28,13 +28,17 @@ export class CompetitionService {
             name: true,
             description: true,
             value: true,
+            type: true,
             position: true,
             quantity: true,
+            allocatedTickets: true,
             imageUrl: true,
           },
-          orderBy: {
-            position: 'asc',
-          },
+          orderBy: [
+            { type: 'asc' }, // DRAW first, then INSTANT_WIN
+            { position: 'asc' },
+            { createdAt: 'asc' },
+          ],
         },
         _count: {
           select: {
@@ -78,13 +82,17 @@ export class CompetitionService {
             name: true,
             description: true,
             value: true,
+            type: true,
             position: true,
             quantity: true,
+            allocatedTickets: true,
             imageUrl: true,
           },
-          orderBy: {
-            position: 'asc',
-          },
+          orderBy: [
+            { type: 'asc' }, // DRAW first, then INSTANT_WIN
+            { position: 'asc' },
+            { createdAt: 'asc' },
+          ],
         },
         tickets: {
           select: {

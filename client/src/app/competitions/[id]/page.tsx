@@ -367,9 +367,15 @@ export default function CompetitionPage() {
                     </Box>
                     <Box textAlign="center" bg="blackAlpha.400" p={4} borderRadius="lg" border="1px" borderColor="purple.700">
                       <Icon as={FaTrophy} boxSize={6} color="purple.400" mb={2} />
-                      <Text fontSize="xs" color="gray.400" mb={1}>Top Prize</Text>
+                      <Text fontSize="xs" color="gray.400" mb={1}>
+                        {competition.prizes.find(p => p.type === 'DRAW') ? 'Draw Prize' : 'Top Prize'}
+                      </Text>
                       <Text fontWeight="bold" color="purple.400" fontSize="lg">
-                        £{competition.prizes[0]?.value || '0'}
+                        £{competition.prizes.find(p => p.type === 'DRAW')
+                          ? (competition.prizes.find(p => p.type === 'DRAW')!.value / 100).toFixed(2)
+                          : competition.prizes[0]
+                          ? (competition.prizes[0].value / 100).toFixed(2)
+                          : '0'}
                       </Text>
                     </Box>
                     <Box textAlign="center" bg="blackAlpha.400" p={4} borderRadius="lg" border="1px" borderColor="blue.700">
@@ -615,80 +621,168 @@ export default function CompetitionPage() {
 
                     {/* Prizes Tab */}
                     <TabPanel px={0}>
-                      <VStack spacing={4} align="stretch">
+                      <VStack spacing={6} align="stretch">
                         {competition.prizes && competition.prizes.length > 0 ? (
                           <>
                             <Text color="gray.300" mb={2}>
-                              Win one of {competition.prizes.length} amazing prizes in this competition!
+                              This competition features {competition.prizes.filter(p => p.type === 'DRAW').length > 0 ? 'a main draw prize' : 'no draw prize'} and {competition.prizes.filter(p => p.type === 'INSTANT_WIN').length} instant win prizes!
                             </Text>
-                            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={3}>
-                              {competition.prizes.map((prize, index) => (
-                                <Box
-                                  key={prize.id}
-                                  bg="blackAlpha.400"
-                                  p={4}
-                                  borderRadius="lg"
-                                  border="1px"
-                                  borderColor={index === 0 ? "yellow.600" : "gray.700"}
-                                  position="relative"
-                                  transition="all 0.2s"
-                                  _hover={{
-                                    transform: "translateY(-2px)",
-                                    borderColor: index === 0 ? "yellow.500" : "purple.600",
-                                  }}
-                                >
-                                  {index === 0 && (
+
+                            {/* Draw Prizes Section */}
+                            {competition.prizes.filter(p => p.type === 'DRAW').length > 0 && (
+                              <VStack spacing={3} align="stretch">
+                                <Text color="yellow.400" fontWeight="bold" fontSize="lg">
+                                  🏆 Main Draw Prize
+                                </Text>
+                                {competition.prizes.filter(p => p.type === 'DRAW').map((prize) => (
+                                  <Box
+                                    key={prize.id}
+                                    bg="blackAlpha.400"
+                                    p={6}
+                                    borderRadius="lg"
+                                    border="2px"
+                                    borderColor="yellow.600"
+                                    position="relative"
+                                    transition="all 0.2s"
+                                    _hover={{
+                                      transform: "translateY(-2px)",
+                                      borderColor: "yellow.500",
+                                    }}
+                                  >
                                     <Badge
                                       position="absolute"
-                                      top={2}
-                                      right={2}
+                                      top={3}
+                                      right={3}
                                       colorScheme="yellow"
                                       variant="solid"
                                     >
-                                      GRAND PRIZE
+                                      DRAW PRIZE
                                     </Badge>
-                                  )}
-                                  <HStack align="start" spacing={3}>
-                                    <Box
-                                      bg={index === 0 ? "yellow.600" : "purple.700"}
-                                      color="white"
-                                      borderRadius="md"
-                                      w="40px"
-                                      h="40px"
-                                      display="flex"
-                                      alignItems="center"
-                                      justifyContent="center"
-                                      fontWeight="bold"
-                                      fontSize="lg"
-                                    >
-                                      {prize.position || index + 1}
-                                    </Box>
-                                    <VStack align="start" flex={1} spacing={1}>
-                                      <Text color="white" fontWeight="semibold">
-                                        {prize.name}
-                                      </Text>
-                                      {prize.description && (
-                                        <Text color="gray.400" fontSize="sm">
-                                          {prize.description}
+                                    <HStack align="start" spacing={4}>
+                                      <Box
+                                        bg="yellow.600"
+                                        color="white"
+                                        borderRadius="md"
+                                        w="50px"
+                                        h="50px"
+                                        display="flex"
+                                        alignItems="center"
+                                        justifyContent="center"
+                                        fontWeight="bold"
+                                        fontSize="xl"
+                                      >
+                                        <Icon as={FaTrophy} />
+                                      </Box>
+                                      <VStack align="start" flex={1} spacing={2}>
+                                        <Text color="white" fontWeight="bold" fontSize="xl">
+                                          {prize.name}
                                         </Text>
-                                      )}
-                                      <Text color={index === 0 ? "yellow.400" : "green.400"} fontWeight="bold" fontSize="lg">
-                                        £{prize.value}
-                                      </Text>
-                                      {prize.quantity > 1 && (
-                                        <Badge colorScheme="blue" variant="subtle">
-                                          {prize.quantity} winners
-                                        </Badge>
-                                      )}
-                                    </VStack>
-                                  </HStack>
-                                </Box>
-                              ))}
-                            </SimpleGrid>
-                            <Box bg="blackAlpha.400" p={4} borderRadius="lg" mt={2}>
-                              <Text color="purple.400" fontWeight="semibold" fontSize="sm">
-                                Total Prize Value: £{competition.prizes.reduce((sum, p) => sum + parseFloat(p.value), 0).toFixed(2)}
-                              </Text>
+                                        {prize.description && (
+                                          <Text color="gray.300" fontSize="md">
+                                            {prize.description}
+                                          </Text>
+                                        )}
+                                        <Text color="yellow.400" fontWeight="bold" fontSize="2xl">
+                                          £{(prize.value / 100).toFixed(2)}
+                                        </Text>
+                                        <Text color="gray.400" fontSize="sm">
+                                          Won through the main lottery draw
+                                        </Text>
+                                      </VStack>
+                                    </HStack>
+                                  </Box>
+                                ))}
+                              </VStack>
+                            )}
+
+                            {/* Instant Win Prizes Section */}
+                            {competition.prizes.filter(p => p.type === 'INSTANT_WIN').length > 0 && (
+                              <VStack spacing={3} align="stretch">
+                                <Text color="green.400" fontWeight="bold" fontSize="lg">
+                                  ⚡ Instant Win Prizes
+                                </Text>
+                                <Text color="gray.400" fontSize="sm" mb={2}>
+                                  Win these prizes instantly when you purchase your tickets!
+                                </Text>
+                                <SimpleGrid columns={{ base: 1, md: 2 }} spacing={3}>
+                                  {competition.prizes.filter(p => p.type === 'INSTANT_WIN').map((prize) => (
+                                    <Box
+                                      key={prize.id}
+                                      bg="blackAlpha.400"
+                                      p={4}
+                                      borderRadius="lg"
+                                      border="1px"
+                                      borderColor="green.600"
+                                      position="relative"
+                                      transition="all 0.2s"
+                                      _hover={{
+                                        transform: "translateY(-2px)",
+                                        borderColor: "green.500",
+                                      }}
+                                    >
+                                      <Badge
+                                        position="absolute"
+                                        top={2}
+                                        right={2}
+                                        colorScheme="green"
+                                        variant="solid"
+                                      >
+                                        INSTANT WIN
+                                      </Badge>
+                                      <HStack align="start" spacing={3}>
+                                        <Box
+                                          bg="green.600"
+                                          color="white"
+                                          borderRadius="md"
+                                          w="40px"
+                                          h="40px"
+                                          display="flex"
+                                          alignItems="center"
+                                          justifyContent="center"
+                                          fontWeight="bold"
+                                          fontSize="lg"
+                                        >
+                                          <Icon as={FaGift} />
+                                        </Box>
+                                        <VStack align="start" flex={1} spacing={1}>
+                                          <Text color="white" fontWeight="semibold">
+                                            {prize.name}
+                                          </Text>
+                                          {prize.description && (
+                                            <Text color="gray.400" fontSize="sm">
+                                              {prize.description}
+                                            </Text>
+                                          )}
+                                          <Text color="green.400" fontWeight="bold" fontSize="lg">
+                                            £{(prize.value / 100).toFixed(2)}
+                                          </Text>
+                                          {prize.allocatedTickets && (
+                                            <Badge colorScheme="blue" variant="subtle">
+                                              {prize.allocatedTickets} winning tickets
+                                            </Badge>
+                                          )}
+                                          {prize.quantity > 1 && (
+                                            <Badge colorScheme="purple" variant="subtle">
+                                              {prize.quantity} available
+                                            </Badge>
+                                          )}
+                                        </VStack>
+                                      </HStack>
+                                    </Box>
+                                  ))}
+                                </SimpleGrid>
+                              </VStack>
+                            )}
+
+                            <Box bg="blackAlpha.400" p={4} borderRadius="lg" mt={4}>
+                              <HStack justify="space-between">
+                                <Text color="purple.400" fontWeight="semibold" fontSize="sm">
+                                  Total Prize Value:
+                                </Text>
+                                <Text color="purple.400" fontWeight="bold" fontSize="lg">
+                                  £{(competition.prizes.reduce((sum, p) => sum + ((p.value / 100) * p.quantity), 0)).toFixed(2)}
+                                </Text>
+                              </HStack>
                             </Box>
                           </>
                         ) : (
@@ -932,9 +1026,15 @@ export default function CompetitionPage() {
                 </Box>
                 <Box textAlign="center" bg="blackAlpha.400" p={4} borderRadius="lg" border="1px" borderColor="purple.700">
                   <Icon as={FaTrophy} boxSize={6} color="purple.400" mb={2} />
-                  <Text fontSize="xs" color="gray.400" mb={1}>Top Prize</Text>
+                  <Text fontSize="xs" color="gray.400" mb={1}>
+                    {competition.prizes.find(p => p.type === 'DRAW') ? 'Draw Prize' : 'Top Prize'}
+                  </Text>
                   <Text fontWeight="bold" color="purple.400" fontSize="lg">
-                    £{competition.prizes[0]?.value || '0'}
+                    £{competition.prizes.find(p => p.type === 'DRAW')
+                      ? (competition.prizes.find(p => p.type === 'DRAW')!.value / 100).toFixed(2)
+                      : competition.prizes[0]
+                      ? (competition.prizes[0].value / 100).toFixed(2)
+                      : '0'}
                   </Text>
                 </Box>
                 <Box textAlign="center" bg="blackAlpha.400" p={4} borderRadius="lg" border="1px" borderColor="blue.700">

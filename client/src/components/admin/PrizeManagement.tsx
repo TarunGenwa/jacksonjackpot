@@ -9,8 +9,10 @@ interface Prize {
   name: string;
   description: string;
   value: number;
-  position: number;
+  type: 'DRAW' | 'INSTANT_WIN';
+  position?: number;
   quantity: number;
+  allocatedTickets?: number;
 }
 
 interface PrizeManagementProps {
@@ -34,16 +36,20 @@ export default function PrizeManagement({
     name: '',
     description: '',
     value: 0,
+    type: 'DRAW' as 'DRAW' | 'INSTANT_WIN',
     position: 1,
-    quantity: 1
+    quantity: 1,
+    allocatedTickets: 1
   });
 
   const [editPrize, setEditPrize] = useState({
     name: '',
     description: '',
     value: 0,
+    type: 'DRAW' as 'DRAW' | 'INSTANT_WIN',
     position: 1,
-    quantity: 1
+    quantity: 1,
+    allocatedTickets: 1
   });
 
   useEffect(() => {
@@ -68,8 +74,10 @@ export default function PrizeManagement({
         name: '',
         description: '',
         value: 0,
+        type: 'DRAW',
         position: 1,
-        quantity: 1
+        quantity: 1,
+        allocatedTickets: 1
       });
       setIsAddingPrize(false);
 
@@ -132,8 +140,10 @@ export default function PrizeManagement({
       name: prize.name,
       description: prize.description,
       value: prize.value / 100, // Convert from pence to pounds for display
-      position: prize.position,
-      quantity: prize.quantity
+      type: prize.type,
+      position: prize.position || 1,
+      quantity: prize.quantity,
+      allocatedTickets: prize.allocatedTickets || 1
     });
   };
 
@@ -143,8 +153,10 @@ export default function PrizeManagement({
       name: '',
       description: '',
       value: 0,
+      type: 'DRAW',
       position: 1,
-      quantity: 1
+      quantity: 1,
+      allocatedTickets: 1
     });
   };
 
@@ -154,14 +166,21 @@ export default function PrizeManagement({
       name: '',
       description: '',
       value: 0,
+      type: 'DRAW',
       position: 1,
-      quantity: 1
+      quantity: 1,
+      allocatedTickets: 1
     });
   };
 
   const getNextPosition = () => {
-    if (prizes.length === 0) return 1;
-    return Math.max(...prizes.map(p => p.position)) + 1;
+    const drawPrizes = prizes.filter(p => p.type === 'DRAW' && p.position);
+    if (drawPrizes.length === 0) return 1;
+    return Math.max(...drawPrizes.map(p => p.position!)) + 1;
+  };
+
+  const hasDrawPrize = () => {
+    return prizes.some(p => p.type === 'DRAW');
   };
 
   return (
@@ -233,8 +252,30 @@ export default function PrizeManagement({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Position *
+                  Prize Type *
                 </label>
+                <select
+                  value={newPrize.type}
+                  onChange={(e) => setNewPrize({
+                    ...newPrize,
+                    type: e.target.value as 'DRAW' | 'INSTANT_WIN',
+                    position: e.target.value === 'DRAW' && !hasDrawPrize() ? 1 : newPrize.position,
+                    allocatedTickets: e.target.value === 'INSTANT_WIN' ? 1 : newPrize.allocatedTickets
+                  })}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={loading}
+                >
+                  <option value="DRAW" disabled={hasDrawPrize()}>
+                    Draw Prize {hasDrawPrize() ? '(Only one allowed)' : '(Main lottery prize)'}
+                  </option>
+                  <option value="INSTANT_WIN">Instant Win Prize</option>
+                </select>
+              </div>
+              {newPrize.type === 'DRAW' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Position *
+                  </label>
                 <input
                   type="number"
                   value={newPrize.position}
@@ -243,7 +284,24 @@ export default function PrizeManagement({
                   min="1"
                   disabled={loading}
                 />
-              </div>
+                </div>
+              )}
+              {newPrize.type === 'INSTANT_WIN' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Allocated Tickets *
+                  </label>
+                  <input
+                    type="number"
+                    value={newPrize.allocatedTickets}
+                    onChange={(e) => setNewPrize({ ...newPrize, allocatedTickets: parseInt(e.target.value) || 1 })}
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    min="1"
+                    disabled={loading}
+                    placeholder="Number of tickets that can win this prize"
+                  />
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Quantity
@@ -282,7 +340,13 @@ export default function PrizeManagement({
               <button
                 onClick={handleAddPrize}
                 className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                disabled={loading || !newPrize.name || newPrize.value <= 0}
+                disabled={
+                  loading ||
+                  !newPrize.name ||
+                  newPrize.value <= 0 ||
+                  (newPrize.type === 'INSTANT_WIN' && (!newPrize.allocatedTickets || newPrize.allocatedTickets <= 0)) ||
+                  (newPrize.type === 'DRAW' && hasDrawPrize())
+                }
               >
                 <Save className="h-4 w-4" />
                 Add Prize
@@ -298,7 +362,8 @@ export default function PrizeManagement({
               <div
                 key={prize.id}
                 className={`border rounded-lg p-4 ${
-                  prize.position === 1 ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200'
+                  prize.type === 'DRAW' ? 'border-yellow-400 bg-yellow-50' :
+                  prize.type === 'INSTANT_WIN' ? 'border-green-400 bg-green-50' : 'border-gray-200'
                 }`}
               >
                 {editingPrizeId === prize.id ? (
@@ -393,12 +458,20 @@ export default function PrizeManagement({
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        {prize.position === 1 && (
+                        {prize.type === 'DRAW' && (
                           <Trophy className="h-5 w-5 text-yellow-500" />
                         )}
+                        {prize.type === 'INSTANT_WIN' && (
+                          <Gift className="h-5 w-5 text-green-500" />
+                        )}
                         <h4 className="font-semibold text-gray-900">
-                          Position {prize.position}: {prize.name}
+                          {prize.type === 'DRAW' ? `Draw Prize: ${prize.name}` : `Instant Win: ${prize.name}`}
                         </h4>
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          prize.type === 'DRAW' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
+                        }`}>
+                          {prize.type === 'DRAW' ? 'Main Draw' : 'Instant Win'}
+                        </span>
                       </div>
                       {prize.description && (
                         <p className="text-sm text-gray-600 mb-2">{prize.description}</p>
@@ -407,6 +480,11 @@ export default function PrizeManagement({
                         <span className="font-medium text-green-600">
                           £{(prize.value / 100).toFixed(2)}
                         </span>
+                        {prize.type === 'INSTANT_WIN' && prize.allocatedTickets && (
+                          <span className="text-gray-600">
+                            {prize.allocatedTickets} winning tickets
+                          </span>
+                        )}
                         {prize.quantity > 1 && (
                           <span className="text-gray-600">
                             Quantity: {prize.quantity}

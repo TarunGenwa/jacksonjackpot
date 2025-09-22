@@ -55,7 +55,11 @@ export class CompetitionsService {
       include: {
         charity: true,
         prizes: {
-          orderBy: { position: 'asc' },
+          orderBy: [
+            { type: 'asc' },
+            { position: 'asc' },
+            { createdAt: 'asc' },
+          ],
         },
         tickets: {
           take: 20,
@@ -188,7 +192,11 @@ export class CompetitionsService {
       where: { id: competitionId },
       include: {
         prizes: {
-          orderBy: { position: 'asc' },
+          orderBy: [
+            { type: 'asc' }, // DRAW first, then INSTANT_WIN
+            { position: 'asc' }, // For DRAW prizes by position
+            { createdAt: 'asc' }, // For INSTANT_WIN prizes by creation order
+          ],
         },
       },
     });
@@ -206,8 +214,10 @@ export class CompetitionsService {
       name: string;
       description?: string;
       value: number;
-      position: number;
+      type: 'DRAW' | 'INSTANT_WIN';
+      position?: number;
       quantity?: number;
+      allocatedTickets?: number;
     },
   ) {
     const competition = await this.prisma.competition.findUnique({
@@ -218,14 +228,34 @@ export class CompetitionsService {
       throw new NotFoundException(`Competition with ID ${competitionId} not found`);
     }
 
+    // Validation based on prize type
+    if (prizeData.type === 'DRAW') {
+      if (!prizeData.position) {
+        throw new BadRequestException('Position is required for DRAW prizes');
+      }
+      // Check if there's already a draw prize for this competition
+      const existingDrawPrize = await this.prisma.prize.findFirst({
+        where: { competitionId, type: 'DRAW' },
+      });
+      if (existingDrawPrize) {
+        throw new BadRequestException('Competition can only have one DRAW prize');
+      }
+    } else if (prizeData.type === 'INSTANT_WIN') {
+      if (!prizeData.allocatedTickets || prizeData.allocatedTickets <= 0) {
+        throw new BadRequestException('Allocated tickets is required for INSTANT_WIN prizes and must be greater than 0');
+      }
+    }
+
     try {
       const prize = await this.prisma.prize.create({
         data: {
           name: prizeData.name,
           description: prizeData.description || '',
           value: prizeData.value,
-          position: prizeData.position,
+          type: prizeData.type,
+          position: prizeData.type === 'DRAW' ? prizeData.position : null,
           quantity: prizeData.quantity || 1,
+          allocatedTickets: prizeData.type === 'INSTANT_WIN' ? prizeData.allocatedTickets : null,
           competitionId,
         },
       });
@@ -247,8 +277,10 @@ export class CompetitionsService {
       name?: string;
       description?: string;
       value?: number;
+      type?: 'DRAW' | 'INSTANT_WIN';
       position?: number;
       quantity?: number;
+      allocatedTickets?: number;
     },
   ) {
     const prize = await this.prisma.prize.findFirst({
@@ -264,10 +296,39 @@ export class CompetitionsService {
       );
     }
 
+    // Validate type changes
+    if (prizeData.type && prizeData.type !== prize.type) {
+      if (prizeData.type === 'DRAW') {
+        // Check if there's already a draw prize for this competition
+        const existingDrawPrize = await this.prisma.prize.findFirst({
+          where: { competitionId, type: 'DRAW', id: { not: prizeId } },
+        });
+        if (existingDrawPrize) {
+          throw new BadRequestException('Competition can only have one DRAW prize');
+        }
+        if (!prizeData.position) {
+          throw new BadRequestException('Position is required for DRAW prizes');
+        }
+      } else if (prizeData.type === 'INSTANT_WIN') {
+        if (!prizeData.allocatedTickets || prizeData.allocatedTickets <= 0) {
+          throw new BadRequestException('Allocated tickets is required for INSTANT_WIN prizes and must be greater than 0');
+        }
+      }
+    }
+
     try {
+      const updateData: any = { ...prizeData };
+
+      // Handle type-specific field updates
+      if (prizeData.type === 'DRAW') {
+        updateData.allocatedTickets = null;
+      } else if (prizeData.type === 'INSTANT_WIN') {
+        updateData.position = null;
+      }
+
       const updatedPrize = await this.prisma.prize.update({
         where: { id: prizeId },
-        data: prizeData,
+        data: updateData,
       });
       return updatedPrize;
     } catch (error) {

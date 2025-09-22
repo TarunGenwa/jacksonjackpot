@@ -197,8 +197,10 @@ class AdminApiService {
     name: string;
     description?: string;
     value: number;
-    position: number;
+    type: 'DRAW' | 'INSTANT_WIN';
+    position?: number;
     quantity?: number;
+    allocatedTickets?: number;
   }) {
     const response = await fetch(
       `${API_BASE_URL}/admin/competitions/${competitionId}/prizes`,
@@ -215,8 +217,10 @@ class AdminApiService {
     name?: string;
     description?: string;
     value?: number;
+    type?: 'DRAW' | 'INSTANT_WIN';
     position?: number;
     quantity?: number;
+    allocatedTickets?: number;
   }) {
     const response = await fetch(
       `${API_BASE_URL}/admin/competitions/${competitionId}/prizes/${prizeId}`,
