@@ -11,6 +11,7 @@ import {
 import { adminApi } from '@/services/adminApi';
 import LoadingSpinner from '@/components/admin/LoadingSpinner';
 import ErrorAlert from '@/components/admin/ErrorAlert';
+import DrawManagement from '@/components/admin/DrawManagement';
 
 interface CompetitionDetail {
   id: string;
@@ -455,6 +456,16 @@ export default function CompetitionDetailPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Draw Management Section */}
+      <div className="mt-8">
+        <DrawManagement
+          competitionId={competition.id}
+          competitionStatus={competition.status}
+          drawDate={competition.drawDate}
+          onStatusUpdate={() => setRefreshKey(prev => prev + 1)}
+        />
       </div>
     </div>
   );

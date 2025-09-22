@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
   Search,
@@ -17,7 +18,8 @@ import {
   X,
   Save,
   AlertTriangle,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Eye
 } from 'lucide-react';
 import { adminApi } from '@/services/adminApi';
 import { Prize } from '@/types/admin';
@@ -57,6 +59,7 @@ interface DeleteModalData {
 }
 
 export default function CompetitionsManagement() {
+  const router = useRouter();
   const [competitions, setCompetitions] = useState<Competition[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -262,7 +265,10 @@ export default function CompetitionsManagement() {
             <div className="p-6 mt-1">
               {/* Header */}
               <div className="mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                <h3
+                  className="text-lg font-semibold text-gray-900 mb-1 cursor-pointer hover:text-blue-600 transition-colors"
+                  onClick={() => router.push(`/admin/competitions/${competition.id}`)}
+                >
                   {competition.title}
                 </h3>
                 <p className="text-sm text-gray-600">
@@ -335,6 +341,13 @@ export default function CompetitionsManagement() {
               {/* Actions */}
               <div className="flex gap-2 mt-4 pt-4 border-t">
                 <button
+                  onClick={() => router.push(`/admin/competitions/${competition.id}`)}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  <Eye className="h-4 w-4" />
+                  View
+                </button>
+                <button
                   onClick={() => openEditModal(competition)}
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
@@ -343,10 +356,10 @@ export default function CompetitionsManagement() {
                 </button>
                 <button
                   onClick={() => openDeleteModal(competition)}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  className="flex items-center justify-center gap-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  title="Delete Competition"
                 >
                   <Trash2 className="h-4 w-4" />
-                  Delete
                 </button>
               </div>
             </div>

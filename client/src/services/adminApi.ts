@@ -278,6 +278,59 @@ class AdminApiService {
     );
     return this.handleResponse(response);
   }
+
+  // Draw Management API
+  async commitDrawSeed(competitionId: string, seed: string) {
+    const response = await fetch(
+      `${API_BASE_URL}/api/draw/commit-seed`,
+      {
+        method: 'POST',
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify({ competitionId, seed }),
+      }
+    );
+    return this.handleResponse(response);
+  }
+
+  async revealDrawSeed(competitionId: string, seed: string) {
+    const response = await fetch(
+      `${API_BASE_URL}/api/draw/reveal-seed`,
+      {
+        method: 'POST',
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify({ competitionId, seed }),
+      }
+    );
+    return this.handleResponse(response);
+  }
+
+  async executeDraw(competitionId: string) {
+    const response = await fetch(
+      `${API_BASE_URL}/api/draw/execute`,
+      {
+        method: 'POST',
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify({ competitionId }),
+      }
+    );
+    return this.handleResponse(response);
+  }
+
+  async getDrawStatus(competitionId: string) {
+    const response = await fetch(
+      `${API_BASE_URL}/api/draw/status/${competitionId}`,
+      { headers: this.getAuthHeaders() }
+    );
+    return this.handleResponse(response);
+  }
+
+  async validateDrawIntegrity(competitionId: string) {
+    const response = await fetch(
+      `${API_BASE_URL}/api/draw/validate/${competitionId}`,
+      { headers: this.getAuthHeaders() }
+    );
+    return this.handleResponse(response);
+  }
 }
 
 export const adminApi = new AdminApiService();
