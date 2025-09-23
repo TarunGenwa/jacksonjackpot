@@ -8,16 +8,11 @@ import {
   Filter,
   ChevronLeft,
   ChevronRight,
-  Edit,
-  Trash2,
   Calendar,
   Users,
   Trophy,
   Plus,
   Ticket,
-  X,
-  Save,
-  AlertTriangle,
   Image as ImageIcon,
   Eye
 } from 'lucide-react';
@@ -48,16 +43,7 @@ interface Competition {
   };
 }
 
-interface EditModalData {
-  competition: Competition | null;
-  isOpen: boolean;
-}
 
-interface DeleteModalData {
-  competitionId: string | null;
-  competitionTitle: string;
-  isOpen: boolean;
-}
 
 export default function CompetitionsManagement() {
   const router = useRouter();
@@ -69,10 +55,6 @@ export default function CompetitionsManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCompetitions, setTotalCompetitions] = useState(0);
-  const [editModal, setEditModal] = useState<EditModalData>({ competition: null, isOpen: false });
-  const [deleteModal, setDeleteModal] = useState<DeleteModalData>({ competitionId: null, competitionTitle: '', isOpen: false });
-  const [editFormData, setEditFormData] = useState<Partial<Competition>>({});
-  const [savingEdit, setSavingEdit] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [showNewCompetitionModal, setShowNewCompetitionModal] = useState(false);
   const itemsPerPage = 12;
@@ -103,72 +85,6 @@ export default function CompetitionsManagement() {
     fetchCompetitions();
   }, [currentPage, searchTerm, statusFilter, refreshKey]);
 
-  const handleDeleteCompetition = async () => {
-    if (!deleteModal.competitionId) return;
-
-    try {
-      await adminApi.deleteCompetition(deleteModal.competitionId);
-      setDeleteModal({ competitionId: null, competitionTitle: '', isOpen: false });
-      setRefreshKey(prev => prev + 1);
-    } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to delete competition');
-    }
-  };
-
-  const openEditModal = (competition: Competition) => {
-    setEditFormData({
-      title: competition.title,
-      description: competition.description,
-      imageUrl: competition.imageUrl || '',
-      status: competition.status,
-      ticketPrice: competition.ticketPrice,
-      maxTickets: competition.maxTickets,
-      startDate: competition.startDate.split('T')[0],
-      endDate: competition.endDate.split('T')[0],
-      drawDate: competition.drawDate.split('T')[0]
-    });
-    setEditModal({ competition, isOpen: true });
-  };
-
-  const closeEditModal = () => {
-    setEditModal({ competition: null, isOpen: false });
-    setEditFormData({});
-  };
-
-  const handleSaveEdit = async () => {
-    if (!editModal.competition) return;
-
-    setSavingEdit(true);
-    try {
-      // Convert date strings to ISO-8601 format
-      const formattedData = {
-        ...editFormData,
-        startDate: editFormData.startDate ? new Date(editFormData.startDate + 'T00:00:00Z').toISOString() : undefined,
-        endDate: editFormData.endDate ? new Date(editFormData.endDate + 'T00:00:00Z').toISOString() : undefined,
-        drawDate: editFormData.drawDate ? new Date(editFormData.drawDate + 'T00:00:00Z').toISOString() : undefined
-      };
-
-      await adminApi.updateCompetition(editModal.competition.id, formattedData);
-      setRefreshKey(prev => prev + 1);
-      closeEditModal();
-    } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to update competition');
-    } finally {
-      setSavingEdit(false);
-    }
-  };
-
-  const openDeleteModal = (competition: Competition) => {
-    setDeleteModal({
-      competitionId: competition.id,
-      competitionTitle: competition.title,
-      isOpen: true
-    });
-  };
-
-  const closeDeleteModal = () => {
-    setDeleteModal({ competitionId: null, competitionTitle: '', isOpen: false });
-  };
 
   const handleNewCompetitionSuccess = () => {
     setRefreshKey(prev => prev + 1);
@@ -220,14 +136,14 @@ export default function CompetitionsManagement() {
               placeholder="Search competitions..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full pl-10 pr-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
             />
           </div>
 
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
           >
             <option value="">All Status</option>
             <option value="DRAFT">Draft</option>
@@ -357,20 +273,6 @@ export default function CompetitionsManagement() {
                   <Eye className="h-4 w-4" />
                   View
                 </button>
-                <button
-                  onClick={() => openEditModal(competition)}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  <Edit className="h-4 w-4" />
-                  Edit
-                </button>
-                <button
-                  onClick={() => openDeleteModal(competition)}
-                  className="flex items-center justify-center gap-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                  title="Delete Competition"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
               </div>
             </div>
           </div>
@@ -404,220 +306,7 @@ export default function CompetitionsManagement() {
           </div>
         </div>
 
-      {/* Edit Modal */}
-      {editModal.isOpen && editModal.competition && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Edit Competition</h2>
-                <button
-                  onClick={closeEditModal}
-                  className="p-2 hover:bg-gray-100 rounded-lg"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
 
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Title
-                  </label>
-                  <input
-                    type="text"
-                    value={editFormData.title || ''}
-                    onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Description
-                  </label>
-                  <textarea
-                    value={editFormData.description || ''}
-                    onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
-                    rows={3}
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Image URL
-                  </label>
-                  <input
-                    type="url"
-                    value={editFormData.imageUrl || ''}
-                    onChange={(e) => setEditFormData({ ...editFormData, imageUrl: e.target.value })}
-                    placeholder="https://example.com/image.jpg"
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                  {editFormData.imageUrl && (
-                    <div className="mt-2">
-                      <Image
-                        src={editFormData.imageUrl}
-                        alt="Competition preview"
-                        width={400}
-                        height={128}
-                        className="w-full h-32 object-cover rounded-lg"
-                      />
-                    </div>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Status
-                    </label>
-                    <select
-                      value={editFormData.status || ''}
-                      onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value })}
-                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                    >
-                      <option value="DRAFT">Draft</option>
-                      <option value="UPCOMING">Upcoming</option>
-                      <option value="ACTIVE">Active</option>
-                      <option value="SOLD_OUT">Sold Out</option>
-                      <option value="COMPLETED">Completed</option>
-                      <option value="CANCELLED">Cancelled</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Ticket Price (£)
-                    </label>
-                    <input
-                      type="number"
-                      value={(editFormData.ticketPrice || 0) / 100}
-                      onChange={(e) => setEditFormData({ ...editFormData, ticketPrice: parseFloat(e.target.value) * 100 })}
-                      step="0.01"
-                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Max Tickets
-                  </label>
-                  <input
-                    type="number"
-                    value={editFormData.maxTickets || ''}
-                    onChange={(e) => setEditFormData({ ...editFormData, maxTickets: parseInt(e.target.value) })}
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                </div>
-
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Start Date
-                    </label>
-                    <input
-                      type="date"
-                      value={editFormData.startDate || ''}
-                      onChange={(e) => setEditFormData({ ...editFormData, startDate: e.target.value })}
-                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      End Date
-                    </label>
-                    <input
-                      type="date"
-                      value={editFormData.endDate || ''}
-                      onChange={(e) => setEditFormData({ ...editFormData, endDate: e.target.value })}
-                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Draw Date
-                    </label>
-                    <input
-                      type="date"
-                      value={editFormData.drawDate || ''}
-                      onChange={(e) => setEditFormData({ ...editFormData, drawDate: e.target.value })}
-                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex gap-3 mt-6 pt-6 border-t">
-                <button
-                  onClick={handleSaveEdit}
-                  disabled={savingEdit}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50"
-                >
-                  <Save className="h-4 w-4" />
-                  {savingEdit ? 'Saving...' : 'Save Changes'}
-                </button>
-                <button
-                  onClick={closeEditModal}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {deleteModal.isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full">
-            <div className="p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                  <AlertTriangle className="h-6 w-6 text-red-600" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Delete Competition
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    This action cannot be undone
-                  </p>
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <p className="text-gray-700">
-                  Are you sure you want to delete the competition
-                  <span className="font-semibold">&ldquo;{deleteModal.competitionTitle}&rdquo;</span>?
-                  This will permanently remove all associated data including tickets and winners.
-                </p>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={handleDeleteCompetition}
-                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                >
-                  Delete Competition
-                </button>
-                <button
-                  onClick={closeDeleteModal}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* New Competition Modal */}
       <NewCompetitionModal

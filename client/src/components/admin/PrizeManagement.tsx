@@ -230,7 +230,7 @@ export default function PrizeManagement({
                   type="text"
                   value={newPrize.name}
                   onChange={(e) => setNewPrize({ ...newPrize, name: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                   placeholder="e.g., First Prize"
                   disabled={loading}
                 />
@@ -243,7 +243,7 @@ export default function PrizeManagement({
                   type="number"
                   value={newPrize.value}
                   onChange={(e) => setNewPrize({ ...newPrize, value: parseFloat(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                   placeholder="0.00"
                   step="0.01"
                   min="0"
@@ -262,7 +262,7 @@ export default function PrizeManagement({
                     position: e.target.value === 'DRAW' && !hasDrawPrize() ? 1 : newPrize.position,
                     allocatedTickets: e.target.value === 'INSTANT_WIN' ? 1 : newPrize.allocatedTickets
                   })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                   disabled={loading}
                 >
                   <option value="DRAW" disabled={hasDrawPrize()}>
@@ -280,7 +280,7 @@ export default function PrizeManagement({
                   type="number"
                   value={newPrize.position}
                   onChange={(e) => setNewPrize({ ...newPrize, position: parseInt(e.target.value) || 1 })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                   min="1"
                   disabled={loading}
                 />
@@ -295,7 +295,7 @@ export default function PrizeManagement({
                     type="number"
                     value={newPrize.allocatedTickets}
                     onChange={(e) => setNewPrize({ ...newPrize, allocatedTickets: parseInt(e.target.value) || 1 })}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                     min="1"
                     disabled={loading}
                     placeholder="Number of tickets that can win this prize"
@@ -310,7 +310,7 @@ export default function PrizeManagement({
                   type="number"
                   value={newPrize.quantity}
                   onChange={(e) => setNewPrize({ ...newPrize, quantity: parseInt(e.target.value) || 1 })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                   min="1"
                   disabled={loading}
                 />
@@ -322,7 +322,7 @@ export default function PrizeManagement({
                 <textarea
                   value={newPrize.description}
                   onChange={(e) => setNewPrize({ ...newPrize, description: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                   rows={2}
                   placeholder="Prize description..."
                   disabled={loading}
@@ -332,7 +332,7 @@ export default function PrizeManagement({
             <div className="flex justify-end gap-2 mt-4">
               <button
                 onClick={cancelAdd}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border-2 border-gray-400 rounded-lg hover:bg-gray-50 transition-colors"
                 disabled={loading}
               >
                 <X className="h-4 w-4" />
@@ -378,7 +378,7 @@ export default function PrizeManagement({
                           type="text"
                           value={editPrize.name}
                           onChange={(e) => setEditPrize({ ...editPrize, name: e.target.value })}
-                          className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                           disabled={loading}
                         />
                       </div>
@@ -390,7 +390,7 @@ export default function PrizeManagement({
                           type="number"
                           value={editPrize.value}
                           onChange={(e) => setEditPrize({ ...editPrize, value: parseFloat(e.target.value) || 0 })}
-                          className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                           step="0.01"
                           min="0"
                           disabled={loading}
@@ -404,7 +404,7 @@ export default function PrizeManagement({
                           type="number"
                           value={editPrize.position}
                           onChange={(e) => setEditPrize({ ...editPrize, position: parseInt(e.target.value) || 1 })}
-                          className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                           min="1"
                           disabled={loading}
                         />
@@ -417,7 +417,7 @@ export default function PrizeManagement({
                           type="number"
                           value={editPrize.quantity}
                           onChange={(e) => setEditPrize({ ...editPrize, quantity: parseInt(e.target.value) || 1 })}
-                          className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                           min="1"
                           disabled={loading}
                         />
@@ -429,7 +429,7 @@ export default function PrizeManagement({
                         <textarea
                           value={editPrize.description}
                           onChange={(e) => setEditPrize({ ...editPrize, description: e.target.value })}
-                          className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                           rows={2}
                           disabled={loading}
                         />
@@ -438,7 +438,7 @@ export default function PrizeManagement({
                     <div className="flex justify-end gap-2">
                       <button
                         onClick={cancelEdit}
-                        className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                        className="px-4 py-2 border-2 border-gray-400 rounded-lg hover:bg-gray-50 transition-colors"
                         disabled={loading}
                       >
                         Cancel

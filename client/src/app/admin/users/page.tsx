@@ -126,14 +126,14 @@ export default function UsersManagement() {
               placeholder="Search users..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full pl-10 pr-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
             />
           </div>
 
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
           >
             <option value="">All Roles</option>
             <option value="USER">User</option>
@@ -144,7 +144,7 @@ export default function UsersManagement() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
           >
             <option value="">All Status</option>
             <option value="true">Active</option>
@@ -200,7 +200,7 @@ export default function UsersManagement() {
                     <select
                       value={user.role}
                       onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                      className="text-sm border rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary"
+                      className="text-sm border-2 border-gray-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                     >
                       <option value="USER">User</option>
                       <option value="ADMIN">Admin</option>

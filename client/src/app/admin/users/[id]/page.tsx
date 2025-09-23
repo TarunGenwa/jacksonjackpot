@@ -145,7 +145,7 @@ export default function UserDetailPage() {
             <>
               <button
                 onClick={handleCancel}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="flex items-center gap-2 px-4 py-2 border-2 border-gray-400 rounded-lg hover:bg-gray-50"
               >
                 <X className="h-4 w-4" />
                 Cancel
@@ -186,7 +186,7 @@ export default function UserDetailPage() {
                     type="text"
                     value={formData.firstName}
                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                   />
                 ) : (
                   <p className="text-gray-900">{user.firstName || 'Not provided'}</p>
@@ -202,7 +202,7 @@ export default function UserDetailPage() {
                     type="text"
                     value={formData.lastName}
                     onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                   />
                 ) : (
                   <p className="text-gray-900">{user.lastName || 'Not provided'}</p>
@@ -218,7 +218,7 @@ export default function UserDetailPage() {
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                   />
                 ) : (
                   <p className="text-gray-900">{user.email}</p>
@@ -234,7 +234,7 @@ export default function UserDetailPage() {
                     type="text"
                     value={formData.username}
                     onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                   />
                 ) : (
                   <p className="text-gray-900">{user.username}</p>
@@ -249,7 +249,7 @@ export default function UserDetailPage() {
                   <select
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value as 'USER' | 'ADMIN' | 'MODERATOR' })}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                   >
                     <option value="USER">User</option>
                     <option value="ADMIN">Admin</option>
@@ -274,7 +274,7 @@ export default function UserDetailPage() {
                   <select
                     value={formData.isActive.toString()}
                     onChange={(e) => setFormData({ ...formData, isActive: e.target.value === 'true' })}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                   >
                     <option value="true">Active</option>
                     <option value="false">Inactive</option>

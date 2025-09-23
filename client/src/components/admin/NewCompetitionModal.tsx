@@ -3,12 +3,35 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import {
-  X,
   Save,
-  AlertTriangle,
   Check,
   Trophy
 } from 'lucide-react';
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  FormControl,
+  FormLabel,
+  Input,
+  Textarea,
+  Select,
+  NumberInput,
+  NumberInputField,
+  Button,
+  Alert,
+  AlertIcon,
+  VStack,
+  HStack,
+  Grid,
+  GridItem,
+  Box,
+  Text,
+  Icon
+} from '@chakra-ui/react';
 import { adminApi } from '@/services/adminApi';
 import { CompetitionCreateData } from '@/types/admin';
 
@@ -154,264 +177,254 @@ export default function NewCompetitionModal({
     }
   };
 
-  const selectedCharity = charities.find(c => c.id === formData.charityId);
-
-  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          {/* Header */}
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">
-              {showSuccess ? 'Competition Created!' : 'Create New Competition'}
-            </h2>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
+    <Modal isOpen={isOpen} onClose={onClose} size="2xl" scrollBehavior="inside">
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>
+          {showSuccess ? 'Competition Created!' : 'Create New Competition'}
+        </ModalHeader>
+        <ModalCloseButton />
+        <ModalBody pb={6}>
 
           {/* Success Content */}
           {showSuccess && createdCompetitionId ? (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Check className="h-8 w-8 text-green-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <VStack spacing={6} textAlign="center" py={8}>
+              <Box
+                w={16}
+                h={16}
+                bg="green.100"
+                borderRadius="full"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Icon as={Check} w={8} h={8} color="green.600" />
+              </Box>
+              <Text fontSize="xl" fontWeight="semibold" color="gray.900">
                 Competition Created Successfully!
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Your competition "{formData.title}" has been created and is ready for configuration.
-              </p>
-              <div className="flex gap-3">
-                <button
+              </Text>
+              <Text color="gray.600">
+                Your competition &quot;{formData.title}&quot; has been created and is ready for configuration.
+              </Text>
+              <HStack spacing={3} w="full">
+                <Button
+                  variant="outline"
                   onClick={onClose}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  flex={1}
                 >
                   Close
-                </button>
-                <a
+                </Button>
+                <Button
+                  as="a"
                   href={`/admin/competitions/${createdCompetitionId}`}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
                   onClick={onClose}
+                  colorScheme="blue"
+                  leftIcon={<Icon as={Trophy} />}
+                  flex={1}
                 >
-                  <Trophy className="h-4 w-4" />
                   Add Prizes
-                </a>
-              </div>
-            </div>
+                </Button>
+              </HStack>
+            </VStack>
           ) : (
             /* Form Content */
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Title
-                </label>
-                <input
-                  type="text"
+            <VStack spacing={4}>
+              <FormControl isInvalid={!!errors.title}>
+                <FormLabel>Title</FormLabel>
+                <Input
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 />
                 {errors.title && (
-                  <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+                  <Text color="red.500" fontSize="sm" mt={1}>{errors.title}</Text>
                 )}
-              </div>
+              </FormControl>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
-                </label>
-                <textarea
+              <FormControl isInvalid={!!errors.description}>
+                <FormLabel>Description</FormLabel>
+                <Textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 />
                 {errors.description && (
-                  <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+                  <Text color="red.500" fontSize="sm" mt={1}>{errors.description}</Text>
                 )}
-              </div>
+              </FormControl>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Image URL
-                </label>
-                <input
+              <FormControl>
+                <FormLabel>Image URL</FormLabel>
+                <Input
                   type="url"
                   value={formData.imageUrl || ''}
                   onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                   placeholder="https://example.com/image.jpg"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 />
                 {formData.imageUrl && (
-                  <div className="mt-2">
+                  <Box mt={2}>
                     <Image
                       src={formData.imageUrl}
                       alt="Competition preview"
                       width={400}
                       height={128}
-                      className="w-full h-32 object-cover rounded-lg"
+                      style={{ width: '100%', height: '8rem', objectFit: 'cover', borderRadius: '0.5rem' }}
                     />
-                  </div>
+                  </Box>
                 )}
-              </div>
+              </FormControl>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Charity
-                </label>
+              <FormControl isInvalid={!!errors.charityId}>
+                <FormLabel>Charity</FormLabel>
                 {charityLoading ? (
-                  <div className="flex items-center justify-center py-4">
-                    <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-primary"></div>
-                  </div>
+                  <Box display="flex" alignItems="center" justifyContent="center" py={4}>
+                    <Box
+                      className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-primary"
+                    />
+                  </Box>
                 ) : (
-                  <select
+                  <Select
                     value={formData.charityId}
                     onChange={(e) => setFormData({ ...formData, charityId: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder="Select a charity..."
                   >
-                    <option value="">Select a charity...</option>
                     {charities.map((charity) => (
                       <option key={charity.id} value={charity.id}>
                         {charity.name} {charity.isVerified ? '✓' : ''}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 )}
                 {errors.charityId && (
-                  <p className="text-red-500 text-sm mt-1">{errors.charityId}</p>
+                  <Text color="red.500" fontSize="sm" mt={1}>{errors.charityId}</Text>
                 )}
-              </div>
+              </FormControl>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Status
-                  </label>
-                  <select
-                    value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  >
-                    <option value="DRAFT">Draft</option>
-                    <option value="UPCOMING">Upcoming</option>
-                    <option value="ACTIVE">Active</option>
-                  </select>
-                </div>
+              <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+                <GridItem>
+                  <FormControl>
+                    <FormLabel>Status</FormLabel>
+                    <Select
+                      value={formData.status}
+                      onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                    >
+                      <option value="DRAFT">Draft</option>
+                      <option value="UPCOMING">Upcoming</option>
+                      <option value="ACTIVE">Active</option>
+                    </Select>
+                  </FormControl>
+                </GridItem>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Ticket Price (£)
-                  </label>
-                  <input
-                    type="number"
-                    value={formData.ticketPrice / 100}
-                    onChange={(e) => setFormData({ ...formData, ticketPrice: parseFloat(e.target.value) * 100 })}
-                    step="0.01"
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                  {errors.ticketPrice && (
-                    <p className="text-red-500 text-sm mt-1">{errors.ticketPrice}</p>
-                  )}
-                </div>
-              </div>
+                <GridItem>
+                  <FormControl isInvalid={!!errors.ticketPrice}>
+                    <FormLabel>Ticket Price (£)</FormLabel>
+                    <NumberInput
+                      value={formData.ticketPrice / 100}
+                      onChange={(valueString) => setFormData({ ...formData, ticketPrice: parseFloat(valueString) * 100 })}
+                      step={0.01}
+                      precision={2}
+                    >
+                      <NumberInputField />
+                    </NumberInput>
+                    {errors.ticketPrice && (
+                      <Text color="red.500" fontSize="sm" mt={1}>{errors.ticketPrice}</Text>
+                    )}
+                  </FormControl>
+                </GridItem>
+              </Grid>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Max Tickets
-                </label>
-                <input
-                  type="number"
+              <FormControl isInvalid={!!errors.maxTickets}>
+                <FormLabel>Max Tickets</FormLabel>
+                <NumberInput
                   value={formData.maxTickets}
-                  onChange={(e) => setFormData({ ...formData, maxTickets: parseInt(e.target.value) })}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                />
+                  onChange={(valueString) => setFormData({ ...formData, maxTickets: parseInt(valueString) })}
+                >
+                  <NumberInputField />
+                </NumberInput>
                 {errors.maxTickets && (
-                  <p className="text-red-500 text-sm mt-1">{errors.maxTickets}</p>
+                  <Text color="red.500" fontSize="sm" mt={1}>{errors.maxTickets}</Text>
                 )}
-              </div>
+              </FormControl>
 
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Start Date
-                  </label>
-                  <input
-                    type="date"
-                    value={formData.startDate}
-                    onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                  {errors.startDate && (
-                    <p className="text-red-500 text-sm mt-1">{errors.startDate}</p>
-                  )}
-                </div>
+              <Grid templateColumns="repeat(3, 1fr)" gap={4}>
+                <GridItem>
+                  <FormControl isInvalid={!!errors.startDate}>
+                    <FormLabel>Start Date</FormLabel>
+                    <Input
+                      type="date"
+                      value={formData.startDate}
+                      onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                    />
+                    {errors.startDate && (
+                      <Text color="red.500" fontSize="sm" mt={1}>{errors.startDate}</Text>
+                    )}
+                  </FormControl>
+                </GridItem>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    End Date
-                  </label>
-                  <input
-                    type="date"
-                    value={formData.endDate}
-                    onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                  {errors.endDate && (
-                    <p className="text-red-500 text-sm mt-1">{errors.endDate}</p>
-                  )}
-                </div>
+                <GridItem>
+                  <FormControl isInvalid={!!errors.endDate}>
+                    <FormLabel>End Date</FormLabel>
+                    <Input
+                      type="date"
+                      value={formData.endDate}
+                      onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                    />
+                    {errors.endDate && (
+                      <Text color="red.500" fontSize="sm" mt={1}>{errors.endDate}</Text>
+                    )}
+                  </FormControl>
+                </GridItem>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Draw Date
-                  </label>
-                  <input
-                    type="date"
-                    value={formData.drawDate}
-                    onChange={(e) => setFormData({ ...formData, drawDate: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                  {errors.drawDate && (
-                    <p className="text-red-500 text-sm mt-1">{errors.drawDate}</p>
-                  )}
-                </div>
-              </div>
+                <GridItem>
+                  <FormControl isInvalid={!!errors.drawDate}>
+                    <FormLabel>Draw Date</FormLabel>
+                    <Input
+                      type="date"
+                      value={formData.drawDate}
+                      onChange={(e) => setFormData({ ...formData, drawDate: e.target.value })}
+                    />
+                    {errors.drawDate && (
+                      <Text color="red.500" fontSize="sm" mt={1}>{errors.drawDate}</Text>
+                    )}
+                  </FormControl>
+                </GridItem>
+              </Grid>
 
               {/* Error Message */}
               {errors.submit && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
-                  <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
-                  <p className="text-red-700">{errors.submit}</p>
-                </div>
+                <Alert status="error">
+                  <AlertIcon />
+                  {errors.submit}
+                </Alert>
               )}
 
               {/* Actions */}
-              <div className="flex gap-3 mt-6 pt-6 border-t">
-                <button
-                  onClick={handleSubmit}
-                  disabled={loading}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50"
-                >
-                  <Save className="h-4 w-4" />
-                  {loading ? 'Creating...' : 'Create Competition'}
-                </button>
-                <button
-                  onClick={onClose}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
+              <Box borderTop="1px" borderColor="gray.200" pt={6} mt={6}>
+                <HStack spacing={3}>
+                  <Button
+                    onClick={handleSubmit}
+                    isLoading={loading}
+                    loadingText="Creating..."
+                    colorScheme="blue"
+                    leftIcon={<Icon as={Save} />}
+                    flex={1}
+                  >
+                    Create Competition
+                  </Button>
+                  <Button
+                    onClick={onClose}
+                    variant="outline"
+                    flex={1}
+                  >
+                    Cancel
+                  </Button>
+                </HStack>
+              </Box>
+            </VStack>
           )}
-        </div>
-      </div>
-    </div>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
 }

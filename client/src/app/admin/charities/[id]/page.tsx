@@ -182,7 +182,7 @@ export default function CharityDetailPage() {
             <>
               <button
                 onClick={handleCancel}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="flex items-center gap-2 px-4 py-2 border-2 border-gray-400 rounded-lg hover:bg-gray-50"
               >
                 <X className="h-4 w-4" />
                 Cancel
@@ -246,7 +246,7 @@ export default function CharityDetailPage() {
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                   />
                 ) : (
                   <p className="text-gray-900">{charity.name}</p>
@@ -262,7 +262,7 @@ export default function CharityDetailPage() {
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={4}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                   />
                 ) : (
                   <p className="text-gray-900">{charity.description}</p>
@@ -279,7 +279,7 @@ export default function CharityDetailPage() {
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                     />
                   ) : (
                     <p className="text-gray-900">{charity.email}</p>
@@ -295,7 +295,7 @@ export default function CharityDetailPage() {
                       type="url"
                       value={formData.website}
                       onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                     />
                   ) : (
                     <p className="text-gray-900">{charity.website || 'Not provided'}</p>
@@ -311,7 +311,7 @@ export default function CharityDetailPage() {
                       type="text"
                       value={formData.taxId}
                       onChange={(e) => setFormData({ ...formData, taxId: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                     />
                   ) : (
                     <p className="text-gray-900">{charity.taxId || 'Not provided'}</p>
@@ -326,7 +326,7 @@ export default function CharityDetailPage() {
                     <select
                       value={formData.isActive.toString()}
                       onChange={(e) => setFormData({ ...formData, isActive: e.target.value === 'true' })}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                     >
                       <option value="true">Active</option>
                       <option value="false">Inactive</option>
@@ -368,7 +368,7 @@ export default function CharityDetailPage() {
                     type="text"
                     value={formData.bankAccountName}
                     onChange={(e) => setFormData({ ...formData, bankAccountName: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                   />
                 ) : (
                   <p className="text-gray-900">{charity.bankAccountName || 'Not provided'}</p>
@@ -384,7 +384,7 @@ export default function CharityDetailPage() {
                     type="text"
                     value={formData.bankAccountNumber}
                     onChange={(e) => setFormData({ ...formData, bankAccountNumber: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                   />
                 ) : (
                   <p className="text-gray-900">{charity.bankAccountNumber || 'Not provided'}</p>
@@ -400,7 +400,7 @@ export default function CharityDetailPage() {
                     type="text"
                     value={formData.bankSortCode}
                     onChange={(e) => setFormData({ ...formData, bankSortCode: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                   />
                 ) : (
                   <p className="text-gray-900">{charity.bankSortCode || 'Not provided'}</p>

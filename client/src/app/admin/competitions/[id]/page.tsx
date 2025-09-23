@@ -6,7 +6,9 @@ import {
   ArrowLeft,
   Edit2,
   Save,
-  X
+  X,
+  Trash2,
+  AlertTriangle
 } from 'lucide-react';
 import { adminApi } from '@/services/adminApi';
 import LoadingSpinner from '@/components/admin/LoadingSpinner';
@@ -93,6 +95,7 @@ export default function CompetitionDetailPage() {
     endDate: '',
     drawDate: '',
   });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     const fetchCompetition = async () => {
@@ -161,6 +164,18 @@ export default function CompetitionDetailPage() {
     setEditing(false);
   };
 
+  const handleDelete = async () => {
+    if (!competition) return;
+
+    try {
+      await adminApi.deleteCompetition(competition.id);
+      router.push('/admin/competitions');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete competition');
+      setShowDeleteModal(false);
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'ACTIVE': return 'bg-green-100 text-green-800';
@@ -210,7 +225,7 @@ export default function CompetitionDetailPage() {
             <>
               <button
                 onClick={handleCancel}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="flex items-center gap-2 px-4 py-2 border-2 border-gray-400 rounded-lg hover:bg-gray-50"
               >
                 <X className="h-4 w-4" />
                 Cancel
@@ -224,13 +239,22 @@ export default function CompetitionDetailPage() {
               </button>
             </>
           ) : (
-            <button
-              onClick={() => setEditing(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
-              <Edit2 className="h-4 w-4" />
-              Edit Competition
-            </button>
+            <>
+              <button
+                onClick={() => setShowDeleteModal(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                <Trash2 className="h-4 w-4" />
+                Delete Competition
+              </button>
+              <button
+                onClick={() => setEditing(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                <Edit2 className="h-4 w-4" />
+                Edit Competition
+              </button>
+            </>
           )}
         </div>
       </div>
@@ -252,7 +276,7 @@ export default function CompetitionDetailPage() {
                     type="text"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                   />
                 ) : (
                   <p className="text-gray-900">{competition.title}</p>
@@ -268,7 +292,7 @@ export default function CompetitionDetailPage() {
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={4}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                   />
                 ) : (
                   <p className="text-gray-900">{competition.description}</p>
@@ -284,7 +308,7 @@ export default function CompetitionDetailPage() {
                     <select
                       value={formData.status}
                       onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                     >
                       <option value="DRAFT">Draft</option>
                       <option value="UPCOMING">Upcoming</option>
@@ -316,7 +340,7 @@ export default function CompetitionDetailPage() {
                       type="number"
                       value={formData.ticketPrice}
                       onChange={(e) => setFormData({ ...formData, ticketPrice: Number(e.target.value) })}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                     />
                   ) : (
                     <p className="text-gray-900">£{(competition.ticketPrice / 100).toFixed(2)}</p>
@@ -332,7 +356,7 @@ export default function CompetitionDetailPage() {
                       type="number"
                       value={formData.maxTickets}
                       onChange={(e) => setFormData({ ...formData, maxTickets: Number(e.target.value) })}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                     />
                   ) : (
                     <p className="text-gray-900">{competition.maxTickets}</p>
@@ -348,7 +372,7 @@ export default function CompetitionDetailPage() {
                       type="date"
                       value={formData.startDate}
                       onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                     />
                   ) : (
                     <p className="text-gray-900">{new Date(competition.startDate).toLocaleDateString()}</p>
@@ -364,7 +388,7 @@ export default function CompetitionDetailPage() {
                       type="date"
                       value={formData.endDate}
                       onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                     />
                   ) : (
                     <p className="text-gray-900">{new Date(competition.endDate).toLocaleDateString()}</p>
@@ -380,7 +404,7 @@ export default function CompetitionDetailPage() {
                       type="date"
                       value={formData.drawDate}
                       onChange={(e) => setFormData({ ...formData, drawDate: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                     />
                   ) : (
                     <p className="text-gray-900">{new Date(competition.drawDate).toLocaleDateString()}</p>
@@ -461,6 +485,52 @@ export default function CompetitionDetailPage() {
           onStatusUpdate={() => setRefreshKey(prev => prev + 1)}
         />
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="h-6 w-6 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Delete Competition
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    This action cannot be undone
+                  </p>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-gray-700">
+                  Are you sure you want to delete the competition
+                  <span className="font-semibold"> &quot;{competition.title}&quot;</span>?
+                  This will permanently remove all associated data including tickets and winners.
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={handleDelete}
+                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                >
+                  Delete Competition
+                </button>
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

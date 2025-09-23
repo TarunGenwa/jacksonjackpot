@@ -133,14 +133,14 @@ export default function CharitiesManagement() {
               placeholder="Search charities..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full pl-10 pr-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
             />
           </div>
 
           <select
             value={verifiedFilter}
             onChange={(e) => setVerifiedFilter(e.target.value)}
-            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
           >
             <option value="">All Verification</option>
             <option value="true">Verified</option>
@@ -150,7 +150,7 @@ export default function CharitiesManagement() {
           <select
             value={activeFilter}
             onChange={(e) => setActiveFilter(e.target.value)}
-            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
           >
             <option value="">All Status</option>
             <option value="true">Active</option>

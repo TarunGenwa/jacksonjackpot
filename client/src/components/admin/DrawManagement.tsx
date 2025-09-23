@@ -294,7 +294,7 @@ export default function DrawManagement({
                               value={seedInput}
                               onChange={(e) => setSeedInput(e.target.value)}
                               placeholder="Enter or generate a seed"
-                              className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              className="flex-1 px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                             />
                             <button
                               onClick={generateRandomSeed}
@@ -333,7 +333,7 @@ export default function DrawManagement({
                               setSeedInput('');
                               setGeneratedSeed('');
                             }}
-                            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                            className="px-4 py-2 border-2 border-gray-400 text-gray-700 rounded-lg hover:bg-gray-50"
                           >
                             Cancel
                           </button>
@@ -375,7 +375,7 @@ export default function DrawManagement({
                           value={seedInput}
                           onChange={(e) => setSeedInput(e.target.value)}
                           placeholder="Enter the original seed"
-                          className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                         />
                       </div>
                     )}
@@ -398,7 +398,7 @@ export default function DrawManagement({
                               setShowSeedInput(false);
                               setSeedInput('');
                             }}
-                            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                            className="px-4 py-2 border-2 border-gray-400 text-gray-700 rounded-lg hover:bg-gray-50"
                           >
                             Cancel
                           </button>
