@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { adminApi } from '@/services/adminApi';
 import { Prize } from '@/types/admin';
+import NewCompetitionModal from '@/components/admin/NewCompetitionModal';
 
 interface Competition {
   id: string;
@@ -73,6 +74,7 @@ export default function CompetitionsManagement() {
   const [editFormData, setEditFormData] = useState<Partial<Competition>>({});
   const [savingEdit, setSavingEdit] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [showNewCompetitionModal, setShowNewCompetitionModal] = useState(false);
   const itemsPerPage = 12;
 
   useEffect(() => {
@@ -168,6 +170,11 @@ export default function CompetitionsManagement() {
     setDeleteModal({ competitionId: null, competitionTitle: '', isOpen: false });
   };
 
+  const handleNewCompetitionSuccess = () => {
+    setRefreshKey(prev => prev + 1);
+    setShowNewCompetitionModal(false);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'ACTIVE': return 'bg-green-100 text-green-800';
@@ -194,7 +201,10 @@ export default function CompetitionsManagement() {
           <h1 className="text-3xl font-bold text-gray-800">Competition Management</h1>
           <p className="text-gray-600 mt-2">Manage lottery competitions</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90">
+        <button
+          onClick={() => setShowNewCompetitionModal(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+        >
           <Plus className="h-4 w-4" />
           New Competition
         </button>
@@ -608,6 +618,13 @@ export default function CompetitionsManagement() {
           </div>
         </div>
       )}
+
+      {/* New Competition Modal */}
+      <NewCompetitionModal
+        isOpen={showNewCompetitionModal}
+        onClose={() => setShowNewCompetitionModal(false)}
+        onSuccess={handleNewCompetitionSuccess}
+      />
     </div>
   );
 }

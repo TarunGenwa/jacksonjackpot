@@ -86,6 +86,19 @@ export interface CompetitionUpdateData {
   charityId?: string;
 }
 
+export interface CompetitionCreateData {
+  title: string;
+  description: string;
+  imageUrl?: string;
+  ticketPrice: number;
+  maxTickets: number;
+  startDate: string;
+  endDate: string;
+  drawDate: string;
+  charityId: string;
+  status?: string;
+}
+
 export interface CharityUpdateData {
   name?: string;
   description?: string;

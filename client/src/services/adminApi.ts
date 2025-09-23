@@ -1,4 +1,4 @@
-import { UserUpdateData, CompetitionUpdateData, CharityUpdateData } from '@/types/admin';
+import { UserUpdateData, CompetitionUpdateData, CompetitionCreateData, CharityUpdateData } from '@/types/admin';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
@@ -145,6 +145,18 @@ class AdminApiService {
     const response = await fetch(
       `${API_BASE_URL}/admin/competitions/${id}`,
       { headers: this.getAuthHeaders() }
+    );
+    return this.handleResponse(response);
+  }
+
+  async createCompetition(data: CompetitionCreateData) {
+    const response = await fetch(
+      `${API_BASE_URL}/admin/competitions`,
+      {
+        method: 'POST',
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify(data),
+      }
     );
     return this.handleResponse(response);
   }
