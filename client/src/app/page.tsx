@@ -29,8 +29,10 @@ import { FaTrophy, FaHeart, FaShieldAlt, FaInfoCircle, FaUsers, FaGift, FaChartL
 import CompetitionCard from '@/components/CompetitionCard';
 import { Competition } from '@/types/api';
 import { competitionsService } from '@/services/competitions';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function Home() {
+  const { getThemeColor } = useTheme();
   const [competitions, setCompetitions] = useState<Competition[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -59,8 +61,8 @@ export default function Home() {
         <Container maxW="container.xl" py={8}>
           <Center minH="50vh">
             <VStack spacing={4}>
-              <Spinner size="xl" color="blue.400" />
-              <Text color="gray.300">Loading competitions...</Text>
+              <Spinner size="xl" color={getThemeColor('primary')} />
+              <Text color={getThemeColor('gray500')}>Loading competitions...</Text>
             </VStack>
           </Center>
         </Container>
@@ -74,12 +76,14 @@ export default function Home() {
         <Container maxW="container.xl" py={8}>
           <Center minH="50vh">
             <VStack spacing={4}>
-              <Alert status="error" maxW="md" borderRadius="md" bg="gray.800" color="white">
+              <Alert status="error" maxW="md" borderRadius="md" bg={getThemeColor('dark')} color="white">
                 <AlertIcon />
                 {error}
               </Alert>
-              <Button 
-                colorScheme="blue" 
+              <Button
+                bg={getThemeColor('primary')}
+                color="white"
+                _hover={{ bg: getThemeColor('primaryDark') }}
                 onClick={() => window.location.reload()}
               >
                 Try Again
@@ -95,7 +99,7 @@ export default function Home() {
     <Box minH="100vh" bg="slate.50">
       {/* Hero Section */}
       <Box
-        bg="#360D3A"
+        bg={getThemeColor('dark')}
         color="white"
         py={20}
         textAlign="center"
@@ -129,9 +133,9 @@ export default function Home() {
                 <Link href="/competitions">
                   <Button
                     size="lg"
-                    bg="green.400"
-                    color="gray.900"
-                    _hover={{ bg: "green.300" }}
+                    bg={getThemeColor('accent')}
+                    color="white"
+                    _hover={{ bg: getThemeColor('accentDark') }}
                     fontWeight="bold"
                   >
                     Browse Competitions
@@ -170,7 +174,7 @@ export default function Home() {
                   }}
                 >
                   <HStack spacing={4}>
-                    <Circle size="60px" bg="green.500" color="white">
+                    <Circle size="60px" bg={getThemeColor('accent')} color="white">
                       <Icon as={FaPoundSign} boxSize={6} />
                     </Circle>
                     <VStack align="start" spacing={1}>
@@ -201,7 +205,7 @@ export default function Home() {
                   }}
                 >
                   <HStack spacing={4}>
-                    <Circle size="60px" bg="purple.500" color="white">
+                    <Circle size="60px" bg={getThemeColor('primary')} color="white">
                       <Icon as={FaTrophy} boxSize={6} />
                     </Circle>
                     <VStack align="start" spacing={1}>
@@ -232,7 +236,7 @@ export default function Home() {
                   }}
                 >
                   <HStack spacing={4}>
-                    <Circle size="60px" bg="blue.500" color="white">
+                    <Circle size="60px" bg={getThemeColor('secondary')} color="white">
                       <Icon as={FaUsers} boxSize={6} />
                     </Circle>
                     <VStack align="start" spacing={1}>
@@ -253,7 +257,7 @@ export default function Home() {
                 top="10%"
                 right="10%"
                 boxSize={8}
-                color="yellow.300"
+                color={getThemeColor('warning')}
                 opacity={0.7}
                 animation="pulse 2s infinite"
                 sx={{
@@ -270,7 +274,7 @@ export default function Home() {
                 bottom="20%"
                 left="5%"
                 boxSize={6}
-                color="pink.300"
+                color={getThemeColor('accent')}
                 opacity={0.8}
                 animation="bounce 3s infinite"
                 sx={{
@@ -287,7 +291,7 @@ export default function Home() {
                 top="50%"
                 right="5%"
                 boxSize={5}
-                color="red.300"
+                color={getThemeColor('error')}
                 opacity={0.6}
                 animation="heartbeat 2s infinite"
                 sx={{
@@ -352,37 +356,37 @@ export default function Home() {
         <VStack spacing={12}>
 
           {/* Features Section */}
-          <Card w="full" shadow="xl" bg="gray.800" border="1px" borderColor="gray.700">
+          <Card w="full" shadow="xl" bg={getThemeColor('dark')} border="1px" borderColor={getThemeColor('secondary')}>
             <CardBody p={8}>
               <VStack spacing={8}>
-                <Heading size="xl" textAlign="center" color="white">
+                <Heading size="xl" textAlign="center" color={getThemeColor('white')}>
                   Why Choose Jackson Jackpot?
                 </Heading>
                 <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8} w="full">
                   <VStack spacing={4} textAlign="center">
-                    <Circle size="16" bg="blue.900" color="blue.400">
+                    <Circle size="16" bg={getThemeColor('secondaryDark')} color={getThemeColor('secondary')}>
                       <Icon as={FaTrophy} boxSize={8} />
                     </Circle>
-                    <Heading size="md" color="white">Amazing Prizes</Heading>
-                    <Text color="gray.400">
+                    <Heading size="md" color={getThemeColor('white')}>Amazing Prizes</Heading>
+                    <Text color={getThemeColor('gray500')}>
                       Win holidays, cash, cars, and more incredible prizes
                     </Text>
                   </VStack>
                   <VStack spacing={4} textAlign="center">
-                    <Circle size="16" bg="green.900" color="green.400">
+                    <Circle size="16" bg={getThemeColor('accentDark')} color={getThemeColor('accent')}>
                       <Icon as={FaHeart} boxSize={8} />
                     </Circle>
-                    <Heading size="md" color="white">Support Charities</Heading>
-                    <Text color="gray.400">
+                    <Heading size="md" color={getThemeColor('white')}>Support Charities</Heading>
+                    <Text color={getThemeColor('gray500')}>
                       Every ticket supports verified charitable causes
                     </Text>
                   </VStack>
                   <VStack spacing={4} textAlign="center">
-                    <Circle size="16" bg="purple.900" color="purple.400">
+                    <Circle size="16" bg={getThemeColor('primaryDark')} color={getThemeColor('primary')}>
                       <Icon as={FaShieldAlt} boxSize={8} />
                     </Circle>
-                    <Heading size="md" color="white">100% Transparent</Heading>
-                    <Text color="gray.400">
+                    <Heading size="md" color={getThemeColor('white')}>100% Transparent</Heading>
+                    <Text color={getThemeColor('gray500')}>
                       Fair draws, verified charities, secure payments
                     </Text>
                   </VStack>
@@ -392,34 +396,34 @@ export default function Home() {
           </Card>
 
           {/* Stats Section */}
-          <Card w="full" shadow="xl" bg="gray.800" border="1px" borderColor="gray.700">
+          <Card w="full" shadow="xl" bg={getThemeColor('dark')} border="1px" borderColor={getThemeColor('secondary')}>
             <CardBody p={8}>
               <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8}>
                 <Stat textAlign="center">
                   <Flex justify="center" mb={2}>
-                    <Icon as={FaInfoCircle} boxSize={8} color="blue.400" />
+                    <Icon as={FaInfoCircle} boxSize={8} color={getThemeColor('secondary')} />
                   </Flex>
-                  <StatLabel fontSize="lg" color="gray.300">Total Raised</StatLabel>
-                  <StatNumber fontSize="3xl" color="blue.400">£1.2M</StatNumber>
-                  <StatHelpText color="gray.400">For charities this year</StatHelpText>
+                  <StatLabel fontSize="lg" color={getThemeColor('gray100')}>Total Raised</StatLabel>
+                  <StatNumber fontSize="3xl" color={getThemeColor('white')}>£1.2M</StatNumber>
+                  <StatHelpText color={getThemeColor('gray300')}>For charities this year</StatHelpText>
                 </Stat>
 
                 <Stat textAlign="center">
                   <Flex justify="center" mb={2}>
-                    <Icon as={FaUsers} boxSize={8} color="green.400" />
+                    <Icon as={FaUsers} boxSize={8} color={getThemeColor('accent')} />
                   </Flex>
-                  <StatLabel fontSize="lg" color="gray.300">Happy Winners</StatLabel>
-                  <StatNumber fontSize="3xl" color="green.400">2,450</StatNumber>
-                  <StatHelpText color="gray.400">Life-changing prizes</StatHelpText>
+                  <StatLabel fontSize="lg" color={getThemeColor('gray100')}>Happy Winners</StatLabel>
+                  <StatNumber fontSize="3xl" color={getThemeColor('white')}>2,450</StatNumber>
+                  <StatHelpText color={getThemeColor('gray300')}>Life-changing prizes</StatHelpText>
                 </Stat>
 
                 <Stat textAlign="center">
                   <Flex justify="center" mb={2}>
-                    <Icon as={FaGift} boxSize={8} color="purple.400" />
+                    <Icon as={FaGift} boxSize={8} color={getThemeColor('primary')} />
                   </Flex>
-                  <StatLabel fontSize="lg" color="gray.300">Active Competitions</StatLabel>
-                  <StatNumber fontSize="3xl" color="purple.400">{competitions.length}</StatNumber>
-                  <StatHelpText color="gray.400">Ready to enter</StatHelpText>
+                  <StatLabel fontSize="lg" color={getThemeColor('gray100')}>Active Competitions</StatLabel>
+                  <StatNumber fontSize="3xl" color={getThemeColor('white')}>{competitions.length}</StatNumber>
+                  <StatHelpText color={getThemeColor('gray300')}>Ready to enter</StatHelpText>
                 </Stat>
               </SimpleGrid>
             </CardBody>

@@ -76,9 +76,9 @@ export default function Header() {
               <Text
                 fontSize="2xl"
                 fontWeight="bold"
-                color={getThemeColor("accent")}
+                color={getThemeColor("primary")}
                 _hover={{
-                  color: getThemeColor("accentDark")
+                  color: getThemeColor("primaryDark")
                 }}
                 transition="all 0.3s"
               >
@@ -276,7 +276,7 @@ export default function Header() {
             <Text
               fontWeight="bold"
               fontSize="xl"
-              color={getThemeColor("accent")}
+              color={getThemeColor("primary")}
             >
               JJ+
             </Text>

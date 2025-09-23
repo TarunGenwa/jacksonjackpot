@@ -908,27 +908,27 @@ export default function CompetitionPage() {
                     <TabPanel px={0}>
                       <VStack spacing={4} align="stretch">
                         <Box bg={getThemeColor('light')} p={5} borderRadius="lg">
-                          <Heading size="md" color="white" mb={4}>Competition Details</Heading>
+                          <Heading size="md" color={getThemeColor('dark')} mb={4}>Competition Details</Heading>
                           <List spacing={3}>
-                            <ListItem color={getThemeColor('gray300')}>
+                            <ListItem color={getThemeColor('gray700')}>
                               <HStack>
                                 <ListIcon as={CheckCircleIcon} color={getThemeColor("accent")} />
                                 <Text>Entry Price: <Text as="span" fontWeight="bold" color={getThemeColor("accent")}>{formatPrice(competition.ticketPrice)}</Text> per ticket</Text>
                               </HStack>
                             </ListItem>
-                            <ListItem color={getThemeColor('gray300')}>
+                            <ListItem color={getThemeColor('gray700')}>
                               <HStack>
                                 <ListIcon as={CheckCircleIcon} color={getThemeColor("accent")} />
-                                <Text>Maximum Tickets: <Text as="span" fontWeight="bold" color="white">{competition.maxTickets}</Text></Text>
+                                <Text>Maximum Tickets: <Text as="span" fontWeight="bold" color={getThemeColor('dark')}>{competition.maxTickets}</Text></Text>
                               </HStack>
                             </ListItem>
-                            <ListItem color={getThemeColor('gray300')}>
+                            <ListItem color={getThemeColor('gray700')}>
                               <HStack>
                                 <ListIcon as={CheckCircleIcon} color={getThemeColor("accent")} />
                                 <Text>Draw Date: <Text as="span" fontWeight="bold" color={getThemeColor("accent")}>{formatDate(competition.drawDate)}</Text></Text>
                               </HStack>
                             </ListItem>
-                            <ListItem color={getThemeColor('gray300')}>
+                            <ListItem color={getThemeColor('gray700')}>
                               <HStack>
                                 <ListIcon as={CheckCircleIcon} color={getThemeColor("accent")} />
                                 <Text>Competition Type: <Badge colorScheme="purple" ml={2}>{competition.type}</Badge></Text>
@@ -938,27 +938,27 @@ export default function CompetitionPage() {
                         </Box>
 
                         <Box bg={getThemeColor('light')} p={5} borderRadius="lg">
-                          <Heading size="md" color="white" mb={4}>How It Works</Heading>
+                          <Heading size="md" color={getThemeColor('dark')} mb={4}>How It Works</Heading>
                           <List spacing={3}>
-                            <ListItem color={getThemeColor('gray300')}>
+                            <ListItem color={getThemeColor('gray700')}>
                               <HStack align="start">
                                 <Text color={getThemeColor("primary")} fontWeight="bold">1.</Text>
                                 <Text>Purchase your tickets for just {formatPrice(competition.ticketPrice)} each</Text>
                               </HStack>
                             </ListItem>
-                            <ListItem color={getThemeColor('gray300')}>
+                            <ListItem color={getThemeColor('gray700')}>
                               <HStack align="start">
                                 <Text color={getThemeColor("primary")} fontWeight="bold">2.</Text>
                                 <Text>Each ticket gives you a chance to win amazing prizes</Text>
                               </HStack>
                             </ListItem>
-                            <ListItem color={getThemeColor('gray300')}>
+                            <ListItem color={getThemeColor('gray700')}>
                               <HStack align="start">
                                 <Text color={getThemeColor("primary")} fontWeight="bold">3.</Text>
                                 <Text>Winners are drawn randomly on {new Date(competition.drawDate).toLocaleDateString('en-GB')}</Text>
                               </HStack>
                             </ListItem>
-                            <ListItem color={getThemeColor('gray300')}>
+                            <ListItem color={getThemeColor('gray700')}>
                               <HStack align="start">
                                 <Text color={getThemeColor("primary")} fontWeight="bold">4.</Text>
                                 <Text>20% of proceeds support {competition.charity.name}</Text>
@@ -968,8 +968,8 @@ export default function CompetitionPage() {
                         </Box>
 
                         <Box bg={getThemeColor('light')} p={5} borderRadius="lg">
-                          <Heading size="md" color="white" mb={4}>About {competition.charity.name}</Heading>
-                          <Text color={getThemeColor('gray300')} mb={3}>
+                          <Heading size="md" color={getThemeColor('dark')} mb={4}>About {competition.charity.name}</Heading>
+                          <Text color={getThemeColor('gray700')} mb={3}>
                             {competition.charity.description || 'This verified charity is making a real difference in our community. Your participation directly supports their important work.'}
                           </Text>
                           {competition.charity.website && (
@@ -999,12 +999,12 @@ export default function CompetitionPage() {
                             _hover={{ bg: getThemeColor('secondaryDark') }}
                             _expanded={{ bg: getThemeColor("brand.valentino"), borderBottomRadius: 0 }}
                           >
-                            <Box flex="1" textAlign="left" color="white" fontWeight="semibold">
+                            <Box flex="1" textAlign="left" color={getThemeColor('dark')} fontWeight="semibold">
                               How do I purchase tickets?
                             </Box>
                             <AccordionIcon color={getThemeColor("primary")} />
                           </AccordionButton>
-                          <AccordionPanel pb={4} bg={getThemeColor('light')} borderBottomRadius="lg" color={getThemeColor('gray300')}>
+                          <AccordionPanel pb={4} bg={getThemeColor('light')} borderBottomRadius="lg" color={getThemeColor('gray700')}>
                             Simply click the &ldquo;Buy Tickets&rdquo; button above, select how many tickets you&rsquo;d like, and complete your purchase securely. You&rsquo;ll receive an email confirmation with your ticket numbers.
                           </AccordionPanel>
                         </AccordionItem>
@@ -1016,12 +1016,12 @@ export default function CompetitionPage() {
                             _hover={{ bg: getThemeColor('secondaryDark') }}
                             _expanded={{ bg: getThemeColor("brand.valentino"), borderBottomRadius: 0 }}
                           >
-                            <Box flex="1" textAlign="left" color="white" fontWeight="semibold">
+                            <Box flex="1" textAlign="left" color={getThemeColor('dark')} fontWeight="semibold">
                               When will the draw take place?
                             </Box>
                             <AccordionIcon color={getThemeColor("primary")} />
                           </AccordionButton>
-                          <AccordionPanel pb={4} bg={getThemeColor('light')} borderBottomRadius="lg" color={getThemeColor('gray300')}>
+                          <AccordionPanel pb={4} bg={getThemeColor('light')} borderBottomRadius="lg" color={getThemeColor('gray700')}>
                             The draw will take place on {formatDate(competition.drawDate)}. Winners will be selected randomly and notified via email immediately after the draw.
                           </AccordionPanel>
                         </AccordionItem>
@@ -1033,12 +1033,12 @@ export default function CompetitionPage() {
                             _hover={{ bg: getThemeColor('secondaryDark') }}
                             _expanded={{ bg: getThemeColor("brand.valentino"), borderBottomRadius: 0 }}
                           >
-                            <Box flex="1" textAlign="left" color="white" fontWeight="semibold">
+                            <Box flex="1" textAlign="left" color={getThemeColor('dark')} fontWeight="semibold">
                               How are winners selected?
                             </Box>
                             <AccordionIcon color={getThemeColor("primary")} />
                           </AccordionButton>
-                          <AccordionPanel pb={4} bg={getThemeColor('light')} borderBottomRadius="lg" color={getThemeColor('gray300')}>
+                          <AccordionPanel pb={4} bg={getThemeColor('light')} borderBottomRadius="lg" color={getThemeColor('gray700')}>
                             Winners are selected using a certified random number generator to ensure complete fairness. Each ticket has an equal chance of winning, regardless of when it was purchased.
                           </AccordionPanel>
                         </AccordionItem>
@@ -1050,12 +1050,12 @@ export default function CompetitionPage() {
                             _hover={{ bg: getThemeColor('secondaryDark') }}
                             _expanded={{ bg: getThemeColor("brand.valentino"), borderBottomRadius: 0 }}
                           >
-                            <Box flex="1" textAlign="left" color="white" fontWeight="semibold">
+                            <Box flex="1" textAlign="left" color={getThemeColor('dark')} fontWeight="semibold">
                               Where does the money go?
                             </Box>
                             <AccordionIcon color={getThemeColor("primary")} />
                           </AccordionButton>
-                          <AccordionPanel pb={4} bg={getThemeColor('light')} borderBottomRadius="lg" color={getThemeColor('gray300')}>
+                          <AccordionPanel pb={4} bg={getThemeColor('light')} borderBottomRadius="lg" color={getThemeColor('gray700')}>
                             20% of the proceeds from ticket sales go directly to {competition.charity.name}, with the remainder covering operational costs and platform fees.
                           </AccordionPanel>
                         </AccordionItem>
@@ -1067,12 +1067,12 @@ export default function CompetitionPage() {
                             _hover={{ bg: getThemeColor('secondaryDark') }}
                             _expanded={{ bg: getThemeColor("brand.valentino"), borderBottomRadius: 0 }}
                           >
-                            <Box flex="1" textAlign="left" color="white" fontWeight="semibold">
+                            <Box flex="1" textAlign="left" color={getThemeColor('dark')} fontWeight="semibold">
                               Is there a limit on tickets I can buy?
                             </Box>
                             <AccordionIcon color={getThemeColor("primary")} />
                           </AccordionButton>
-                          <AccordionPanel pb={4} bg={getThemeColor('light')} borderBottomRadius="lg" color={getThemeColor('gray300')}>
+                          <AccordionPanel pb={4} bg={getThemeColor('light')} borderBottomRadius="lg" color={getThemeColor('gray700')}>
                             You can purchase as many tickets as you like, up to the maximum available. More tickets mean more chances to win! However, please gamble responsibly.
                           </AccordionPanel>
                         </AccordionItem>
@@ -1084,12 +1084,12 @@ export default function CompetitionPage() {
                             _hover={{ bg: getThemeColor('secondaryDark') }}
                             _expanded={{ bg: getThemeColor("brand.valentino"), borderBottomRadius: 0 }}
                           >
-                            <Box flex="1" textAlign="left" color="white" fontWeight="semibold">
+                            <Box flex="1" textAlign="left" color={getThemeColor('dark')} fontWeight="semibold">
                               How will I know if I&rsquo;ve won?
                             </Box>
                             <AccordionIcon color={getThemeColor("primary")} />
                           </AccordionButton>
-                          <AccordionPanel pb={4} bg={getThemeColor('light')} borderBottomRadius="lg" color={getThemeColor('gray300')}>
+                          <AccordionPanel pb={4} bg={getThemeColor('light')} borderBottomRadius="lg" color={getThemeColor('gray700')}>
                             Winners are notified via email and SMS (if provided) immediately after the draw. You can also check your account dashboard to see if any of your tickets have won.
                           </AccordionPanel>
                         </AccordionItem>
@@ -1101,12 +1101,12 @@ export default function CompetitionPage() {
                             _hover={{ bg: getThemeColor('secondaryDark') }}
                             _expanded={{ bg: getThemeColor("brand.valentino"), borderBottomRadius: 0 }}
                           >
-                            <Box flex="1" textAlign="left" color="white" fontWeight="semibold">
+                            <Box flex="1" textAlign="left" color={getThemeColor('dark')} fontWeight="semibold">
                               Can I get a refund?
                             </Box>
                             <AccordionIcon color={getThemeColor("primary")} />
                           </AccordionButton>
-                          <AccordionPanel pb={4} bg={getThemeColor('light')} borderBottomRadius="lg" color={getThemeColor('gray300')}>
+                          <AccordionPanel pb={4} bg={getThemeColor('light')} borderBottomRadius="lg" color={getThemeColor('gray700')}>
                             As per our terms and conditions, all ticket sales are final and non-refundable. This ensures fairness for all participants and maximizes the charity&rsquo;s fundraising.
                           </AccordionPanel>
                         </AccordionItem>

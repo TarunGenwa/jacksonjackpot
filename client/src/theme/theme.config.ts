@@ -1,50 +1,160 @@
-// EPL Brand Theme Configuration
+// Theme Configuration
 // This file centralizes all theme values including colors, typography, spacing, etc.
+
+// Original Purple Theme
+const purpleTheme = {
+  // 5 Core Colors
+  primary: '#963CFF',     // Electric Violet - Main brand color
+  secondary: '#68348F',   // Medium Purple - Secondary actions
+  accent: '#E90052',      // Razzmatazz - CTAs and highlights
+  dark: '#360D3A',        // Valentino - Dark backgrounds
+  light: '#F3E9F4',       // Light Purple - Light backgrounds
+
+  // Color Variants (generated from core colors)
+  primaryDark: '#6F2DCC',    // Darker primary
+  primaryLight: '#C195FF',   // Lighter primary
+  secondaryDark: '#4E2A7F',  // Darker secondary
+  secondaryLight: '#803D9B', // Lighter secondary
+  accentDark: '#CC0048',     // Darker accent
+  accentLight: '#FF80B1',    // Lighter accent
+
+  // Status Colors (semantic)
+  success: '#48bb78',
+  warning: '#ed8936',
+  error: '#E90052',    // Using accent for errors
+  info: '#4299e1',
+
+  // Neutral Colors (grays)
+  white: '#FFFFFF',
+  gray100: '#F5F5F5',
+  gray300: '#D4D4D4',
+  gray500: '#737373',
+  gray700: '#404040',
+  gray900: '#171717',
+  black: '#000000',
+
+  // Opacity utilities
+  opacity10: 0.1,
+  opacity20: 0.2,
+  opacity30: 0.3,
+  opacity50: 0.5,
+  opacity70: 0.7,
+  opacity90: 0.9,
+};
+
+// New Pastel Theme
+const pastelTheme = {
+  // 5 Core Colors
+  primary: '#cdb4db',     // Thistle - Main brand color
+  secondary: '#a2d2ff',   // Light Sky Blue - Secondary actions
+  accent: '#221b1eff',      // Carnation Pink - CTAs and highlights
+  dark: '#cdb4db',        // Dark Thistle - Dark backgrounds
+  light: '#f5f0f8',       // Very Light Thistle - Light backgrounds
+
+  // Color Variants - Using actual pastel palette colors
+  primaryDark: '#57346b',    // Thistle 200 - Darker primary
+  primaryLight: '#e0d2e9',   // Thistle 700 - Lighter primary
+  secondaryDark: '#0056a7',  // Light Sky Blue 200 - Darker secondary
+  secondaryLight: '#c8e4ff', // Light Sky Blue 700 - Lighter secondary
+  accentDark: '#ab003f',     // Carnation Pink 200 - Darker accent
+  accentLight: '#ffcee0',    // Carnation Pink 700 - Lighter accent
+
+  // Status Colors (semantic)
+  success: '#66b6fd',     // Uranian blue variant
+  warning: '#ff6ca4',     // Fairy tale variant
+  error: '#ff025f',       // Strong carnation pink
+  info: '#0f8dfb',        // Strong uranian blue
+
+  // Neutral Colors (grays)
+  white: '#FFFFFF',
+  gray100: '#f2f9ff',     // Very light blue
+  gray300: '#cbe6fe',     // Light blue
+  gray500: '#66b6fd',     // Medium blue
+  gray700: '#035eaf',     // Dark blue
+  gray900: '#012f57',     // Very dark blue
+  black: '#000000',
+
+  // Opacity utilities
+  opacity10: 0.1,
+  opacity20: 0.2,
+  opacity30: 0.3,
+  opacity50: 0.5,
+  opacity70: 0.7,
+  opacity90: 0.9,
+};
+
+// Black-Gold Theme
+const blackGoldTheme = {
+  // 5 Core Colors - Based on provided palette
+  primary: '#fca311',     // Gold - Main brand color
+  secondary: '#14213d',   // Dark Blue - Secondary actions
+  accent: '#000000',      // Black - CTAs and highlights
+  dark: '#000000',        // Black - Dark backgrounds
+  light: '#ffffff',       // White - Light backgrounds
+
+  // Color Variants (generated from core colors)
+  primaryDark: '#e5940e',    // Darker gold
+  primaryLight: '#fdb64a',   // Lighter gold
+  secondaryDark: '#0f1a2e',  // Darker blue
+  secondaryLight: '#1f2d4a', // Lighter blue
+  accentDark: '#000000',     // Black (same)
+  accentLight: '#333333',    // Dark gray
+
+  // Status Colors (semantic)
+  success: '#48bb78',
+  warning: '#fca311',     // Using primary gold for warnings
+  error: '#dc3545',       // Red for errors
+  info: '#14213d',        // Using secondary blue for info
+
+  // Neutral Colors (grays)
+  white: '#ffffff',
+  gray100: '#f8f9fa',
+  gray300: '#dee2e6',
+  gray500: '#6c757d',
+  gray700: '#495057',
+  gray900: '#212529',
+  black: '#000000',
+
+  // Opacity utilities
+  opacity10: 0.1,
+  opacity20: 0.2,
+  opacity30: 0.3,
+  opacity50: 0.5,
+  opacity70: 0.7,
+  opacity90: 0.9,
+};
+
+// Theme selection based on environment variable
+const getActiveTheme = () => {
+  const themeMode = process.env.NEXT_PUBLIC_THEME_MODE || 'purple';
+
+  switch (themeMode) {
+    case 'pastel':
+      return pastelTheme;
+    case 'blackgold':
+      return blackGoldTheme;
+    default:
+      return purpleTheme;
+  }
+};
+
+// Export individual themes for potential runtime switching
+export const themes = {
+  purple: purpleTheme,
+  pastel: pastelTheme,
+  blackgold: blackGoldTheme,
+};
+
+// Helper function to get current theme mode
+export const getCurrentThemeMode = () => {
+  return process.env.NEXT_PUBLIC_THEME_MODE || 'purple';
+};
 
 export const themeConfig = {
   // ========================================
-  // CORE COLORS - 5 Main Colors
+  // CORE COLORS - Active Theme
   // ========================================
-  colors: {
-    // 5 Core Colors
-    primary: '#963CFF',     // Electric Violet - Main brand color
-    secondary: '#68348F',   // Medium Purple - Secondary actions
-    accent: '#E90052',      // Razzmatazz - CTAs and highlights
-    dark: '#360D3A',        // Valentino - Dark backgrounds
-    light: '#F3E9F4',       // Light Purple - Light backgrounds
-
-    // Color Variants (generated from core colors)
-    primaryDark: '#6F2DCC',    // Darker primary
-    primaryLight: '#C195FF',   // Lighter primary
-    secondaryDark: '#4E2A7F',  // Darker secondary
-    secondaryLight: '#803D9B', // Lighter secondary
-    accentDark: '#CC0048',     // Darker accent
-    accentLight: '#FF80B1',    // Lighter accent
-
-    // Status Colors (semantic)
-    success: '#48bb78',
-    warning: '#ed8936',
-    error: '#E90052',    // Using accent for errors
-    info: '#4299e1',
-
-    // Neutral Colors (grays)
-    white: '#FFFFFF',
-    gray100: '#F5F5F5',
-    gray300: '#D4D4D4',
-    gray500: '#737373',
-    gray700: '#404040',
-    gray900: '#171717',
-    black: '#000000',
-
-
-    // Opacity utilities
-    opacity10: 0.1,
-    opacity20: 0.2,
-    opacity30: 0.3,
-    opacity50: 0.5,
-    opacity70: 0.7,
-    opacity90: 0.9,
-  },
+  colors: getActiveTheme(),
 
   // ========================================
   // TYPOGRAPHY

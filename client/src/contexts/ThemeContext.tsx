@@ -2,12 +2,14 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { theme, ThemeColors, SemanticColors } from '@/theme';
-import { themeConfig, ThemeConfig } from '@/theme/theme.config';
+import { themeConfig, ThemeConfig, getCurrentThemeMode, themes } from '@/theme/theme.config';
 
 export type ThemeMode = 'light' | 'dark';
+export type ColorTheme = 'purple' | 'pastel';
 
 interface ThemeContextType {
   mode: ThemeMode;
+  colorTheme: ColorTheme;
   toggleTheme: () => void;
   setTheme: (mode: ThemeMode) => void;
   colors: ThemeColors;
@@ -32,6 +34,7 @@ interface ThemeProviderProps {
 
 export function ThemeProvider({ children, defaultMode = 'dark' }: ThemeProviderProps) {
   const [mode, setMode] = useState<ThemeMode>(defaultMode);
+  const colorTheme = getCurrentThemeMode() as ColorTheme;
 
   // Load theme from localStorage on mount
   useEffect(() => {
@@ -163,6 +166,7 @@ export function ThemeProvider({ children, defaultMode = 'dark' }: ThemeProviderP
 
   const value: ThemeContextType = {
     mode,
+    colorTheme,
     toggleTheme,
     setTheme,
     colors: theme.colors,

@@ -208,59 +208,59 @@ export default function TicketPurchaseModal({
   return (
     <>
       <Modal isOpen={isOpen} onClose={handleClose} size="md" closeOnOverlayClick={!isLoading}>
-      <ModalOverlay bg={getThemeColor('ui.overlay.dark')} backdropFilter="blur(4px)" />
+      <ModalOverlay bg="blackAlpha.600" backdropFilter="blur(4px)" />
       <ModalContent
-        bg={getThemeColor('brand.valentino')}
+        bg={getThemeColor('dark')}
         border="1px"
-        borderColor={getColor('primary.700')}
-        color={getColor('text.primary')}
+        borderColor={getThemeColor('primary')}
+        color={getThemeColor('white')}
         shadow="2xl"
       >
         <ModalHeader>
           <HStack spacing={3}>
-            <Icon as={FaTicketAlt} color={getColor('success.400')} boxSize={5} />
-            <Text color={getColor('text.primary')} fontWeight="bold">Purchase Tickets</Text>
+            <Icon as={FaTicketAlt} color={getThemeColor('primary')} boxSize={5} />
+            <Text color={getThemeColor('white')} fontWeight="bold">Purchase Tickets</Text>
           </HStack>
         </ModalHeader>
-        <ModalCloseButton isDisabled={isLoading} color={getColor('text.primary')} _hover={{ bg: getThemeColor('ui.hover.base') }} />
+        <ModalCloseButton isDisabled={isLoading} color={getThemeColor('white')} _hover={{ bg: getThemeColor('secondaryDark') }} />
 
         <ModalBody>
           <VStack spacing={6} align="stretch">
             {/* Competition Info */}
             <Box>
-              <Text fontWeight="semibold" fontSize="lg" mb={2} color={getColor('text.primary')}>
+              <Text fontWeight="semibold" fontSize="lg" mb={2} color={getThemeColor('white')}>
                 {competition.title}
               </Text>
               <HStack spacing={2} mb={3}>
-                <Text fontSize="sm" color={getColor('text.secondary')}>
+                <Text fontSize="sm" color={getThemeColor('gray300')}>
                   Supporting: {competition.charity.name}
                 </Text>
                 {competition.charity.isVerified && (
                   <Badge colorScheme="green" size="sm" variant="solid">✓ Verified</Badge>
                 )}
               </HStack>
-              <Text fontSize="sm" color={getColor('text.secondary')} noOfLines={2}>
+              <Text fontSize="sm" color={getThemeColor('gray300')} noOfLines={2}>
                 {competition.description}
               </Text>
             </Box>
 
-            <Divider borderColor={getThemeColor('ui.border.light')} />
+            <Divider borderColor={getThemeColor('secondary')} />
 
             {/* Availability Status */}
             <Alert
               status={availableTickets > 0 ? 'success' : 'error'}
               variant="left-accent"
               borderRadius="md"
-              bg={availableTickets > 0 ? getSemanticColor('alerts', 'success.bgDark') : getSemanticColor('alerts', 'error.bgDark')}
-              borderColor={availableTickets > 0 ? getColor('success.600') : getColor('error.600')}
-              color={getColor('text.primary')}
+              bg={getThemeColor('light')}
+              borderColor={availableTickets > 0 ? getThemeColor('success') : getThemeColor('error')}
+              color={getThemeColor('dark')}
             >
-              <AlertIcon color={availableTickets > 0 ? getColor('success.400') : getColor('error.400')} />
+              <AlertIcon color={availableTickets > 0 ? getThemeColor('success') : getThemeColor('error')} />
               <VStack align="start" spacing={1}>
-                <Text fontWeight="medium" color={getColor('text.primary')}>
+                <Text fontWeight="medium" color={getThemeColor('dark')}>
                   {availableTickets > 0 ? 'Tickets Available' : 'Sold Out'}
                 </Text>
-                <Text fontSize="sm" color={getColor('text.secondary')}>
+                <Text fontSize="sm" color={getThemeColor('gray700')}>
                   {availableTickets > 0
                     ? `${availableTickets.toLocaleString()} of ${competition.maxTickets.toLocaleString()} tickets remaining`
                     : 'All tickets have been sold for this competition'
@@ -276,12 +276,12 @@ export default function TicketPurchaseModal({
                   <FormLabel>
                     <Flex justify="space-between" align="center" w="full">
                       <HStack spacing={2}>
-                        <Text color={getColor('text.primary')}>Number of Tickets</Text>
+                        <Text color={getThemeColor('white')}>Number of Tickets</Text>
                         <Badge colorScheme="green" variant="solid" fontSize="md" px={2}>
                           {quantity}
                         </Badge>
                       </HStack>
-                      <Badge colorScheme="purple" variant="outline" color={getColor('primary.300')} borderColor={getColor('primary.400')}>
+                      <Badge variant="outline" color={getThemeColor('primary')} borderColor={getThemeColor('primary')}>
                         Max: {Math.min(availableTickets, 10)}
                       </Badge>
                     </Flex>
@@ -295,22 +295,22 @@ export default function TicketPurchaseModal({
                       step={1}
                       colorScheme="purple"
                     >
-                      <SliderMark value={1} mt={3} ml={-2} fontSize="sm" color={getColor('text.secondary')}>
+                      <SliderMark value={1} mt={3} ml={-2} fontSize="sm" color={getThemeColor('gray300')}>
                         1
                       </SliderMark>
-                      <SliderMark value={Math.min(availableTickets, 10)} mt={3} ml={-2} fontSize="sm" color={getColor('text.secondary')}>
+                      <SliderMark value={Math.min(availableTickets, 10)} mt={3} ml={-2} fontSize="sm" color={getThemeColor('gray300')}>
                         {Math.min(availableTickets, 10)}
                       </SliderMark>
                       {Math.min(availableTickets, 10) > 5 && (
-                        <SliderMark value={Math.ceil(Math.min(availableTickets, 10) / 2)} mt={3} ml={-2} fontSize="sm" color={getColor('text.secondary')}>
+                        <SliderMark value={Math.ceil(Math.min(availableTickets, 10) / 2)} mt={3} ml={-2} fontSize="sm" color={getThemeColor('gray300')}>
                           {Math.ceil(Math.min(availableTickets, 10) / 2)}
                         </SliderMark>
                       )}
-                      <SliderTrack bg={getThemeColor('ui.background.elevated')}>
-                        <SliderFilledTrack bg={getColor('primary.400')} />
+                      <SliderTrack bg={getThemeColor('light')}>
+                        <SliderFilledTrack bg={getThemeColor('primary')} />
                       </SliderTrack>
-                      <SliderThumb boxSize={6} bg={getColor('primary.500')} border="2px" borderColor={getColor('text.primary')}>
-                        <Box color={getColor('text.primary')} fontSize="xs" fontWeight="bold">
+                      <SliderThumb boxSize={6} bg={getThemeColor('primary')} border="2px" borderColor={getThemeColor('white')}>
+                        <Box color={getThemeColor('white')} fontSize="xs" fontWeight="bold">
                           {quantity}
                         </Box>
                       </SliderThumb>
@@ -319,41 +319,41 @@ export default function TicketPurchaseModal({
                 </FormControl>
 
                 {/* Price Breakdown */}
-                <Box bg={getThemeColor('ui.overlay.light')} p={4} borderRadius="md" border="1px" borderColor={getThemeColor('ui.border.light')}>
+                <Box bg={getThemeColor('light')} p={4} borderRadius="md" border="1px" borderColor={getThemeColor('secondary')}>
                   <VStack spacing={3}>
                     <Flex justify="space-between" w="full" align="center">
                       <HStack spacing={2}>
-                        <Icon as={FaCalculator} boxSize={4} color={getColor('success.400')} />
-                        <Text fontWeight="medium" color={getColor('text.primary')}>Price Breakdown</Text>
+                        <Icon as={FaCalculator} boxSize={4} color={getThemeColor('primary')} />
+                        <Text fontWeight="medium" color={getThemeColor('dark')}>Price Breakdown</Text>
                       </HStack>
                     </Flex>
 
                     <VStack spacing={2} w="full">
                       <Flex justify="space-between" w="full">
-                        <Text fontSize="sm" color={getColor('text.secondary')}>
+                        <Text fontSize="sm" color={getThemeColor('gray700')}>
                           Ticket Price:
                         </Text>
-                        <Text fontSize="sm" fontWeight="medium" color={getColor('text.primary')}>
+                        <Text fontSize="sm" fontWeight="medium" color={getThemeColor('dark')}>
                           {formatPrice(ticketPrice)}
                         </Text>
                       </Flex>
 
                       <Flex justify="space-between" w="full">
-                        <Text fontSize="sm" color={getColor('text.secondary')}>
+                        <Text fontSize="sm" color={getThemeColor('gray700')}>
                           Quantity:
                         </Text>
-                        <Text fontSize="sm" fontWeight="medium" color={getColor('text.primary')}>
+                        <Text fontSize="sm" fontWeight="medium" color={getThemeColor('dark')}>
                           {quantity}
                         </Text>
                       </Flex>
 
-                      <Divider borderColor={getThemeColor('ui.border.light')} />
+                      <Divider borderColor={getThemeColor('secondary')} />
 
                       <Flex justify="space-between" w="full">
-                        <Text fontWeight="bold" color={getColor('success.400')}>
+                        <Text fontWeight="bold" color={getThemeColor('accent')}>
                           Total Cost:
                         </Text>
-                        <Text fontWeight="bold" fontSize="lg" color={getColor('success.400')}>
+                        <Text fontWeight="bold" fontSize="lg" color={getThemeColor('accent')}>
                           {formatPrice(totalCost)}
                         </Text>
                       </Flex>
@@ -366,13 +366,13 @@ export default function TicketPurchaseModal({
                   status="info"
                   variant="left-accent"
                   borderRadius="md"
-                  bg={getSemanticColor('alerts', 'info.bgDark')}
-                  borderColor={getColor('secondary.600')}
-                  color={getColor('text.primary')}
+                  bg={getThemeColor('light')}
+                  borderColor={getThemeColor('secondary')}
+                  color={getThemeColor('dark')}
                 >
-                  <AlertIcon color={getColor('secondary.400')} />
+                  <AlertIcon color={getThemeColor('secondary')} />
                   <VStack align="start" spacing={1}>
-                    <Text fontWeight="medium" fontSize="sm" color={getColor('text.primary')}>
+                    <Text fontWeight="medium" fontSize="sm" color={getThemeColor('dark')}>
                       Draw Date: {new Date(competition.drawDate).toLocaleDateString('en-GB', {
                         weekday: 'long',
                         year: 'numeric',
@@ -389,13 +389,13 @@ export default function TicketPurchaseModal({
                   <Alert
                     status="error"
                     borderRadius="md"
-                    bg={getSemanticColor('alerts', 'error.bgDark')}
-                    borderColor={getColor('error.600')}
-                    color={getColor('text.primary')}
+                    bg={getThemeColor('light')}
+                    borderColor={getThemeColor('error')}
+                    color={getThemeColor('dark')}
                     variant="left-accent"
                   >
-                    <AlertIcon color={getColor('error.400')} />
-                    <Text color={getColor('text.primary')}>{error}</Text>
+                    <AlertIcon color={getThemeColor('error')} />
+                    <Text color={getThemeColor('dark')}>{error}</Text>
                   </Alert>
                 )}
               </>
@@ -409,17 +409,17 @@ export default function TicketPurchaseModal({
               variant="ghost"
               onClick={handleClose}
               isDisabled={isLoading}
-              color={getColor('text.secondary')}
-              _hover={{ bg: "whiteAlpha.200", color: getColor('text.primary') }}
+              color={getThemeColor('gray300')}
+              _hover={{ bg: getThemeColor('secondaryDark'), color: getThemeColor('white') }}
             >
               Cancel
             </Button>
             {availableTickets > 0 && (
               <Button
-                bg={getColor('success.400')}
-                color={getColor('neutral.900')}
-                _hover={{ bg: getColor('success.300'), transform: "translateY(-1px)" }}
-                _active={{ bg: getColor('success.500') }}
+                bg={getThemeColor('success')}
+                color={getThemeColor('white')}
+                _hover={{ bg: getThemeColor('primaryDark'), transform: "translateY(-1px)" }}
+                _active={{ bg: getThemeColor('primaryDark') }}
                 onClick={handlePurchase}
                 isLoading={isLoading}
                 loadingText="Processing..."

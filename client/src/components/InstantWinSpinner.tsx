@@ -51,9 +51,9 @@ interface InstantWinSpinnerProps {
 }
 
 const pulseGlow = keyframes`
-  0% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
-  50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.6); }
-  100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
+  0% { box-shadow: 0 0 20px rgba(252, 163, 17, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(252, 163, 17, 0.6); }
+  100% { box-shadow: 0 0 20px rgba(252, 163, 17, 0.3); }
 `;
 
 export default function InstantWinSpinner({
@@ -72,10 +72,10 @@ export default function InstantWinSpinner({
 
   const generatePrizePool = (hasWin: boolean): InstantPrize[] => {
     const commonPrizes: InstantPrize[] = [
-      { id: '1', name: 'Better Luck Next Time', value: 0, icon: FaStar, color: getThemeColor('text.muted'), isWin: false },
-      { id: '2', name: 'Try Again', value: 0, icon: FaStar, color: getThemeColor('text.muted'), isWin: false },
-      { id: '3', name: 'Almost There', value: 0, icon: FaStar, color: getThemeColor('text.muted'), isWin: false },
-      { id: '4', name: 'Keep Playing', value: 0, icon: FaStar, color: getThemeColor('text.muted'), isWin: false },
+      { id: '1', name: 'Better Luck Next Time', value: 0, icon: FaStar, color: getThemeColor('gray500'), isWin: false },
+      { id: '2', name: 'Try Again', value: 0, icon: FaStar, color: getThemeColor('gray500'), isWin: false },
+      { id: '3', name: 'Almost There', value: 0, icon: FaStar, color: getThemeColor('gray500'), isWin: false },
+      { id: '4', name: 'Keep Playing', value: 0, icon: FaStar, color: getThemeColor('gray500'), isWin: false },
     ];
 
     let winningPrize: InstantPrize | null = null;
@@ -87,7 +87,7 @@ export default function InstantWinSpinner({
         name: prize.name,
         value: prize.value,
         icon: prize.value > 100 ? FaTrophy : prize.value > 50 ? FaGift : FaCoins,
-        color: prize.value > 100 ? getThemeColor('semantic.warning.light') : prize.value > 50 ? getThemeColor('brand.electricViolet') : getThemeColor('semantic.success.light'),
+        color: prize.value > 100 ? getThemeColor('warning') : prize.value > 50 ? getThemeColor('primary') : getThemeColor('success'),
         isWin: true,
         description: prize.description
       };
@@ -173,25 +173,25 @@ export default function InstantWinSpinner({
       closeOnOverlayClick={!isSpinning}
       isCentered
     >
-      <ModalOverlay bg={getThemeColor('ui.overlay.dark')} backdropFilter="blur(8px)" />
+      <ModalOverlay bg="blackAlpha.700" backdropFilter="blur(8px)" />
       <ModalContent
-        bg={getThemeColor('brand.valentino')}
+        bg={getThemeColor('dark')}
         border="2px"
-        borderColor={getColor('primary.600')}
-        color={getColor('text.primary')}
+        borderColor={getThemeColor('primary')}
+        color={getThemeColor('white')}
         shadow="2xl"
         maxW="900px"
       >
-        <ModalHeader borderBottom="1px" borderColor={getThemeColor('ui.border.light')}>
+        <ModalHeader borderBottom="1px" borderColor={getThemeColor('secondary')}>
           <VStack spacing={2} align="center">
-            <Text fontSize="2xl" fontWeight="bold" color={getThemeColor('brand.razzmatazz')}>
+            <Text fontSize="2xl" fontWeight="bold" color={getThemeColor('accent')}>
               Instant Prize Reveal
             </Text>
             <HStack spacing={3}>
-              <Badge colorScheme="purple" variant="solid" fontSize="md" px={3} py={1}>
+              <Badge bg={getThemeColor('primary')} color={getThemeColor('white')} variant="solid" fontSize="md" px={3} py={1}>
                 Ticket: {currentTicket?.ticketNumber}
               </Badge>
-              <Badge colorScheme="blue" variant="outline" fontSize="sm">
+              <Badge borderColor={getThemeColor('secondary')} color={getThemeColor('secondary')} variant="outline" fontSize="sm">
                 {currentTicketIndex + 1} of {tickets.length}
               </Badge>
             </HStack>
@@ -205,7 +205,7 @@ export default function InstantWinSpinner({
                 <Text
                   fontSize="lg"
                   textAlign="center"
-                  color={getColor('text.secondary')}
+                  color={getThemeColor('gray300')}
                   fontWeight="medium"
                 >
                   {!revealedPrize
@@ -222,8 +222,8 @@ export default function InstantWinSpinner({
                   overflow="hidden"
                   borderRadius="lg"
                   border="3px solid"
-                  borderColor={revealedPrize?.isWin ? getThemeColor('semantic.warning.light') : getColor('primary.500')}
-                  bg={getThemeColor('ui.overlay.medium')}
+                  borderColor={revealedPrize?.isWin ? getThemeColor('warning') : getThemeColor('primary')}
+                  bg={getThemeColor('light')}
                   animation={revealedPrize?.isWin ? `${pulseGlow} 2s infinite` : undefined}
                 >
                   <Center
@@ -232,7 +232,7 @@ export default function InstantWinSpinner({
                     top="0"
                     h="full"
                     w="2px"
-                    bg={getColor('error.400')}
+                    bg={getThemeColor('error')}
                     zIndex={2}
                     transform="translateX(-50%)"
                   >
@@ -243,7 +243,7 @@ export default function InstantWinSpinner({
                       h="0"
                       borderLeft="10px solid transparent"
                       borderRight="10px solid transparent"
-                      borderTop={`15px solid ${getColor('error.400')}`}
+                      borderTop={`15px solid ${getThemeColor('error')}`}
                     />
                     <Box
                       position="absolute"
@@ -252,7 +252,7 @@ export default function InstantWinSpinner({
                       h="0"
                       borderLeft="10px solid transparent"
                       borderRight="10px solid transparent"
-                      borderBottom={`15px solid ${getColor('error.400')}`}
+                      borderBottom={`15px solid ${getThemeColor('error')}`}
                     />
                   </Center>
 
@@ -273,10 +273,10 @@ export default function InstantWinSpinner({
                         justify="center"
                         minW="150px"
                         h="150px"
-                        bg={prize.isWin ? getThemeColor('semantic.warning.dark') : getThemeColor('ui.overlay.light')}
+                        bg={prize.isWin ? getThemeColor('warning') : getThemeColor('light')}
                         borderRadius="lg"
                         border="2px solid"
-                        borderColor={prize.isWin ? getThemeColor('semantic.warning.light') : getThemeColor('ui.border.light')}
+                        borderColor={prize.isWin ? getThemeColor('accent') : getThemeColor('secondary')}
                         p={4}
                         position="relative"
                         _hover={{ transform: isSpinning ? 'none' : 'scale(1.05)' }}
@@ -287,13 +287,14 @@ export default function InstantWinSpinner({
                           fontSize="sm"
                           fontWeight="bold"
                           textAlign="center"
-                          color={prize.isWin ? getThemeColor('semantic.warning.light') : getColor('text.primary')}
+                          color={prize.isWin ? getThemeColor('white') : getThemeColor('dark')}
                         >
                           {prize.name}
                         </Text>
                         {prize.value > 0 && (
                           <Badge
-                            colorScheme="green"
+                            bg={getThemeColor('success')}
+                            color={getThemeColor('white')}
                             variant="solid"
                             mt={2}
                             fontSize="md"
@@ -309,10 +310,10 @@ export default function InstantWinSpinner({
                 {revealedPrize && (
                   <Box
                     p={6}
-                    bg={revealedPrize.isWin ? getThemeColor('semantic.warning.dark') : getThemeColor('ui.overlay.light')}
+                    bg={revealedPrize.isWin ? getThemeColor('warning') : getThemeColor('light')}
                     borderRadius="lg"
                     border="2px solid"
-                    borderColor={revealedPrize.isWin ? getThemeColor('semantic.warning.light') : getThemeColor('ui.border.light')}
+                    borderColor={revealedPrize.isWin ? getThemeColor('accent') : getThemeColor('secondary')}
                     w="full"
                     textAlign="center"
                   >
@@ -322,16 +323,16 @@ export default function InstantWinSpinner({
                         boxSize={16}
                         color={revealedPrize.color}
                       />
-                      <Text fontSize="xl" fontWeight="bold" color={getColor('text.primary')}>
+                      <Text fontSize="xl" fontWeight="bold" color={getThemeColor('white')}>
                         {revealedPrize.name}
                       </Text>
                       {revealedPrize.value > 0 && (
-                        <Text fontSize="3xl" fontWeight="bold" color={getThemeColor('semantic.success.light')}>
+                        <Text fontSize="3xl" fontWeight="bold" color={getThemeColor('success')}>
                           £{revealedPrize.value}
                         </Text>
                       )}
                       {revealedPrize.description && (
-                        <Text fontSize="md" color={getColor('text.secondary')}>
+                        <Text fontSize="md" color={getThemeColor('gray300')}>
                           {revealedPrize.description}
                         </Text>
                       )}
@@ -341,11 +342,11 @@ export default function InstantWinSpinner({
               </>
             ) : (
               <Box textAlign="center" py={8}>
-                <Icon as={FaTrophy} boxSize={20} color={getThemeColor('semantic.warning.light')} mb={4} />
-                <Text fontSize="2xl" fontWeight="bold" mb={2} color={getColor('text.primary')}>
+                <Icon as={FaTrophy} boxSize={20} color={getThemeColor('warning')} mb={4} />
+                <Text fontSize="2xl" fontWeight="bold" mb={2} color={getThemeColor('white')}>
                   All Tickets Revealed!
                 </Text>
-                <Text fontSize="lg" color={getColor('text.secondary')}>
+                <Text fontSize="lg" color={getThemeColor('gray300')}>
                   Good luck in the main draw!
                 </Text>
               </Box>
@@ -353,17 +354,17 @@ export default function InstantWinSpinner({
           </VStack>
         </ModalBody>
 
-        <ModalFooter borderTop="1px" borderColor={getThemeColor('ui.border.light')}>
+        <ModalFooter borderTop="1px" borderColor={getThemeColor('secondary')}>
           <HStack spacing={3}>
             {!allRevealed && (
               <>
                 {!revealedPrize && (
                   <Button
                     size="lg"
-                    bg={getColor('success.400')}
-                    color={getColor('neutral.900')}
-                    _hover={{ bg: getColor('success.300'), transform: 'translateY(-2px)' }}
-                    _active={{ bg: getColor('success.500') }}
+                    bg={getThemeColor('success')}
+                    color={getThemeColor('white')}
+                    _hover={{ bg: getThemeColor('primaryDark'), transform: 'translateY(-2px)' }}
+                    _active={{ bg: getThemeColor('primaryDark') }}
                     onClick={handleSpin}
                     isLoading={isSpinning}
                     loadingText="Spinning..."
@@ -378,7 +379,9 @@ export default function InstantWinSpinner({
                 {revealedPrize && currentTicketIndex < tickets.length - 1 && (
                   <Button
                     size="lg"
-                    colorScheme="purple"
+                    bg={getThemeColor('primary')}
+                    color={getThemeColor('white')}
+                    _hover={{ bg: getThemeColor('primaryDark') }}
                     onClick={handleNextTicket}
                     rightIcon={<Text>→</Text>}
                   >
@@ -388,7 +391,9 @@ export default function InstantWinSpinner({
                 {revealedPrize && currentTicketIndex === tickets.length - 1 && (
                   <Button
                     size="lg"
-                    colorScheme="green"
+                    bg={getThemeColor('success')}
+                    color={getThemeColor('white')}
+                    _hover={{ bg: getThemeColor('primaryDark') }}
                     onClick={handleCloseModal}
                   >
                     Complete
@@ -399,7 +404,9 @@ export default function InstantWinSpinner({
             {allRevealed && (
               <Button
                 size="lg"
-                colorScheme="purple"
+                bg={getThemeColor('primary')}
+                color={getThemeColor('white')}
+                _hover={{ bg: getThemeColor('primaryDark') }}
                 onClick={handleCloseModal}
               >
                 Close
