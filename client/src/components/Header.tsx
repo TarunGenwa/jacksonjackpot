@@ -61,13 +61,13 @@ export default function Header() {
   return (
     <>
       <Box
-        bg={getThemeColor("components.header.bg")}
+        bg={getThemeColor("dark")}
         shadow="2xl"
         position="sticky"
         top={0}
         zIndex={1000}
         borderBottom="1px"
-        borderColor={getThemeColor('ui.border.accent')}
+        borderColor={getThemeColor('primary')}
       >
         <Container maxW="container.xl">
           <Flex h={16} alignItems="center" justifyContent="space-between">
@@ -76,9 +76,9 @@ export default function Header() {
               <Text
                 fontSize="2xl"
                 fontWeight="bold"
-                color={getThemeColor("components.header.logo")}
+                color={getThemeColor("accent")}
                 _hover={{
-                  color: getThemeColor("razzmatazz.600")
+                  color: getThemeColor("accentDark")
                 }}
                 transition="all 0.3s"
               >
@@ -94,8 +94,8 @@ export default function Header() {
                   aria-label="Open Menu"
                   icon={<HamburgerIcon />}
                   variant="ghost"
-                  color={getThemeColor('text.primary')}
-                  _hover={{ bg: getThemeColor('ui.hover.base') }}
+                  color={getThemeColor('white')}
+                  _hover={{ bg: getThemeColor('secondaryDark') }}
                   onClick={onOpen}
                 />
               )}
@@ -107,14 +107,14 @@ export default function Header() {
                   {!isMobile && user.role !== 'ADMIN' && (
                     <Link href="/wallet">
                       <Badge
-                        bg={getThemeColor('semantic.success.DEFAULT')}
-                        color={getThemeColor('text.primary')}
+                        bg={getThemeColor('success')}
+                        color={getThemeColor('white')}
                         px={3}
                         py={1}
                         borderRadius="full"
                         fontSize="sm"
                         cursor="pointer"
-                        _hover={{ bg: getThemeColor('semantic.success.light') }}
+                        _hover={{ bg: getThemeColor('success') }}
                         transition="all 0.2s"
                       >
                         <HStack spacing={1}>
@@ -136,16 +136,16 @@ export default function Header() {
                       <Avatar
                         size="sm"
                         name={getUserDisplayName()}
-                        bg={getThemeColor('brand.electricViolet')}
-                        color={getThemeColor('text.primary')}
+                        bg={getThemeColor('primary')}
+                        color={getThemeColor('white')}
                         border="2px"
-                        borderColor={getThemeColor('ui.border.accent')}
+                        borderColor={getThemeColor('primary')}
                       />
                     </MenuButton>
-                    <MenuList minW="250px" p={2} bg={getThemeColor('ui.card.bg')} borderColor={getThemeColor('ui.border.base')}>
-                      <Box px={3} py={2} borderBottom="1px" borderColor={getThemeColor('ui.border.base')} mb={2}>
-                        <Text fontWeight="semibold" color={getThemeColor('text.primary')}>{getUserDisplayName()}</Text>
-                        <Text fontSize="sm" color={getThemeColor('text.muted')}>{user.email}</Text>
+                    <MenuList minW="250px" p={2} bg={getThemeColor('dark')} borderColor={getThemeColor('secondary')}>
+                      <Box px={3} py={2} borderBottom="1px" borderColor={getThemeColor('secondary')} mb={2}>
+                        <Text fontWeight="semibold" color={getThemeColor('white')}>{getUserDisplayName()}</Text>
+                        <Text fontSize="sm" color={getThemeColor('gray500')}>{user.email}</Text>
                         <HStack justify="space-between" mt={2}>
                           <Badge colorScheme="blue" variant="solid" fontSize="xs">
                             {user.role}
@@ -171,56 +171,56 @@ export default function Header() {
                       /* Admin Menu Items */
                       <>
                         <Link href="/admin">
-                          <MenuItem icon={<FaCog />} bg={getThemeColor('ui.card.bg')} _hover={{ bg: getThemeColor('ui.hover.elevated') }} color={getThemeColor('semantic.warning.light')}>Dashboard</MenuItem>
+                          <MenuItem icon={<FaCog />} bg={getThemeColor('dark')} _hover={{ bg: getThemeColor('secondaryLight') }} color={getThemeColor('warning')}>Dashboard</MenuItem>
                         </Link>
                         <Link href="/admin/users">
-                          <MenuItem icon={<FaUsers />} bg={getThemeColor('ui.card.bg')} _hover={{ bg: getThemeColor('ui.hover.elevated') }} color={getThemeColor('text.secondary')}>Users</MenuItem>
+                          <MenuItem icon={<FaUsers />} bg={getThemeColor('dark')} _hover={{ bg: getThemeColor('secondaryLight') }} color={getThemeColor('gray300')}>Users</MenuItem>
                         </Link>
                         <Link href="/admin/competitions">
-                          <MenuItem icon={<FaTrophy />} bg={getThemeColor('ui.card.bg')} _hover={{ bg: getThemeColor('ui.hover.elevated') }} color={getThemeColor('text.secondary')}>Competitions</MenuItem>
+                          <MenuItem icon={<FaTrophy />} bg={getThemeColor('dark')} _hover={{ bg: getThemeColor('secondaryLight') }} color={getThemeColor('gray300')}>Competitions</MenuItem>
                         </Link>
                         <Link href="/admin/charities">
-                          <MenuItem icon={<FaHeart />} bg={getThemeColor('ui.card.bg')} _hover={{ bg: getThemeColor('ui.hover.elevated') }} color={getThemeColor('text.secondary')}>Charities</MenuItem>
+                          <MenuItem icon={<FaHeart />} bg={getThemeColor('dark')} _hover={{ bg: getThemeColor('secondaryLight') }} color={getThemeColor('gray300')}>Charities</MenuItem>
                         </Link>
                       </>
                     ) : (
                       /* Regular User Menu Items */
                       <>
                         <Link href="/profile">
-                          <MenuItem icon={<FaUser />} bg={getThemeColor('ui.card.bg')} _hover={{ bg: getThemeColor('ui.hover.elevated') }} color={getThemeColor('text.secondary')}>Profile Settings</MenuItem>
+                          <MenuItem icon={<FaUser />} bg={getThemeColor('dark')} _hover={{ bg: getThemeColor('secondaryLight') }} color={getThemeColor('gray300')}>Profile Settings</MenuItem>
                         </Link>
                         <Link href="/my-tickets">
-                          <MenuItem icon={<FaTicketAlt />} bg={getThemeColor('ui.card.bg')} _hover={{ bg: getThemeColor('ui.hover.elevated') }} color={getThemeColor('text.secondary')}>My Tickets</MenuItem>
+                          <MenuItem icon={<FaTicketAlt />} bg={getThemeColor('dark')} _hover={{ bg: getThemeColor('secondaryLight') }} color={getThemeColor('gray300')}>My Tickets</MenuItem>
                         </Link>
                         <Link href="/wallet">
-                          <MenuItem icon={<FaWallet />} bg={getThemeColor('ui.card.bg')} _hover={{ bg: getThemeColor('ui.hover.elevated') }} color={getThemeColor('text.secondary')}>Wallet</MenuItem>
+                          <MenuItem icon={<FaWallet />} bg={getThemeColor('dark')} _hover={{ bg: getThemeColor('secondaryLight') }} color={getThemeColor('gray300')}>Wallet</MenuItem>
                         </Link>
                         <Link href="/transaction-history">
-                          <MenuItem icon={<FaHistory />} bg={getThemeColor('ui.card.bg')} _hover={{ bg: getThemeColor('ui.hover.elevated') }} color={getThemeColor('text.secondary')}>Transaction History</MenuItem>
+                          <MenuItem icon={<FaHistory />} bg={getThemeColor('dark')} _hover={{ bg: getThemeColor('secondaryLight') }} color={getThemeColor('gray300')}>Transaction History</MenuItem>
                         </Link>
 
-                        <MenuDivider borderColor={getThemeColor('ui.border.base')} />
+                        <MenuDivider borderColor={getThemeColor('secondary')} />
 
                         <Link href="/charities">
-                          <MenuItem icon={<FaHeart />} bg={getThemeColor('ui.card.bg')} _hover={{ bg: getThemeColor('ui.hover.elevated') }} color={getThemeColor('text.secondary')}>Charities</MenuItem>
+                          <MenuItem icon={<FaHeart />} bg={getThemeColor('dark')} _hover={{ bg: getThemeColor('secondaryLight') }} color={getThemeColor('gray300')}>Charities</MenuItem>
                         </Link>
                         <Link href="/how-it-works">
-                          <MenuItem icon={<FaQuestionCircle />} bg={getThemeColor('ui.card.bg')} _hover={{ bg: getThemeColor('ui.hover.elevated') }} color={getThemeColor('text.secondary')}>How It Works</MenuItem>
+                          <MenuItem icon={<FaQuestionCircle />} bg={getThemeColor('dark')} _hover={{ bg: getThemeColor('secondaryLight') }} color={getThemeColor('gray300')}>How It Works</MenuItem>
                         </Link>
                         <Link href="/verify">
-                          <MenuItem icon={<FaShieldAlt />} bg={getThemeColor('ui.card.bg')} _hover={{ bg: getThemeColor('ui.hover.elevated') }} color={getThemeColor('text.secondary')}>Verify Chain</MenuItem>
+                          <MenuItem icon={<FaShieldAlt />} bg={getThemeColor('dark')} _hover={{ bg: getThemeColor('secondaryLight') }} color={getThemeColor('gray300')}>Verify Chain</MenuItem>
                         </Link>
                       </>
                     )}
 
-                    <MenuDivider borderColor={getThemeColor('ui.border.base')} />
+                    <MenuDivider borderColor={getThemeColor('secondary')} />
 
                     <MenuItem
                       icon={<FaSignOutAlt />}
                       onClick={logout}
-                      bg={getThemeColor('ui.card.bg')}
-                      color={getThemeColor('semantic.error.DEFAULT')}
-                      _hover={{ bg: getThemeColor('ui.hover.elevated') }}
+                      bg={getThemeColor('dark')}
+                      color={getThemeColor('error')}
+                      _hover={{ bg: getThemeColor('secondaryLight') }}
                     >
                       Sign Out
                     </MenuItem>
@@ -234,8 +234,8 @@ export default function Header() {
                     <Link href="/verify">
                       <Button
                         variant="ghost"
-                        color={getThemeColor('text.primary')}
-                        _hover={{ bg: getThemeColor('ui.hover.base') }}
+                        color={getThemeColor('white')}
+                        _hover={{ bg: getThemeColor('secondaryDark') }}
                         leftIcon={<FaShieldAlt />}
                       >
                         Verify
@@ -245,16 +245,16 @@ export default function Header() {
                   <Link href="/login">
                     <Button
                       variant="ghost"
-                      color={getThemeColor('text.primary')}
-                      _hover={{ bg: getThemeColor('ui.hover.base') }}
+                      color={getThemeColor('white')}
+                      _hover={{ bg: getThemeColor('secondaryDark') }}
                     >
                       Log In
                     </Button>
                   </Link>
                   <Link href="/signup">
                     <Button
-                      bg={getThemeColor('brand.electricViolet')}
-                      color={getThemeColor('text.primary')}
+                      bg={getThemeColor('primary')}
+                      color={getThemeColor('white')}
                       _hover={{ bg: "purple.400" }}
                     >
                       Sign Up
@@ -270,13 +270,13 @@ export default function Header() {
       {/* Mobile Navigation Drawer */}
       <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
         <DrawerOverlay />
-        <DrawerContent bg={getThemeColor('ui.card.bg')} color={getThemeColor('text.primary')}>
+        <DrawerContent bg={getThemeColor('dark')} color={getThemeColor('white')}>
           <DrawerCloseButton />
-          <DrawerHeader borderBottomWidth="1px" borderColor={getThemeColor('ui.border.base')}>
+          <DrawerHeader borderBottomWidth="1px" borderColor={getThemeColor('secondary')}>
             <Text
               fontWeight="bold"
               fontSize="xl"
-              color={getThemeColor("components.header.logo")}
+              color={getThemeColor("accent")}
             >
               JJ+
             </Text>
@@ -286,11 +286,11 @@ export default function Header() {
               {/* Mobile User Menu */}
               {user && (
                 <>
-                  <Box borderTop="1px" borderColor={getThemeColor('ui.border.base')} pt={4}>
+                  <Box borderTop="1px" borderColor={getThemeColor('secondary')} pt={4}>
                     <VStack spacing={2} align="stretch">
                       <Box px={3} py={2} bg="gray.700" borderRadius="md">
-                        <Text fontWeight="semibold" color={getThemeColor('text.primary')}>{getUserDisplayName()}</Text>
-                        <Text fontSize="sm" color={getThemeColor('text.muted')}>{user.email}</Text>
+                        <Text fontWeight="semibold" color={getThemeColor('white')}>{getUserDisplayName()}</Text>
+                        <Text fontSize="sm" color={getThemeColor('gray500')}>{user.email}</Text>
                         <HStack justify="space-between" mt={2}>
                           <Badge colorScheme="blue" variant="solid" fontSize="xs">
                             {user.role}
@@ -316,22 +316,22 @@ export default function Header() {
                         /* Admin Mobile Menu Items */
                         <>
                           <Link href="/admin" onClick={onClose}>
-                            <Button variant="ghost" leftIcon={<FaCog />} w="full" justifyContent="flex-start" color={getThemeColor('semantic.warning.light')} _hover={{ bg: getThemeColor('ui.hover.elevated') }}>
+                            <Button variant="ghost" leftIcon={<FaCog />} w="full" justifyContent="flex-start" color={getThemeColor('warning')} _hover={{ bg: getThemeColor('secondaryLight') }}>
                               Dashboard
                             </Button>
                           </Link>
                           <Link href="/admin/users" onClick={onClose}>
-                            <Button variant="ghost" leftIcon={<FaUsers />} w="full" justifyContent="flex-start" color={getThemeColor('text.secondary')} _hover={{ bg: getThemeColor('ui.hover.elevated') }}>
+                            <Button variant="ghost" leftIcon={<FaUsers />} w="full" justifyContent="flex-start" color={getThemeColor('gray300')} _hover={{ bg: getThemeColor('secondaryLight') }}>
                               Users
                             </Button>
                           </Link>
                           <Link href="/admin/competitions" onClick={onClose}>
-                            <Button variant="ghost" leftIcon={<FaTrophy />} w="full" justifyContent="flex-start" color={getThemeColor('text.secondary')} _hover={{ bg: getThemeColor('ui.hover.elevated') }}>
+                            <Button variant="ghost" leftIcon={<FaTrophy />} w="full" justifyContent="flex-start" color={getThemeColor('gray300')} _hover={{ bg: getThemeColor('secondaryLight') }}>
                               Competitions
                             </Button>
                           </Link>
                           <Link href="/admin/charities" onClick={onClose}>
-                            <Button variant="ghost" leftIcon={<FaHeart />} w="full" justifyContent="flex-start" color={getThemeColor('text.secondary')} _hover={{ bg: getThemeColor('ui.hover.elevated') }}>
+                            <Button variant="ghost" leftIcon={<FaHeart />} w="full" justifyContent="flex-start" color={getThemeColor('gray300')} _hover={{ bg: getThemeColor('secondaryLight') }}>
                               Charities
                             </Button>
                           </Link>
@@ -340,39 +340,39 @@ export default function Header() {
                         /* Regular User Mobile Menu Items */
                         <>
                           <Link href="/profile" onClick={onClose}>
-                            <Button variant="ghost" leftIcon={<FaUser />} w="full" justifyContent="flex-start" color={getThemeColor('text.secondary')} _hover={{ bg: getThemeColor('ui.hover.elevated') }}>
+                            <Button variant="ghost" leftIcon={<FaUser />} w="full" justifyContent="flex-start" color={getThemeColor('gray300')} _hover={{ bg: getThemeColor('secondaryLight') }}>
                               Profile Settings
                             </Button>
                           </Link>
                           <Link href="/my-tickets" onClick={onClose}>
-                            <Button variant="ghost" leftIcon={<FaTicketAlt />} w="full" justifyContent="flex-start" color={getThemeColor('text.secondary')} _hover={{ bg: getThemeColor('ui.hover.elevated') }}>
+                            <Button variant="ghost" leftIcon={<FaTicketAlt />} w="full" justifyContent="flex-start" color={getThemeColor('gray300')} _hover={{ bg: getThemeColor('secondaryLight') }}>
                               My Tickets
                             </Button>
                           </Link>
                           <Link href="/wallet" onClick={onClose}>
-                            <Button variant="ghost" leftIcon={<FaWallet />} w="full" justifyContent="flex-start" color={getThemeColor('text.secondary')} _hover={{ bg: getThemeColor('ui.hover.elevated') }}>
+                            <Button variant="ghost" leftIcon={<FaWallet />} w="full" justifyContent="flex-start" color={getThemeColor('gray300')} _hover={{ bg: getThemeColor('secondaryLight') }}>
                               Wallet
                             </Button>
                           </Link>
                           <Link href="/transaction-history" onClick={onClose}>
-                            <Button variant="ghost" leftIcon={<FaHistory />} w="full" justifyContent="flex-start" color={getThemeColor('text.secondary')} _hover={{ bg: getThemeColor('ui.hover.elevated') }}>
+                            <Button variant="ghost" leftIcon={<FaHistory />} w="full" justifyContent="flex-start" color={getThemeColor('gray300')} _hover={{ bg: getThemeColor('secondaryLight') }}>
                               Transaction History
                             </Button>
                           </Link>
 
-                          <Box borderTop="1px" borderColor={getThemeColor('ui.border.light')} pt={2} mt={2}>
+                          <Box borderTop="1px" borderColor={getThemeColor('gray300')} pt={2} mt={2}>
                             <Link href="/charities" onClick={onClose}>
-                              <Button variant="ghost" leftIcon={<FaHeart />} w="full" justifyContent="flex-start" color={getThemeColor('text.secondary')} _hover={{ bg: getThemeColor('ui.hover.elevated') }}>
+                              <Button variant="ghost" leftIcon={<FaHeart />} w="full" justifyContent="flex-start" color={getThemeColor('gray300')} _hover={{ bg: getThemeColor('secondaryLight') }}>
                                 Charities
                               </Button>
                             </Link>
                             <Link href="/how-it-works" onClick={onClose}>
-                              <Button variant="ghost" leftIcon={<FaQuestionCircle />} w="full" justifyContent="flex-start" color={getThemeColor('text.secondary')} _hover={{ bg: getThemeColor('ui.hover.elevated') }}>
+                              <Button variant="ghost" leftIcon={<FaQuestionCircle />} w="full" justifyContent="flex-start" color={getThemeColor('gray300')} _hover={{ bg: getThemeColor('secondaryLight') }}>
                                 How It Works
                               </Button>
                             </Link>
                             <Link href="/verify" onClick={onClose}>
-                              <Button variant="ghost" leftIcon={<FaShieldAlt />} w="full" justifyContent="flex-start" color={getThemeColor('text.secondary')} _hover={{ bg: getThemeColor('ui.hover.elevated') }}>
+                              <Button variant="ghost" leftIcon={<FaShieldAlt />} w="full" justifyContent="flex-start" color={getThemeColor('gray300')} _hover={{ bg: getThemeColor('secondaryLight') }}>
                                 Verify Chain
                               </Button>
                             </Link>
@@ -385,8 +385,8 @@ export default function Header() {
                         leftIcon={<FaSignOutAlt />}
                         w="full"
                         justifyContent="flex-start"
-                        color={getThemeColor('semantic.error.DEFAULT')}
-                        _hover={{ bg: getThemeColor('ui.hover.elevated') }}
+                        color={getThemeColor('error')}
+                        _hover={{ bg: getThemeColor('secondaryLight') }}
                         onClick={() => {
                           logout();
                           onClose();
@@ -402,25 +402,25 @@ export default function Header() {
               {/* Mobile Auth Links */}
               {!user && (
                 <>
-                  <Box borderTop="1px" borderColor={getThemeColor('ui.border.light')} pt={4} mt={4}>
+                  <Box borderTop="1px" borderColor={getThemeColor('gray300')} pt={4} mt={4}>
                     <VStack spacing={2}>
                       <Link href="/verify" onClick={onClose}>
-                        <Button variant="ghost" leftIcon={<FaShieldAlt />} w="full" color={getThemeColor('text.secondary')} _hover={{ bg: getThemeColor('ui.hover.elevated') }}>
+                        <Button variant="ghost" leftIcon={<FaShieldAlt />} w="full" color={getThemeColor('gray300')} _hover={{ bg: getThemeColor('secondaryLight') }}>
                           Verify Chain
                         </Button>
                       </Link>
                       <Link href="/login" onClick={onClose}>
-                        <Button variant="ghost" w="full" color={getThemeColor('text.secondary')} _hover={{ bg: getThemeColor('ui.hover.elevated') }}>
+                        <Button variant="ghost" w="full" color={getThemeColor('gray300')} _hover={{ bg: getThemeColor('secondaryLight') }}>
                           Log In
                         </Button>
                       </Link>
                       <Link href="/signup" onClick={onClose}>
                         <Button
                           w="full"
-                          bg={getThemeColor("ui.button.primary.bg")}
-                          color={getThemeColor('text.primary')}
+                          bg={getThemeColor("primary")}
+                          color={getThemeColor('white')}
                           _hover={{
-                            bg: getThemeColor("ui.button.primary.hover")
+                            bg: getThemeColor("primaryDark")
                           }}
                         >
                           Sign Up

@@ -3,311 +3,47 @@
 
 export const themeConfig = {
   // ========================================
-  // BRAND COLORS - EPL Palette
+  // CORE COLORS - 5 Main Colors
   // ========================================
   colors: {
-    // Core Brand Colors
-    brand: {
-      valentino: '#360D3A',        // Primary Dark Purple
-      razzmatazz: '#E90052',       // Accent Red
-      electricViolet: '#963CFF',   // Secondary Purple
-      white: '#FFFFFF',            // Pure White
-    },
+    // 5 Core Colors
+    primary: '#963CFF',     // Electric Violet - Main brand color
+    secondary: '#68348F',   // Medium Purple - Secondary actions
+    accent: '#E90052',      // Razzmatazz - CTAs and highlights
+    dark: '#360D3A',        // Valentino - Dark backgrounds
+    light: '#F3E9F4',       // Light Purple - Light backgrounds
 
-    // Extended Valentino Palette
-    valentino: {
-      50: '#F3E9F4',
-      100: '#E1C8E3',
-      200: '#CDA3D1',
-      300: '#B87EBF',
-      400: '#A862B1',
-      500: '#9846A3',
-      600: '#803D9B',
-      700: '#68348F',
-      800: '#4E2A7F',
-      900: '#360D3A', // Brand Valentino
-      950: '#1A061D', // Darker variant
-    },
+    // Color Variants (generated from core colors)
+    primaryDark: '#6F2DCC',    // Darker primary
+    primaryLight: '#C195FF',   // Lighter primary
+    secondaryDark: '#4E2A7F',  // Darker secondary
+    secondaryLight: '#803D9B', // Lighter secondary
+    accentDark: '#CC0048',     // Darker accent
+    accentLight: '#FF80B1',    // Lighter accent
 
-    // Extended Razzmatazz Palette
-    razzmatazz: {
-      50: '#FFE0EC',
-      100: '#FFB3D0',
-      200: '#FF80B1',
-      300: '#FF4D93',
-      400: '#FF267A',
-      500: '#E90052', // Brand Razzmatazz
-      600: '#CC0048',
-      700: '#A6003A',
-      800: '#80002D',
-      900: '#590020',
-    },
+    // Status Colors (semantic)
+    success: '#48bb78',
+    warning: '#ed8936',
+    error: '#E90052',    // Using accent for errors
+    info: '#4299e1',
 
-    // Extended Electric Violet Palette
-    electricViolet: {
-      50: '#F0E6FF',
-      100: '#D9BFFF',
-      200: '#C195FF',
-      300: '#A96BFF',
-      400: '#9F53FF',
-      500: '#963CFF', // Brand Electric Violet
-      600: '#8636E6',
-      700: '#6F2DCC',
-      800: '#5924B3',
-      900: '#421A99',
-    },
+    // Neutral Colors (grays)
+    white: '#FFFFFF',
+    gray100: '#F5F5F5',
+    gray300: '#D4D4D4',
+    gray500: '#737373',
+    gray700: '#404040',
+    gray900: '#171717',
+    black: '#000000',
 
-    // Semantic Colors
-    semantic: {
-      // UI States
-      primary: '#963CFF',        // Electric Violet
-      secondary: '#360D3A',      // Valentino
-      accent: '#E90052',         // Razzmatazz
 
-      // Status Colors
-      success: {
-        light: '#48bb78',
-        DEFAULT: '#38a169',
-        dark: '#2f855a',
-      },
-      warning: {
-        light: '#f6ad55',
-        DEFAULT: '#ed8936',
-        dark: '#c05621',
-      },
-      error: {
-        light: '#FC8181',
-        DEFAULT: '#E90052',      // Using Razzmatazz for errors
-        dark: '#CC0048',
-      },
-      info: {
-        light: '#90CDF4',
-        DEFAULT: '#3182ce',
-        dark: '#2C5282',
-      },
-    },
-
-    // Neutral Colors
-    neutral: {
-      white: '#FFFFFF',
-      50: '#FAFAFA',
-      100: '#F5F5F5',
-      200: '#E5E5E5',
-      300: '#D4D4D4',
-      400: '#A3A3A3',
-      500: '#737373',
-      600: '#525252',
-      700: '#404040',
-      800: '#262626',
-      900: '#171717',
-      black: '#000000',
-    },
-
-    // Background Colors
-    backgrounds: {
-      // Page backgrounds
-      page: {
-        light: '#FFFFFF',
-        dark: '#360D3A',          // Valentino
-        darker: '#1A061D',
-      },
-
-      // Card backgrounds
-      card: {
-        primary: '#360D3A',       // Valentino
-        secondary: '#4E2A7F',     // Lighter Valentino
-        elevated: '#68348F',      // Even lighter
-        overlay: 'rgba(54, 13, 58, 0.95)',
-        glass: 'rgba(54, 13, 58, 0.3)',
-      },
-
-      // Specific UI elements
-      modal: 'rgba(54, 13, 58, 0.95)',
-      dropdown: '#360D3A',
-      tooltip: '#1A061D',
-      sidebar: '#360D3A',
-      header: '#360D3A',
-    },
-
-    // Text Colors
-    text: {
-      // Primary text
-      primary: {
-        light: '#171717',
-        dark: '#FFFFFF',
-      },
-      secondary: {
-        light: '#525252',
-        dark: '#D9BFFF',         // Light Electric Violet
-      },
-      muted: {
-        light: '#737373',
-        dark: '#A96BFF',         // Medium Electric Violet
-      },
-      disabled: {
-        light: '#A3A3A3',
-        dark: '#525252',
-      },
-
-      // Semantic text
-      accent: '#E90052',         // Razzmatazz
-      link: '#963CFF',           // Electric Violet
-      linkHover: '#8636E6',
-      success: '#38a169',
-      error: '#E90052',
-      warning: '#ed8936',
-      info: '#3182ce',
-    },
-
-    // Border Colors
-    borders: {
-      default: {
-        light: '#E5E5E5',
-        dark: '#963CFF',         // Electric Violet
-      },
-      subtle: {
-        light: '#F5F5F5',
-        dark: 'rgba(150, 60, 255, 0.3)',
-      },
-      focus: '#E90052',          // Razzmatazz
-      error: '#E90052',
-      success: '#38a169',
-    },
-
-    // Special UI Elements
-    ui: {
-      // Buttons
-      button: {
-        primary: {
-          bg: '#963CFF',         // Electric Violet
-          hover: '#8636E6',
-          active: '#6F2DCC',
-          text: '#FFFFFF',
-        },
-        secondary: {
-          bg: '#360D3A',         // Valentino
-          hover: '#4E2A7F',
-          active: '#68348F',
-          text: '#FFFFFF',
-        },
-        accent: {
-          bg: '#E90052',         // Razzmatazz
-          hover: '#CC0048',
-          active: '#A6003A',
-          text: '#FFFFFF',
-        },
-        ghost: {
-          bg: 'transparent',
-          hover: 'rgba(150, 60, 255, 0.1)',
-          active: 'rgba(150, 60, 255, 0.2)',
-          text: '#963CFF',
-        },
-      },
-
-      // Progress bars
-      progress: {
-        bg: 'rgba(150, 60, 255, 0.2)',
-        fill: '#963CFF',
-      },
-
-      // Badges
-      badge: {
-        primary: '#963CFF',
-        secondary: '#360D3A',
-        accent: '#E90052',
-        success: '#38a169',
-        warning: '#ed8936',
-        error: '#E90052',
-        info: '#3182ce',
-      },
-
-      // Form elements
-      input: {
-        bg: {
-          light: '#FFFFFF',
-          dark: 'rgba(54, 13, 58, 0.3)',
-        },
-        border: {
-          default: '#963CFF',
-          focus: '#E90052',
-          error: '#E90052',
-        },
-      },
-    },
-
-    // Component specific colors
-    components: {
-      header: {
-        bg: '#360D3A',
-        border: '#963CFF',
-        text: '#FFFFFF',
-        logo: '#E90052',
-      },
-
-      competitionCard: {
-        bg: '#360D3A',
-        border: '#963CFF',
-        hoverBorder: '#E90052',
-        imagePlaceholder: '#4E2A7F',
-        statusBadge: {
-          active: '#38a169',
-          upcoming: '#3182ce',
-          soldOut: '#E90052',
-          completed: '#737373',
-        },
-      },
-
-      prizeSection: {
-        drawPrize: {
-          border: '#963CFF',
-          icon: '#963CFF',
-          value: '#E90052',
-        },
-        instantWin: {
-          border: '#E90052',
-          icon: '#E90052',
-          value: '#E90052',
-        },
-      },
-
-      wallet: {
-        balance: '#E90052',
-        currency: '#963CFF',
-      },
-
-      tickets: {
-        number: '#E90052',
-        price: '#E90052',
-        available: '#38a169',
-        soldOut: '#E90052',
-      },
-    },
-
-    // Transparency/Opacity variants
-    alpha: {
-      black: {
-        100: 'rgba(0, 0, 0, 0.1)',
-        200: 'rgba(0, 0, 0, 0.2)',
-        300: 'rgba(0, 0, 0, 0.3)',
-        400: 'rgba(0, 0, 0, 0.4)',
-        500: 'rgba(0, 0, 0, 0.5)',
-        600: 'rgba(0, 0, 0, 0.6)',
-        700: 'rgba(0, 0, 0, 0.7)',
-        800: 'rgba(0, 0, 0, 0.8)',
-        900: 'rgba(0, 0, 0, 0.9)',
-      },
-      white: {
-        100: 'rgba(255, 255, 255, 0.1)',
-        200: 'rgba(255, 255, 255, 0.2)',
-        300: 'rgba(255, 255, 255, 0.3)',
-        400: 'rgba(255, 255, 255, 0.4)',
-        500: 'rgba(255, 255, 255, 0.5)',
-        600: 'rgba(255, 255, 255, 0.6)',
-        700: 'rgba(255, 255, 255, 0.7)',
-        800: 'rgba(255, 255, 255, 0.8)',
-        900: 'rgba(255, 255, 255, 0.9)',
-      },
-    },
+    // Opacity utilities
+    opacity10: 0.1,
+    opacity20: 0.2,
+    opacity30: 0.3,
+    opacity50: 0.5,
+    opacity70: 0.7,
+    opacity90: 0.9,
   },
 
   // ========================================

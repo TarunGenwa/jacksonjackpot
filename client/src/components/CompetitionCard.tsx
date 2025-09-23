@@ -17,6 +17,7 @@ import {
 } from '@chakra-ui/react';
 import { FaClock, FaTicketAlt, FaTrophy, FaGift, FaBolt, FaCalendarDay, FaCircle } from 'react-icons/fa';
 import { Competition } from '@/types/api';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface CompetitionWithCategory extends Competition {
   category?: string;
@@ -28,6 +29,7 @@ interface CompetitionCardProps {
 
 export default function CompetitionCard({ competition }: CompetitionCardProps) {
   const router = useRouter();
+  const { getThemeColor } = useTheme();
   const [localCompetition, setLocalCompetition] = useState(competition);
 
   // Update local state when prop changes
@@ -63,28 +65,23 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'ACTIVE': return 'green';
-      case 'UPCOMING': return 'blue';
-      case 'SOLD_OUT': return 'red';
-      case 'COMPLETED': return 'gray';
-      default: return 'gray';
-    }
+    const statusMap: Record<string, string> = {
+      'ACTIVE': getThemeColor('success'),
+      'UPCOMING': getThemeColor('info'),
+      'SOLD_OUT': getThemeColor('error'),
+      'COMPLETED': getThemeColor('gray500'),
+    };
+    return statusMap[status] || getThemeColor('gray500');
   };
 
   const getCategoryInfo = (category?: string) => {
-    switch (category) {
-      case 'Mystery Box':
-        return { icon: FaGift, color: 'purple' };
-      case 'Instant Win':
-        return { icon: FaBolt, color: 'orange' };
-      case 'Daily Free':
-        return { icon: FaCalendarDay, color: 'green' };
-      case 'Instant Spin':
-        return { icon: FaCircle, color: 'blue' };
-      default:
-        return { icon: FaTrophy, color: 'gray' };
-    }
+    const categoryMap: Record<string, { icon: any; color: string }> = {
+      'Mystery Box': { icon: FaGift, color: getThemeColor('primary') },
+      'Instant Win': { icon: FaBolt, color: getThemeColor('warning') },
+      'Daily Free': { icon: FaCalendarDay, color: getThemeColor('success') },
+      'Instant Spin': { icon: FaCircle, color: getThemeColor('info') },
+    };
+    return categoryMap[category || ''] || { icon: FaTrophy, color: getThemeColor('gray500') };
   };
 
   const categoryInfo = getCategoryInfo(localCompetition.category);
@@ -94,15 +91,15 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
     <Card
       w="full"
       shadow="xl"
-      _hover={{ shadow: "2xl", transform: "translateY(-2px)", borderColor: "purple.400" }}
+      _hover={{ shadow: "2xl", transform: "translateY(-2px)", borderColor: getThemeColor('primaryLight') }}
       transition="all 0.3s"
       overflow="hidden"
       cursor="pointer"
       onClick={handleCardClick}
-      bg="#360D3A"
+      bg={getThemeColor('dark')}
       borderRadius="lg"
       border="1px"
-      borderColor="purple.800"
+      borderColor={getThemeColor('secondary')}
     >
       <CardBody p={0}>
         <VStack spacing={0} align="stretch">
@@ -119,12 +116,12 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
               <Box
                 w="full"
                 h="full"
-                bg="#4E2A7F"
+                bg={getThemeColor('secondaryDark')}
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
               >
-                <Icon as={FaTrophy} color="white" boxSize={10} />
+                <Icon as={FaTrophy} color={getThemeColor('white')} boxSize={10} />
               </Box>
             )}
 
@@ -137,8 +134,8 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
             >
               {localCompetition.category && (
                 <Badge
-                  colorScheme={categoryInfo.color}
-                  variant="solid"
+                  bg={categoryInfo.color}
+                  color={getThemeColor('white')}
                   fontSize="sm"
                   borderRadius="md"
                   px={3}
@@ -152,8 +149,8 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
                 </Badge>
               )}
               <Badge
-                colorScheme={getStatusColor(localCompetition.status)}
-                variant="solid"
+                bg={getStatusColor(localCompetition.status)}
+                color={getThemeColor('white')}
                 fontSize="sm"
                 borderRadius="md"
                 px={3}
@@ -168,8 +165,8 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
               position="absolute"
               top={4}
               right={4}
-              bg="green.400"
-              color="gray.900"
+              bg={getThemeColor('success')}
+              color={getThemeColor('gray900')}
               fontSize="md"
               px={3}
               py={1}
@@ -186,7 +183,7 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
             <Heading
               as="h3"
               size="sm"
-              color="white"
+              color={getThemeColor('white')}
               lineHeight="1.2"
               noOfLines={2}
             >
@@ -196,29 +193,33 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
             {/* Progress Bar */}
             <Box>
               <Flex justify="space-between" mb={1}>
-                <Text fontSize="xs" fontWeight="semibold" color="gray.300">
+                <Text fontSize="xs" fontWeight="semibold" color={getThemeColor('gray300')}>
                   Progress
                 </Text>
-                <Text fontSize="xs" fontWeight="bold" color="purple.400">
+                <Text fontSize="xs" fontWeight="bold" color={getThemeColor('primary')}>
                   {getProgressPercentage()}%
                 </Text>
               </Flex>
               <Progress
                 value={getProgressPercentage()}
-                colorScheme="purple"
                 size="sm"
                 borderRadius="full"
-                bg="blackAlpha.400"
+                bg={`rgba(0, 0, 0, 0.4)`}
+                sx={{
+                  '& > div': {
+                    bg: getThemeColor('primary'),
+                  },
+                }}
               />
             </Box>
 
             {/* Prizes */}
             <HStack justify="space-between" py={1}>
               <HStack spacing={1}>
-                <Icon as={FaTrophy} boxSize={3} color="yellow.400" />
-                <Text fontSize="xs" color="gray.400">Total Prizes Value</Text>
+                <Icon as={FaTrophy} boxSize={3} color={getThemeColor('warning')} />
+                <Text fontSize="xs" color={getThemeColor('gray500')}>Total Prizes Value</Text>
               </HStack>
-              <Text fontWeight="bold" color="green.400" fontSize="sm">
+              <Text fontWeight="bold" color={getThemeColor('success')} fontSize="sm">
                 £{(localCompetition.prizes.reduce((sum, prize) => sum + (prize.value * prize.quantity), 0) / 100).toFixed(2)}
               </Text>
             </HStack>
@@ -226,10 +227,10 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
             {/* Action Button */}
             <Button
               size="sm"
-              bg="green.400"
-              color="gray.900"
+              bg={getThemeColor('success')}
+              color={getThemeColor('gray900')}
               _hover={{
-                bg: "green.300",
+                bg: getThemeColor('success'),
                 transform: "translateY(-1px)"
               }}
               variant="solid"
