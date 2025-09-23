@@ -131,7 +131,7 @@ const brightBoldTheme = {
   secondary: '#5626c4',   // Chrysler Blue - Secondary actions
   accent: '#facd3d',      // Sunglow - CTAs and highlights
   dark: '#1f3044',        // Prussian Blue - Dark backgrounds
-  light: '#f0f8ff',       // Alice Blue - Light backgrounds
+  light: '#ffffff',       // Alice Blue - Light backgrounds
 
   // Color Variants (generated from core colors)
   primaryDark: '#1a9d96',    // Darker robin egg blue

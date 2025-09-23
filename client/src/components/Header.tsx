@@ -63,12 +63,12 @@ export default function Header() {
   return (
     <>
       <Box
-        bg={getThemeColor("dark")}
+        bg={getThemeColor("secondary")}
         shadow="2xl"
         position="sticky"
         top={0}
         zIndex={1000}
-        borderBottom="1px"
+        borderBottom="2px"
         borderColor={getThemeColor('primary')}
       >
         <Container maxW="container.xl">
@@ -109,14 +109,14 @@ export default function Header() {
                   {!isMobile && user.role !== 'ADMIN' && (
                     <Link href="/wallet">
                       <Badge
-                        bg={getThemeColor('success')}
+                        bg={getThemeColor('primary')}
                         color={getThemeColor('white')}
                         px={3}
                         py={1}
                         borderRadius="full"
                         fontSize="sm"
                         cursor="pointer"
-                        _hover={{ bg: getThemeColor('success') }}
+                        _hover={{ bg: getThemeColor('primaryDark') }}
                         transition="all 0.2s"
                       >
                         <HStack spacing={1}>
@@ -273,9 +273,9 @@ export default function Header() {
                   </Link>
                   <Link href="/signup">
                     <Button
-                      bg={getThemeColor('primary')}
-                      color={getThemeColor('white')}
-                      _hover={{ bg: "purple.400" }}
+                      bg={getThemeColor('accent')}
+                      color={getThemeColor('dark')}
+                      _hover={{ bg: getThemeColor('accentDark') }}
                     >
                       Sign Up
                     </Button>
