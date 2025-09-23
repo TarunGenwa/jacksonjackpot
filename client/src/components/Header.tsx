@@ -32,11 +32,13 @@ import { FaUser, FaTicketAlt, FaWallet, FaHistory, FaSignOutAlt, FaPoundSign, Fa
 import { useAuth } from '@/contexts/AuthContext';
 import { useWallet } from '@/contexts/WalletContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useUnrevealedTickets } from '@/contexts/UnrevealedTicketsContext';
 
 export default function Header() {
   const { user, logout } = useAuth();
   const { balance: walletBalance, isLoading: walletLoading } = useWallet();
   const { getThemeColor } = useTheme();
+  const { unrevealedTickets } = useUnrevealedTickets();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const isMobile = useBreakpointValue({ base: true, lg: false });
 
@@ -132,7 +134,7 @@ export default function Header() {
                   )}
                   
                   <Menu>
-                    <MenuButton>
+                    <MenuButton position="relative">
                       <Avatar
                         size="sm"
                         name={getUserDisplayName()}
@@ -141,6 +143,24 @@ export default function Header() {
                         border="2px"
                         borderColor={getThemeColor('primary')}
                       />
+                      {unrevealedTickets.length > 0 && (
+                        <Badge
+                          position="absolute"
+                          top="-1"
+                          right="-1"
+                          bg={getThemeColor('accent')}
+                          color={getThemeColor('white')}
+                          borderRadius="full"
+                          fontSize="xs"
+                          minW="18px"
+                          h="18px"
+                          display="flex"
+                          alignItems="center"
+                          justifyContent="center"
+                        >
+                          {unrevealedTickets.length}
+                        </Badge>
+                      )}
                     </MenuButton>
                     <MenuList minW="250px" p={2} bg={getThemeColor('dark')} borderColor={getThemeColor('secondary')}>
                       <Box px={3} py={2} borderBottom="1px" borderColor={getThemeColor('secondary')} mb={2}>

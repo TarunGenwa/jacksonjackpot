@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Header from './Header';
 import Footer from './Footer';
+import UnrevealedTicketsNotification from './UnrevealedTicketsNotification';
 
 interface ConditionalLayoutProps {
   children: React.ReactNode;
@@ -33,6 +34,8 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
         {children}
       </main>
       <Footer />
+      {/* Show unrevealed tickets notification for authenticated users */}
+      {user && <UnrevealedTicketsNotification />}
     </div>
   );
 }

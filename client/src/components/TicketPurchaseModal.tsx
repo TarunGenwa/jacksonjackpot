@@ -37,6 +37,7 @@ import { ticketsService, PurchaseTicketRequest } from '@/services/tickets';
 import { useAuth } from '@/contexts/AuthContext';
 import { useWallet } from '@/contexts/WalletContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useUnrevealedTickets } from '@/contexts/UnrevealedTicketsContext';
 
 interface TicketWithInstantWin {
   ticketNumber: string;
@@ -65,6 +66,7 @@ export default function TicketPurchaseModal({
   const { user } = useAuth();
   const { updateBalance } = useWallet();
   const { getColor, getSemanticColor, getThemeColor } = useTheme();
+  const { addUnrevealedTickets, markTicketsAsRevealed } = useUnrevealedTickets();
   const toast = useToast();
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -113,10 +115,19 @@ export default function TicketPurchaseModal({
       // Store purchased tickets for instant win reveal
       setPurchasedTickets(result.tickets);
 
-      // Check if any tickets have instant wins
+      // Save all tickets to unrevealed context first
+      const ticketsWithCompetitionInfo = result.tickets.map((ticket: TicketWithInstantWin) => ({
+        ...ticket,
+        competitionId: competition.id,
+        competitionTitle: competition.title,
+        purchaseDate: new Date().toISOString()
+      }));
+      addUnrevealedTickets(ticketsWithCompetitionInfo);
+
+      // Check if any tickets have instant wins or if there are tickets to reveal
       const hasInstantWins = result.tickets.some((ticket: TicketWithInstantWin) => ticket.instantWin?.prize);
 
-      if (hasInstantWins || result.tickets.length > 0) {
+      if (result.tickets.length > 0) {
         // Show instant win spinner for all purchased tickets
         setShowInstantWinSpinner(true);
         onClose(); // Close purchase modal
@@ -179,6 +190,10 @@ export default function TicketPurchaseModal({
   };
 
   const handleInstantWinComplete = () => {
+    // Mark tickets as revealed in context
+    const ticketNumbers = purchasedTickets.map(t => t.ticketNumber);
+    markTicketsAsRevealed(ticketNumbers);
+
     // Show success message after instant win reveal
     toast({
       title: 'Purchase Complete! 🎉',
@@ -189,11 +204,10 @@ export default function TicketPurchaseModal({
     });
 
     // Show ticket numbers
-    const ticketNumbers = purchasedTickets.map(t => t.ticketNumber).join(', ');
     setTimeout(() => {
       toast({
         title: 'Your Ticket Numbers',
-        description: `Ticket${purchasedTickets.length > 1 ? 's' : ''}: ${ticketNumbers}`,
+        description: `Ticket${purchasedTickets.length > 1 ? 's' : ''}: ${ticketNumbers.join(', ')}`,
         status: 'info',
         duration: 8000,
         isClosable: true,
@@ -440,6 +454,7 @@ export default function TicketPurchaseModal({
     <InstantWinSpinner
       isOpen={showInstantWinSpinner}
       onClose={() => {
+        // Don't mark as revealed if user escapes - let them stay in unrevealed state
         setShowInstantWinSpinner(false);
         setPurchasedTickets([]);
       }}

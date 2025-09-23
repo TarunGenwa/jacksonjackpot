@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { WalletProvider } from "@/contexts/WalletContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { UnrevealedTicketsProvider } from "@/contexts/UnrevealedTicketsContext";
 import ConditionalLayout from "@/components/ConditionalLayout";
 import AdminRouteGuard from "@/components/AdminRouteGuard";
 import { ChakraProvider } from "@chakra-ui/react";
@@ -43,11 +44,13 @@ export default function RootLayout({
           <ThemeProvider>
             <AuthProvider>
               <WalletProvider>
-                <AdminRouteGuard>
-                  <ConditionalLayout>
-                    {children}
-                  </ConditionalLayout>
-                </AdminRouteGuard>
+                <UnrevealedTicketsProvider>
+                  <AdminRouteGuard>
+                    <ConditionalLayout>
+                      {children}
+                    </ConditionalLayout>
+                  </AdminRouteGuard>
+                </UnrevealedTicketsProvider>
               </WalletProvider>
             </AuthProvider>
           </ThemeProvider>
