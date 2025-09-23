@@ -57,12 +57,12 @@ export default function Home() {
 
   if (loading) {
     return (
-      <Box minH="100vh" bg="slate.50">
+      <Box minH="100vh" bg={getThemeColor('dark')}>
         <Container maxW="container.xl" py={8}>
           <Center minH="50vh">
             <VStack spacing={4}>
               <Spinner size="xl" color={getThemeColor('primary')} />
-              <Text color={getThemeColor('gray500')}>Loading competitions...</Text>
+              <Text color={getThemeColor('gray300')}>Loading competitions...</Text>
             </VStack>
           </Center>
         </Container>
@@ -72,11 +72,11 @@ export default function Home() {
 
   if (error) {
     return (
-      <Box minH="100vh" bg="slate.50">
+      <Box minH="100vh" bg={getThemeColor('dark')}>
         <Container maxW="container.xl" py={8}>
           <Center minH="50vh">
             <VStack spacing={4}>
-              <Alert status="error" maxW="md" borderRadius="md" bg={getThemeColor('dark')} color="white">
+              <Alert status="error" maxW="md" borderRadius="md" bg={getThemeColor('secondary')} color="white">
                 <AlertIcon />
                 {error}
               </Alert>
@@ -158,12 +158,11 @@ export default function Home() {
             >
               <VStack spacing={6} align="stretch">
                 <Box
-                  bg="whiteAlpha.200"
-                  backdropFilter="blur(10px)"
+                  bg={getThemeColor('secondary')}
                   borderRadius="xl"
                   p={6}
                   border="1px solid"
-                  borderColor="whiteAlpha.300"
+                  borderColor={getThemeColor('secondaryLight')}
                   transform="translateY(0)"
                   animation="float 3s ease-in-out infinite"
                   sx={{
@@ -181,7 +180,7 @@ export default function Home() {
                       <Text fontSize="2xl" fontWeight="bold" color="white">
                         £500K+
                       </Text>
-                      <Text fontSize="sm" color="whiteAlpha.800">
+                      <Text fontSize="sm" color="white">
                         Raised for Charities
                       </Text>
                     </VStack>
@@ -189,12 +188,11 @@ export default function Home() {
                 </Box>
 
                 <Box
-                  bg="whiteAlpha.200"
-                  backdropFilter="blur(10px)"
+                  bg={getThemeColor('secondary')}
                   borderRadius="xl"
                   p={6}
                   border="1px solid"
-                  borderColor="whiteAlpha.300"
+                  borderColor={getThemeColor('secondaryLight')}
                   transform="translateY(0)"
                   animation="float 3s ease-in-out infinite 1s"
                   sx={{
@@ -212,7 +210,7 @@ export default function Home() {
                       <Text fontSize="2xl" fontWeight="bold" color="white">
                         1,200+
                       </Text>
-                      <Text fontSize="sm" color="whiteAlpha.800">
+                      <Text fontSize="sm" color="white">
                         Prizes Won
                       </Text>
                     </VStack>
@@ -220,12 +218,11 @@ export default function Home() {
                 </Box>
 
                 <Box
-                  bg="whiteAlpha.200"
-                  backdropFilter="blur(10px)"
+                  bg={getThemeColor('secondary')}
                   borderRadius="xl"
                   p={6}
                   border="1px solid"
-                  borderColor="whiteAlpha.300"
+                  borderColor={getThemeColor('secondaryLight')}
                   transform="translateY(0)"
                   animation="float 3s ease-in-out infinite 2s"
                   sx={{
@@ -243,7 +240,7 @@ export default function Home() {
                       <Text fontSize="2xl" fontWeight="bold" color="white">
                         25K+
                       </Text>
-                      <Text fontSize="sm" color="whiteAlpha.800">
+                      <Text fontSize="sm" color="white">
                         Happy Players
                       </Text>
                     </VStack>
@@ -309,7 +306,8 @@ export default function Home() {
       </Box>
 
       {/* Main Content */}
-      <Container maxW="container.xl" py={12}>
+      <Box bg={getThemeColor('dark')} py={12}>
+        <Container maxW="container.xl">
         {/* Active Competitions Section - HIDDEN */}
         {/*
         <VStack spacing={12}>
@@ -356,7 +354,7 @@ export default function Home() {
         <VStack spacing={12}>
 
           {/* Features Section */}
-          <Card w="full" shadow="xl" bg={getThemeColor('dark')} border="1px" borderColor={getThemeColor('secondary')}>
+          <Card w="full" shadow="xl" bg={getThemeColor('secondary')} border="1px" borderColor={getThemeColor('secondaryLight')}>
             <CardBody p={8}>
               <VStack spacing={8}>
                 <Heading size="xl" textAlign="center" color={getThemeColor('white')}>
@@ -364,29 +362,29 @@ export default function Home() {
                 </Heading>
                 <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8} w="full">
                   <VStack spacing={4} textAlign="center">
-                    <Circle size="16" bg={getThemeColor('secondaryDark')} color={getThemeColor('secondary')}>
+                    <Circle size="16" bg={getThemeColor('primary')} color={getThemeColor('white')}>
                       <Icon as={FaTrophy} boxSize={8} />
                     </Circle>
                     <Heading size="md" color={getThemeColor('white')}>Amazing Prizes</Heading>
-                    <Text color={getThemeColor('gray500')}>
+                    <Text color={getThemeColor('gray300')}>
                       Win holidays, cash, cars, and more incredible prizes
                     </Text>
                   </VStack>
                   <VStack spacing={4} textAlign="center">
-                    <Circle size="16" bg={getThemeColor('accentDark')} color={getThemeColor('accent')}>
+                    <Circle size="16" bg={getThemeColor('accent')} color={getThemeColor('dark')}>
                       <Icon as={FaHeart} boxSize={8} />
                     </Circle>
                     <Heading size="md" color={getThemeColor('white')}>Support Charities</Heading>
-                    <Text color={getThemeColor('gray500')}>
+                    <Text color={getThemeColor('gray300')}>
                       Every ticket supports verified charitable causes
                     </Text>
                   </VStack>
                   <VStack spacing={4} textAlign="center">
-                    <Circle size="16" bg={getThemeColor('primaryDark')} color={getThemeColor('primary')}>
+                    <Circle size="16" bg={getThemeColor('primaryLight')} color={getThemeColor('dark')}>
                       <Icon as={FaShieldAlt} boxSize={8} />
                     </Circle>
                     <Heading size="md" color={getThemeColor('white')}>100% Transparent</Heading>
-                    <Text color={getThemeColor('gray500')}>
+                    <Text color={getThemeColor('gray300')}>
                       Fair draws, verified charities, secure payments
                     </Text>
                   </VStack>
@@ -396,7 +394,7 @@ export default function Home() {
           </Card>
 
           {/* Stats Section */}
-          <Card w="full" shadow="xl" bg={getThemeColor('dark')} border="1px" borderColor={getThemeColor('secondary')}>
+          <Card w="full" shadow="xl" bg={getThemeColor('secondary')} border="1px" borderColor={getThemeColor('secondaryLight')}>
             <CardBody p={8}>
               <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8}>
                 <Stat textAlign="center">
@@ -430,6 +428,7 @@ export default function Home() {
           </Card>
         </VStack>
       </Container>
+      </Box>
     </Box>
   );
 }

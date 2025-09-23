@@ -50,9 +50,11 @@ export default function UnrevealedTicketsNotification() {
     setShowSpinner(true);
   };
 
+  const handleTicketRevealed = (ticketNumber: string) => {
+    markTicketsAsRevealed([ticketNumber]);
+  };
+
   const handleSpinnerComplete = () => {
-    const ticketNumbers = selectedTickets.map(t => t.ticketNumber);
-    markTicketsAsRevealed(ticketNumbers);
     setShowSpinner(false);
     setSelectedTickets([]);
   };
@@ -157,6 +159,7 @@ export default function UnrevealedTicketsNotification() {
         onClose={handleSpinnerClose}
         tickets={selectedTickets}
         onComplete={handleSpinnerComplete}
+        onTicketRevealed={handleTicketRevealed}
       />
     </>
   );

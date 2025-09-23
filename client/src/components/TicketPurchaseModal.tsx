@@ -189,11 +189,12 @@ export default function TicketPurchaseModal({
     }).format(price);
   };
 
-  const handleInstantWinComplete = () => {
-    // Mark tickets as revealed in context
-    const ticketNumbers = purchasedTickets.map(t => t.ticketNumber);
-    markTicketsAsRevealed(ticketNumbers);
+  const handleTicketRevealed = (ticketNumber: string) => {
+    // Mark individual ticket as revealed immediately when spun
+    markTicketsAsRevealed([ticketNumber]);
+  };
 
+  const handleInstantWinComplete = () => {
     // Show success message after instant win reveal
     toast({
       title: 'Purchase Complete! 🎉',
@@ -204,6 +205,7 @@ export default function TicketPurchaseModal({
     });
 
     // Show ticket numbers
+    const ticketNumbers = purchasedTickets.map(t => t.ticketNumber);
     setTimeout(() => {
       toast({
         title: 'Your Ticket Numbers',
@@ -460,6 +462,7 @@ export default function TicketPurchaseModal({
       }}
       tickets={purchasedTickets}
       onComplete={handleInstantWinComplete}
+      onTicketRevealed={handleTicketRevealed}
     />
   </>
   );

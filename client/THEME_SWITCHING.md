@@ -1,7 +1,7 @@
 # Theme Switching Guide
 
 ## Overview
-The application supports three color themes that can be switched via environment variable:
+The application supports four color themes that can be switched via environment variable:
 
 ### Available Themes
 
@@ -29,6 +29,15 @@ The application supports three color themes that can be switched via environment
 - **Dark Background**: Black (#000000)
 - **Light Background**: White (#ffffff)
 
+#### 4. Bright Bold Theme
+- **Theme ID**: `brightbold`
+- **Primary Color**: Robin Egg Blue (#2cccc3)
+- **Secondary Color**: Chrysler Blue (#5626c4)
+- **Accent Color**: Sunglow (#facd3d)
+- **Dark Background**: Prussian Blue (#1f3044)
+- **Light Background**: Alice Blue (#f0f8ff)
+- **Error Color**: Mexican Pink (#e60576)
+
 ## How to Switch Themes
 
 ### Method 1: Environment Variable (Recommended)
@@ -43,6 +52,9 @@ The application supports three color themes that can be switched via environment
 
    # For Black-Gold Theme
    NEXT_PUBLIC_THEME_MODE=blackgold
+
+   # For Bright Bold Theme
+   NEXT_PUBLIC_THEME_MODE=brightbold
    ```
 3. Restart your development server:
    ```bash
@@ -57,6 +69,9 @@ NEXT_PUBLIC_THEME_MODE=pastel npm run build
 
 # For Black-Gold Theme
 NEXT_PUBLIC_THEME_MODE=blackgold npm run build
+
+# For Bright Bold Theme
+NEXT_PUBLIC_THEME_MODE=brightbold npm run build
 ```
 
 ## Color Mapping
@@ -88,6 +103,8 @@ if (colorTheme === 'pastel') {
   // Pastel-specific logic
 } else if (colorTheme === 'blackgold') {
   // Black-Gold-specific logic
+} else if (colorTheme === 'brightbold') {
+  // Bright Bold-specific logic
 }
 ```
 

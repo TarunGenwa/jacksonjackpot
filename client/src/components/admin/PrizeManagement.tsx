@@ -2,6 +2,25 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Save, X, Trophy, Gift } from 'lucide-react';
+import {
+  FormControl,
+  FormLabel,
+  Input,
+  Textarea,
+  Select,
+  NumberInput,
+  NumberInputField,
+  Button,
+  VStack,
+  HStack,
+  Box,
+  Text,
+  Icon,
+  Alert,
+  AlertIcon,
+  Flex,
+  Spacer
+} from '@chakra-ui/react';
 import { adminApi } from '@/services/adminApi';
 
 interface Prize {

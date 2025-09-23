@@ -48,6 +48,7 @@ interface InstantWinSpinnerProps {
     };
   }>;
   onComplete?: () => void;
+  onTicketRevealed?: (ticketNumber: string) => void;
 }
 
 const pulseGlow = keyframes`
@@ -60,7 +61,8 @@ export default function InstantWinSpinner({
   isOpen,
   onClose,
   tickets,
-  onComplete
+  onComplete,
+  onTicketRevealed
 }: InstantWinSpinnerProps) {
   const { getColor, getThemeColor } = useTheme();
   const toast = useToast();
@@ -124,6 +126,9 @@ export default function InstantWinSpinner({
       setTimeout(() => {
         setRevealedPrize(prizes[10]);
         setIsSpinning(false);
+
+        // Mark this ticket as revealed in the context
+        onTicketRevealed?.(currentTicket.ticketNumber);
 
         if (hasWin) {
           toast({

@@ -5,7 +5,7 @@ import { theme, ThemeColors, SemanticColors } from '@/theme';
 import { themeConfig, ThemeConfig, getCurrentThemeMode, themes } from '@/theme/theme.config';
 
 export type ThemeMode = 'light' | 'dark';
-export type ColorTheme = 'purple' | 'pastel';
+export type ColorTheme = 'purple' | 'pastel' | 'brightbold';
 
 interface ThemeContextType {
   mode: ThemeMode;

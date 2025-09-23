@@ -10,6 +10,32 @@ import {
   Trash2,
   AlertTriangle
 } from 'lucide-react';
+import {
+  FormControl,
+  FormLabel,
+  Input,
+  Textarea,
+  Select,
+  NumberInput,
+  NumberInputField,
+  Button,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  Alert,
+  AlertIcon,
+  VStack,
+  HStack,
+  Box,
+  Text,
+  Icon,
+  Grid,
+  GridItem,
+  Badge
+} from '@chakra-ui/react';
 import { adminApi } from '@/services/adminApi';
 import LoadingSpinner from '@/components/admin/LoadingSpinner';
 import ErrorAlert from '@/components/admin/ErrorAlert';
@@ -267,150 +293,150 @@ export default function CompetitionDetailPage() {
             <h2 className="text-xl font-semibold text-gray-800 mb-6">Competition Information</h2>
 
             <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Title
-                </label>
+              <FormControl>
+                <FormLabel>Title</FormLabel>
                 {editing ? (
-                  <input
-                    type="text"
+                  <Input
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                   />
                 ) : (
-                  <p className="text-gray-900">{competition.title}</p>
+                  <Text color="gray.900">{competition.title}</Text>
                 )}
-              </div>
+              </FormControl>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
-                </label>
+              <FormControl>
+                <FormLabel>Description</FormLabel>
                 {editing ? (
-                  <textarea
+                  <Textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={4}
-                    className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                   />
                 ) : (
-                  <p className="text-gray-900">{competition.description}</p>
+                  <Text color="gray.900">{competition.description}</Text>
                 )}
-              </div>
+              </FormControl>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Status
-                  </label>
-                  {editing ? (
-                    <select
-                      value={formData.status}
-                      onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                      className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                    >
-                      <option value="DRAFT">Draft</option>
-                      <option value="UPCOMING">Upcoming</option>
-                      <option value="ACTIVE">Active</option>
-                      <option value="SOLD_OUT">Sold Out</option>
-                      <option value="COMPLETED">Completed</option>
-                      <option value="CANCELLED">Cancelled</option>
-                    </select>
-                  ) : (
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(competition.status)}`}>
-                      {competition.status}
-                    </span>
-                  )}
-                </div>
+              <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6}>
+                <GridItem>
+                  <FormControl>
+                    <FormLabel>Status</FormLabel>
+                    {editing ? (
+                      <Select
+                        value={formData.status}
+                        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                      >
+                        <option value="DRAFT">Draft</option>
+                        <option value="UPCOMING">Upcoming</option>
+                        <option value="ACTIVE">Active</option>
+                        <option value="SOLD_OUT">Sold Out</option>
+                        <option value="COMPLETED">Completed</option>
+                        <option value="CANCELLED">Cancelled</option>
+                      </Select>
+                    ) : (
+                      <Badge
+                        colorScheme={
+                          competition.status === 'ACTIVE' ? 'green' :
+                          competition.status === 'COMPLETED' ? 'blue' :
+                          competition.status === 'UPCOMING' ? 'yellow' :
+                          competition.status === 'CANCELLED' ? 'red' : 'gray'
+                        }
+                        variant="subtle"
+                        fontSize="xs"
+                      >
+                        {competition.status}
+                      </Badge>
+                    )}
+                  </FormControl>
+                </GridItem>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Charity
-                  </label>
-                  <p className="text-gray-900">{competition.charity.name}</p>
-                </div>
+                <GridItem>
+                  <FormControl>
+                    <FormLabel>Charity</FormLabel>
+                    <Text color="gray.900">{competition.charity.name}</Text>
+                  </FormControl>
+                </GridItem>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Ticket Price
-                  </label>
-                  {editing ? (
-                    <input
-                      type="number"
-                      value={formData.ticketPrice}
-                      onChange={(e) => setFormData({ ...formData, ticketPrice: Number(e.target.value) })}
-                      className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                    />
-                  ) : (
-                    <p className="text-gray-900">£{(competition.ticketPrice / 100).toFixed(2)}</p>
-                  )}
-                </div>
+                <GridItem>
+                  <FormControl>
+                    <FormLabel>Ticket Price</FormLabel>
+                    {editing ? (
+                      <NumberInput
+                        value={formData.ticketPrice / 100}
+                        onChange={(valueString) => setFormData({ ...formData, ticketPrice: parseFloat(valueString) * 100 })}
+                        step={0.01}
+                        precision={2}
+                      >
+                        <NumberInputField />
+                      </NumberInput>
+                    ) : (
+                      <Text color="gray.900">£{(competition.ticketPrice / 100).toFixed(2)}</Text>
+                    )}
+                  </FormControl>
+                </GridItem>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Max Tickets
-                  </label>
-                  {editing ? (
-                    <input
-                      type="number"
-                      value={formData.maxTickets}
-                      onChange={(e) => setFormData({ ...formData, maxTickets: Number(e.target.value) })}
-                      className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                    />
-                  ) : (
-                    <p className="text-gray-900">{competition.maxTickets}</p>
-                  )}
-                </div>
+                <GridItem>
+                  <FormControl>
+                    <FormLabel>Max Tickets</FormLabel>
+                    {editing ? (
+                      <NumberInput
+                        value={formData.maxTickets}
+                        onChange={(valueString) => setFormData({ ...formData, maxTickets: parseInt(valueString) })}
+                      >
+                        <NumberInputField />
+                      </NumberInput>
+                    ) : (
+                      <Text color="gray.900">{competition.maxTickets}</Text>
+                    )}
+                  </FormControl>
+                </GridItem>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Start Date
-                  </label>
-                  {editing ? (
-                    <input
-                      type="date"
-                      value={formData.startDate}
-                      onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                      className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                    />
-                  ) : (
-                    <p className="text-gray-900">{new Date(competition.startDate).toLocaleDateString()}</p>
-                  )}
-                </div>
+                <GridItem>
+                  <FormControl>
+                    <FormLabel>Start Date</FormLabel>
+                    {editing ? (
+                      <Input
+                        type="date"
+                        value={formData.startDate}
+                        onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                      />
+                    ) : (
+                      <Text color="gray.900">{new Date(competition.startDate).toLocaleDateString()}</Text>
+                    )}
+                  </FormControl>
+                </GridItem>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    End Date
-                  </label>
-                  {editing ? (
-                    <input
-                      type="date"
-                      value={formData.endDate}
-                      onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                      className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                    />
-                  ) : (
-                    <p className="text-gray-900">{new Date(competition.endDate).toLocaleDateString()}</p>
-                  )}
-                </div>
+                <GridItem>
+                  <FormControl>
+                    <FormLabel>End Date</FormLabel>
+                    {editing ? (
+                      <Input
+                        type="date"
+                        value={formData.endDate}
+                        onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                      />
+                    ) : (
+                      <Text color="gray.900">{new Date(competition.endDate).toLocaleDateString()}</Text>
+                    )}
+                  </FormControl>
+                </GridItem>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Draw Date
-                  </label>
-                  {editing ? (
-                    <input
-                      type="date"
-                      value={formData.drawDate}
-                      onChange={(e) => setFormData({ ...formData, drawDate: e.target.value })}
-                      className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                    />
-                  ) : (
-                    <p className="text-gray-900">{new Date(competition.drawDate).toLocaleDateString()}</p>
-                  )}
-                </div>
-              </div>
+                <GridItem>
+                  <FormControl>
+                    <FormLabel>Draw Date</FormLabel>
+                    {editing ? (
+                      <Input
+                        type="date"
+                        value={formData.drawDate}
+                        onChange={(e) => setFormData({ ...formData, drawDate: e.target.value })}
+                      />
+                    ) : (
+                      <Text color="gray.900">{new Date(competition.drawDate).toLocaleDateString()}</Text>
+                    )}
+                  </FormControl>
+                </GridItem>
+              </Grid>
             </div>
           </div>
 
@@ -487,50 +513,59 @@ export default function CompetitionDetailPage() {
       </div>
 
       {/* Delete Confirmation Modal */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full">
-            <div className="p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                  <AlertTriangle className="h-6 w-6 text-red-600" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Delete Competition
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    This action cannot be undone
-                  </p>
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <p className="text-gray-700">
-                  Are you sure you want to delete the competition
-                  <span className="font-semibold"> &quot;{competition.title}&quot;</span>?
-                  This will permanently remove all associated data including tickets and winners.
-                </p>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={handleDelete}
-                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                >
+      <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)} size="md">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>
+            <HStack spacing={3}>
+              <Box
+                w={12}
+                h={12}
+                bg="red.100"
+                borderRadius="full"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Icon as={AlertTriangle} w={6} h={6} color="red.600" />
+              </Box>
+              <VStack align="start" spacing={0}>
+                <Text fontSize="lg" fontWeight="semibold" color="gray.900">
                   Delete Competition
-                </button>
-                <button
-                  onClick={() => setShowDeleteModal(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+                </Text>
+                <Text fontSize="sm" color="gray.500">
+                  This action cannot be undone
+                </Text>
+              </VStack>
+            </HStack>
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <Text color="gray.700" mb={6}>
+              Are you sure you want to delete the competition
+              <Text as="span" fontWeight="semibold"> &quot;{competition.title}&quot;</Text>?
+              This will permanently remove all associated data including tickets and winners.
+            </Text>
+
+            <HStack spacing={3}>
+              <Button
+                onClick={handleDelete}
+                colorScheme="red"
+                flex={1}
+              >
+                Delete Competition
+              </Button>
+              <Button
+                onClick={() => setShowDeleteModal(false)}
+                variant="outline"
+                flex={1}
+              >
+                Cancel
+              </Button>
+            </HStack>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

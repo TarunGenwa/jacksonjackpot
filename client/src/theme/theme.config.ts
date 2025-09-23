@@ -124,6 +124,47 @@ const blackGoldTheme = {
   opacity90: 0.9,
 };
 
+// Bright Bold Theme
+const brightBoldTheme = {
+  // 5 Core Colors from provided palette
+  primary: '#2cccc3',     // Robin Egg Blue - Main brand color
+  secondary: '#5626c4',   // Chrysler Blue - Secondary actions
+  accent: '#facd3d',      // Sunglow - CTAs and highlights
+  dark: '#1f3044',        // Prussian Blue - Dark backgrounds
+  light: '#f0f8ff',       // Alice Blue - Light backgrounds
+
+  // Color Variants (generated from core colors)
+  primaryDark: '#1a9d96',    // Darker robin egg blue
+  primaryLight: '#53dbd4',   // Lighter robin egg blue (from palette)
+  secondaryDark: '#441e9e',  // Darker chrysler blue (from palette)
+  secondaryLight: '#7346dc', // Lighter chrysler blue (from palette)
+  accentDark: '#e5b406',     // Darker sunglow
+  accentLight: '#fbd864',    // Lighter sunglow (from palette)
+
+  // Status Colors (semantic using Mexican Pink)
+  success: '#2cccc3',     // Using primary robin egg blue
+  warning: '#facd3d',     // Using accent sunglow
+  error: '#e60576',       // Mexican Pink for errors
+  info: '#5626c4',        // Using secondary chrysler blue
+
+  // Neutral Colors (derived from Prussian Blue)
+  white: '#ffffff',
+  gray100: '#c6d5e5',     // Light prussian blue (from palette)
+  gray300: '#8eaacb',     // Medium-light prussian blue (from palette)
+  gray500: '#5580b1',     // Medium prussian blue (from palette)
+  gray700: '#39587b',     // Medium-dark prussian blue (from palette)
+  gray900: '#1f3044',     // Prussian blue base
+  black: '#0c131b',       // Darkest prussian blue (from palette)
+
+  // Opacity utilities
+  opacity10: 0.1,
+  opacity20: 0.2,
+  opacity30: 0.3,
+  opacity50: 0.5,
+  opacity70: 0.7,
+  opacity90: 0.9,
+};
+
 // Theme selection based on environment variable
 const getActiveTheme = () => {
   const themeMode = process.env.NEXT_PUBLIC_THEME_MODE || 'purple';
@@ -133,6 +174,8 @@ const getActiveTheme = () => {
       return pastelTheme;
     case 'blackgold':
       return blackGoldTheme;
+    case 'brightbold':
+      return brightBoldTheme;
     default:
       return purpleTheme;
   }
@@ -143,6 +186,7 @@ export const themes = {
   purple: purpleTheme,
   pastel: pastelTheme,
   blackgold: blackGoldTheme,
+  brightbold: brightBoldTheme,
 };
 
 // Helper function to get current theme mode
