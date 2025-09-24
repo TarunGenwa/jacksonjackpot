@@ -332,56 +332,30 @@ export default function Home() {
                     <Grid templateColumns={{ base: '1fr', lg: '1fr 2fr' }} gap={8}>
                       {/* Competition Image */}
                       <GridItem>
-                        <VStack spacing={4} align="stretch">
-                          {competitions[selectedCompetitionIndex].imageUrl ? (
-                            <Box borderRadius="lg" overflow="hidden" border="2px" borderColor={getThemeColor('primary')}>
-                              <Image
-                                src={competitions[selectedCompetitionIndex].imageUrl}
-                                alt={competitions[selectedCompetitionIndex].title}
-                                width="100%"
-                                height="auto"
-                                objectFit="cover"
-                              />
-                            </Box>
-                          ) : (
-                            <Box
-                              h="250px"
-                              bg={getThemeColor('dark')}
-                              borderRadius="lg"
-                              display="flex"
-                              alignItems="center"
-                              justifyContent="center"
-                              border="2px"
-                              borderColor={getThemeColor('primary')}
-                            >
-                              <Icon as={FaTrophy} boxSize={20} color={getThemeColor('accent')} />
-                            </Box>
-                          )}
-
-                          {/* Prize Preview */}
-                          <Box bg={getThemeColor('dark')} p={4} borderRadius="lg">
-                            <Text fontSize="sm" fontWeight="bold" color={getThemeColor('accent')} mb={2}>
-                              PRIZES
-                            </Text>
-                            <VStack align="stretch" spacing={2}>
-                              {competitions[selectedCompetitionIndex].prizes?.slice(0, 3).map((prize, idx) => (
-                                <HStack key={idx} justify="space-between">
-                                  <Text fontSize="sm" color={getThemeColor('gray300')}>
-                                    {prize.name}
-                                  </Text>
-                                  <Badge colorScheme="yellow" variant="solid">
-                                    £{(prize.value / 100).toFixed(0)}
-                                  </Badge>
-                                </HStack>
-                              ))}
-                              {competitions[selectedCompetitionIndex].prizes?.length > 3 && (
-                                <Text fontSize="xs" color={getThemeColor('gray500')} textAlign="center">
-                                  +{competitions[selectedCompetitionIndex].prizes.length - 3} more prizes
-                                </Text>
-                              )}
-                            </VStack>
+                        {competitions[selectedCompetitionIndex].imageUrl ? (
+                          <Box borderRadius="lg" overflow="hidden" border="2px" borderColor={getThemeColor('primary')}>
+                            <Image
+                              src={competitions[selectedCompetitionIndex].imageUrl}
+                              alt={competitions[selectedCompetitionIndex].title}
+                              width="100%"
+                              height="auto"
+                              objectFit="cover"
+                            />
                           </Box>
-                        </VStack>
+                        ) : (
+                          <Box
+                            h="350px"
+                            bg={getThemeColor('dark')}
+                            borderRadius="lg"
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            border="2px"
+                            borderColor={getThemeColor('primary')}
+                          >
+                            <Icon as={FaTrophy} boxSize={24} color={getThemeColor('accent')} />
+                          </Box>
+                        )}
                       </GridItem>
 
                       {/* Competition Info */}
