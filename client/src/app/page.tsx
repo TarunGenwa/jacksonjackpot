@@ -52,7 +52,12 @@ import {
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
-  useBreakpointValue
+  useBreakpointValue,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper
 } from '@chakra-ui/react';
 import { CheckCircleIcon, ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { FaTrophy, FaHeart, FaShieldAlt, FaInfoCircle, FaUsers, FaGift, FaChartLine, FaPoundSign, FaTicketAlt, FaQuestionCircle } from 'react-icons/fa';
@@ -76,6 +81,7 @@ export default function Home() {
   const [showAllTickets, setShowAllTickets] = useState<Record<string, boolean>>({});
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isMobile = useBreakpointValue({ base: true, md: false });
+  const [ticketQuantity, setTicketQuantity] = useState(1);
 
   useEffect(() => {
     const fetchCompetitions = async () => {
@@ -330,58 +336,77 @@ export default function Home() {
                   {/* Selected Competition Details */}
                   {competitions[selectedCompetitionIndex] && (
                     <Grid templateColumns={{ base: '1fr', lg: '1fr 2fr' }} gap={8}>
-                      {/* Competition Image */}
+                      {/* Competition Image and Title */}
                       <GridItem>
-                        {competitions[selectedCompetitionIndex].imageUrl ? (
-                          <Box borderRadius="lg" overflow="hidden" border="2px" borderColor={getThemeColor('primary')}>
-                            <Image
-                              src={competitions[selectedCompetitionIndex].imageUrl}
-                              alt={competitions[selectedCompetitionIndex].title}
-                              width="100%"
-                              height="auto"
-                              objectFit="cover"
-                            />
+                        <VStack spacing={4} align="stretch">
+                          {/* Image with Badge */}
+                          <Box position="relative">
+                            {competitions[selectedCompetitionIndex].imageUrl ? (
+                              <Box borderRadius="lg" overflow="hidden" border="2px" borderColor={getThemeColor('primary')}>
+                                <Image
+                                  src={competitions[selectedCompetitionIndex].imageUrl}
+                                  alt={competitions[selectedCompetitionIndex].title}
+                                  width="100%"
+                                  height="auto"
+                                  objectFit="cover"
+                                />
+                              </Box>
+                            ) : (
+                              <Box
+                                h="350px"
+                                bg={getThemeColor('dark')}
+                                borderRadius="lg"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                border="2px"
+                                borderColor={getThemeColor('primary')}
+                              >
+                                <Icon as={FaTrophy} boxSize={24} color={getThemeColor('accent')} />
+                              </Box>
+                            )}
+
+                            {/* ACTIVE Badge on top left */}
+                            <Badge
+                              position="absolute"
+                              top={4}
+                              left={4}
+                              bg={getThemeColor('accent')}
+                              color={getThemeColor('dark')}
+                              px={3}
+                              py={1}
+                              fontSize="sm"
+                              fontWeight="bold"
+                              borderRadius="md"
+                            >
+                              ACTIVE
+                            </Badge>
                           </Box>
-                        ) : (
-                          <Box
-                            h="350px"
-                            bg={getThemeColor('dark')}
-                            borderRadius="lg"
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
-                            border="2px"
-                            borderColor={getThemeColor('primary')}
-                          >
-                            <Icon as={FaTrophy} boxSize={24} color={getThemeColor('accent')} />
+
+                          {/* Title and Description below image */}
+                          <Box>
+                            <Heading size="lg" color={getThemeColor('white')} mb={2}>
+                              {competitions[selectedCompetitionIndex].title}
+                            </Heading>
+                            <HStack spacing={2} mb={3}>
+                              <Text color={getThemeColor('gray300')} fontSize="sm">Supporting</Text>
+                              <Text color={getThemeColor('primary')} fontWeight="semibold" fontSize="sm">
+                                {competitions[selectedCompetitionIndex].charity.name}
+                              </Text>
+                              {competitions[selectedCompetitionIndex].charity.isVerified && (
+                                <Badge colorScheme="green" variant="solid" fontSize="xs">✓ Verified</Badge>
+                              )}
+                            </HStack>
+                            <Text color={getThemeColor('gray300')} fontSize="sm">
+                              {competitions[selectedCompetitionIndex].description}
+                            </Text>
                           </Box>
-                        )}
+                        </VStack>
                       </GridItem>
 
                       {/* Competition Info */}
                       <GridItem>
                         <VStack spacing={6} align="stretch">
-                          <Box>
-                            <Badge bg={getThemeColor('accent')} color={getThemeColor('dark')} mb={2}>
-                              ACTIVE
-                            </Badge>
-                            <Heading size="xl" color={getThemeColor('white')} mb={2}>
-                              {competitions[selectedCompetitionIndex].title}
-                            </Heading>
-                            <HStack spacing={2} mb={4}>
-                              <Text color={getThemeColor('gray300')}>Supporting</Text>
-                              <Text color={getThemeColor('primary')} fontWeight="semibold">
-                                {competitions[selectedCompetitionIndex].charity.name}
-                              </Text>
-                              {competitions[selectedCompetitionIndex].charity.isVerified && (
-                                <Badge colorScheme="green" variant="solid">✓ Verified</Badge>
-                              )}
-                            </HStack>
-                            <Text color={getThemeColor('gray300')} fontSize="lg">
-                              {competitions[selectedCompetitionIndex].description}
-                            </Text>
-                          </Box>
-
                           {/* Ticket Info */}
                           <Box bg={getThemeColor('dark')} p={6} borderRadius="lg">
                             <Grid templateColumns="repeat(2, 1fr)" gap={4}>
@@ -430,6 +455,44 @@ export default function Home() {
                             </Text>
                           </Box>
 
+                          {/* Ticket Quantity Selector */}
+                          <Box bg={getThemeColor('dark')} p={4} borderRadius="lg">
+                            <HStack justify="space-between" align="center">
+                              <VStack align="start" spacing={1}>
+                                <Text fontSize="sm" color={getThemeColor('gray300')}>Number of Tickets</Text>
+                                <HStack>
+                                  <NumberInput
+                                    value={ticketQuantity}
+                                    onChange={(_, value) => setTicketQuantity(value)}
+                                    min={1}
+                                    max={100}
+                                    size="md"
+                                    w="120px"
+                                  >
+                                    <NumberInputField
+                                      bg={getThemeColor('secondary')}
+                                      color={getThemeColor('white')}
+                                      borderColor={getThemeColor('primary')}
+                                      _hover={{ borderColor: getThemeColor('primaryLight') }}
+                                      _focus={{ borderColor: getThemeColor('primary'), boxShadow: 'none' }}
+                                    />
+                                    <NumberInputStepper>
+                                      <NumberIncrementStepper color={getThemeColor('primary')} />
+                                      <NumberDecrementStepper color={getThemeColor('primary')} />
+                                    </NumberInputStepper>
+                                  </NumberInput>
+                                  <Text color={getThemeColor('gray300')}>tickets</Text>
+                                </HStack>
+                              </VStack>
+                              <VStack align="end" spacing={1}>
+                                <Text fontSize="sm" color={getThemeColor('gray300')}>Total Price</Text>
+                                <Text fontSize="2xl" fontWeight="bold" color={getThemeColor('accent')}>
+                                  £{(ticketQuantity * parseFloat(competitions[selectedCompetitionIndex].ticketPrice)).toFixed(2)}
+                                </Text>
+                              </VStack>
+                            </HStack>
+                          </Box>
+
                           {/* Action Button */}
                           <Button
                             size="lg"
@@ -441,7 +504,7 @@ export default function Home() {
                             onClick={handlePurchaseClick}
                             w="full"
                           >
-                            Buy Tickets Now
+                            Checkout - £{(ticketQuantity * parseFloat(competitions[selectedCompetitionIndex].ticketPrice)).toFixed(2)}
                           </Button>
                         </VStack>
                       </GridItem>
@@ -922,6 +985,7 @@ export default function Home() {
           isOpen={isOpen}
           onClose={onClose}
           competition={competitions[selectedCompetitionIndex]}
+          ticketQuantity={ticketQuantity}
           onPurchaseSuccess={async () => {
             console.log('Purchase successful');
             // Refresh competition data to show updated ticket count
@@ -931,6 +995,8 @@ export default function Home() {
             } catch (err) {
               console.error('Failed to refresh competitions:', err);
             }
+            // Reset ticket quantity
+            setTicketQuantity(1);
             onClose();
           }}
         />

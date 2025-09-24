@@ -14,24 +14,16 @@ import {
   VStack,
   HStack,
   Text,
-  FormControl,
-  FormLabel,
   Alert,
   AlertIcon,
   Divider,
   Badge,
   Icon,
-  Flex,
   Box,
   useToast,
-  Spinner,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  SliderMark
+  Spinner
 } from '@chakra-ui/react';
-import { FaTicketAlt, FaPoundSign, FaCalculator } from 'react-icons/fa';
+import { FaTicketAlt, FaPoundSign, FaCheckCircle } from 'react-icons/fa';
 import { Competition } from '@/types/api';
 import { ticketsService, PurchaseTicketRequest } from '@/services/tickets';
 import { useAuth } from '@/contexts/AuthContext';
@@ -54,6 +46,7 @@ interface TicketPurchaseModalProps {
   isOpen: boolean;
   onClose: () => void;
   competition: Competition;
+  ticketQuantity: number;
   onPurchaseSuccess?: () => void;
 }
 
@@ -61,6 +54,7 @@ export default function TicketPurchaseModal({
   isOpen,
   onClose,
   competition,
+  ticketQuantity,
   onPurchaseSuccess
 }: TicketPurchaseModalProps) {
   const { user } = useAuth();
@@ -68,20 +62,13 @@ export default function TicketPurchaseModal({
   const { getColor, getSemanticColor, getThemeColor } = useTheme();
   const { addUnrevealedTickets, markTicketsAsRevealed } = useUnrevealedTickets();
   const toast = useToast();
-  const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showInstantWinSpinner, setShowInstantWinSpinner] = useState(false);
   const [purchasedTickets, setPurchasedTickets] = useState<TicketWithInstantWin[]>([]);
 
   const ticketPrice = parseFloat(competition.ticketPrice);
-  const totalCost = ticketPrice * quantity;
-  const availableTickets = competition.maxTickets - competition.ticketsSold;
-
-  const handleQuantityChange = (value: number) => {
-    const maxAllowed = Math.min(availableTickets, 10); // Limit to 10 tickets per purchase
-    setQuantity(Math.max(1, Math.min(value, maxAllowed)));
-  };
+  const totalCost = ticketPrice * ticketQuantity;
 
   const handlePurchase = async () => {
     if (!user) {
@@ -99,72 +86,57 @@ export default function TicketPurchaseModal({
     setError(null);
 
     try {
-      const purchaseData: PurchaseTicketRequest = {
+      const request: PurchaseTicketRequest = {
         competitionId: competition.id,
-        quantity,
-        paymentMethod: 'WALLET',
+        quantity: ticketQuantity,
+        paymentMethodId: 'wallet' // Using wallet as payment method
       };
 
-      const result = await ticketsService.purchaseTickets(purchaseData);
+      const response = await ticketsService.purchaseTickets(request);
 
-      // Update the wallet balance with the new balance from the response
-      if (result.wallet?.newBalance) {
-        updateBalance(result.wallet.newBalance);
-      }
+      // Update wallet balance
+      await updateBalance();
 
-      // Store purchased tickets for instant win reveal
-      setPurchasedTickets(result.tickets);
-
-      // Save all tickets to unrevealed context first
-      const ticketsWithCompetitionInfo = result.tickets.map((ticket: TicketWithInstantWin) => ({
-        ...ticket,
+      // Prepare tickets for instant win spinner
+      const ticketsWithInstantWin = response.tickets.map((ticket: any) => ({
+        ticketNumber: ticket.ticketNumber,
+        instantWin: ticket.instantWin,
         competitionId: competition.id,
         competitionTitle: competition.title,
         purchaseDate: new Date().toISOString()
       }));
-      addUnrevealedTickets(ticketsWithCompetitionInfo);
 
-      // Check if any tickets have instant wins or if there are tickets to reveal
-      const hasInstantWins = result.tickets.some((ticket: TicketWithInstantWin) => ticket.instantWin?.prize);
+      setPurchasedTickets(ticketsWithInstantWin);
 
-      if (result.tickets.length > 0) {
-        // Show instant win spinner for all purchased tickets
+      // Add tickets with instant win potential to unrevealed tickets
+      const instantWinTickets = ticketsWithInstantWin.filter((t: any) => t.instantWin);
+      if (instantWinTickets.length > 0) {
+        addUnrevealedTickets(instantWinTickets);
+      }
+
+      toast({
+        title: 'Purchase successful!',
+        description: `You have purchased ${ticketQuantity} ticket${ticketQuantity > 1 ? 's' : ''} for ${competition.title}`,
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+
+      onPurchaseSuccess?.();
+
+      // Show instant win spinner if there are instant win tickets
+      if (instantWinTickets.length > 0) {
         setShowInstantWinSpinner(true);
         onClose(); // Close purchase modal
       } else {
-        // No instant wins, show regular success message
-        toast({
-          title: 'Purchase Successful! 🎉',
-          description: `You've successfully purchased ${quantity} ticket${quantity > 1 ? 's' : ''} for ${competition.title}`,
-          status: 'success',
-          duration: 6000,
-          isClosable: true,
-        });
-
-        // Show ticket numbers in a follow-up toast
-        const ticketNumbers = result.tickets.map(t => t.ticketNumber).join(', ');
-        setTimeout(() => {
-          toast({
-            title: 'Your Ticket Numbers',
-            description: `Ticket${quantity > 1 ? 's' : ''}: ${ticketNumbers}`,
-            status: 'info',
-            duration: 8000,
-            isClosable: true,
-          });
-        }, 1000);
-
-        onPurchaseSuccess?.();
         onClose();
       }
-      
-    } catch (err) {
+    } catch (err: any) {
       console.error('Purchase failed:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Purchase failed. Please try again.';
-      setError(errorMessage);
-      
+      setError(err.response?.data?.message || 'Failed to purchase tickets. Please try again.');
       toast({
-        title: 'Purchase Failed',
-        description: errorMessage,
+        title: 'Purchase failed',
+        description: err.response?.data?.message || 'Failed to purchase tickets. Please try again.',
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -174,296 +146,142 @@ export default function TicketPurchaseModal({
     }
   };
 
-  const handleClose = () => {
-    if (!isLoading) {
-      setError(null);
-      setQuantity(1);
-      onClose();
-    }
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-GB', {
-      style: 'currency',
-      currency: 'GBP'
-    }).format(price);
+  const handleInstantWinComplete = () => {
+    setShowInstantWinSpinner(false);
+    setPurchasedTickets([]);
   };
 
   const handleTicketRevealed = (ticketNumber: string) => {
-    // Mark individual ticket as revealed immediately when spun
     markTicketsAsRevealed([ticketNumber]);
-  };
-
-  const handleInstantWinComplete = () => {
-    // Show success message after instant win reveal
-    toast({
-      title: 'Purchase Complete! 🎉',
-      description: `You've successfully purchased ${purchasedTickets.length} ticket${purchasedTickets.length > 1 ? 's' : ''}`,
-      status: 'success',
-      duration: 6000,
-      isClosable: true,
-    });
-
-    // Show ticket numbers
-    const ticketNumbers = purchasedTickets.map(t => t.ticketNumber);
-    setTimeout(() => {
-      toast({
-        title: 'Your Ticket Numbers',
-        description: `Ticket${purchasedTickets.length > 1 ? 's' : ''}: ${ticketNumbers.join(', ')}`,
-        status: 'info',
-        duration: 8000,
-        isClosable: true,
-      });
-    }, 1000);
-
-    setShowInstantWinSpinner(false);
-    setPurchasedTickets([]);
-    onPurchaseSuccess?.();
   };
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={handleClose} size="md" closeOnOverlayClick={!isLoading}>
-      <ModalOverlay bg="blackAlpha.600" backdropFilter="blur(4px)" />
-      <ModalContent
-        bg={getThemeColor('dark')}
-        border="1px"
-        borderColor={getThemeColor('primary')}
-        color={getThemeColor('white')}
-        shadow="2xl"
-      >
-        <ModalHeader>
-          <HStack spacing={3}>
-            <Icon as={FaTicketAlt} color={getThemeColor('primary')} boxSize={5} />
-            <Text color={getThemeColor('white')} fontWeight="bold">Purchase Tickets</Text>
-          </HStack>
-        </ModalHeader>
-        <ModalCloseButton isDisabled={isLoading} color={getThemeColor('white')} _hover={{ bg: getThemeColor('secondaryDark') }} />
+      <Modal isOpen={isOpen} onClose={onClose} isCentered size="md">
+        <ModalOverlay bg="blackAlpha.700" />
+        <ModalContent
+          bg={getThemeColor('secondary')}
+          border="2px"
+          borderColor={getThemeColor('primary')}
+          color={getThemeColor('white')}
+        >
+          <ModalHeader borderBottom="1px" borderColor={getThemeColor('primaryDark')}>
+            <HStack spacing={3}>
+              <Icon as={FaCheckCircle} color={getThemeColor('accent')} />
+              <Text>Confirm Purchase</Text>
+            </HStack>
+          </ModalHeader>
+          <ModalCloseButton color={getThemeColor('white')} />
 
-        <ModalBody>
-          <VStack spacing={6} align="stretch">
-            {/* Competition Info */}
-            <Box>
-              <Text fontWeight="semibold" fontSize="lg" mb={2} color={getThemeColor('white')}>
-                {competition.title}
-              </Text>
-              <HStack spacing={2} mb={3}>
-                <Text fontSize="sm" color={getThemeColor('gray300')}>
-                  Supporting: {competition.charity.name}
-                </Text>
-                {competition.charity.isVerified && (
-                  <Badge colorScheme="green" size="sm" variant="solid">✓ Verified</Badge>
-                )}
-              </HStack>
-              <Text fontSize="sm" color={getThemeColor('gray300')} noOfLines={2}>
-                {competition.description}
-              </Text>
-            </Box>
+          <ModalBody py={6}>
+            <VStack spacing={6} align="stretch">
+              {/* Competition Details */}
+              <Box bg={getThemeColor('dark')} p={4} borderRadius="lg">
+                <VStack align="start" spacing={2}>
+                  <Text fontSize="sm" color={getThemeColor('gray300')}>Competition</Text>
+                  <Text fontSize="lg" fontWeight="bold" color={getThemeColor('white')}>
+                    {competition.title}
+                  </Text>
+                  <HStack>
+                    <Badge colorScheme="purple" variant="solid">
+                      {competition.charity.name}
+                    </Badge>
+                  </HStack>
+                </VStack>
+              </Box>
 
-            <Divider borderColor={getThemeColor('secondary')} />
+              {/* Purchase Summary */}
+              <Box bg={getThemeColor('dark')} p={4} borderRadius="lg">
+                <VStack spacing={3}>
+                  <HStack justify="space-between" w="full">
+                    <Text color={getThemeColor('gray300')}>Tickets</Text>
+                    <Text color={getThemeColor('white')} fontWeight="semibold">
+                      {ticketQuantity} × £{ticketPrice.toFixed(2)}
+                    </Text>
+                  </HStack>
 
-            {/* Availability Status */}
-            <Alert
-              status={availableTickets > 0 ? 'success' : 'error'}
-              variant="left-accent"
-              borderRadius="md"
-              bg={getThemeColor('light')}
-              borderColor={availableTickets > 0 ? getThemeColor('success') : getThemeColor('error')}
-              color={getThemeColor('dark')}
-            >
-              <AlertIcon color={availableTickets > 0 ? getThemeColor('success') : getThemeColor('error')} />
-              <VStack align="start" spacing={1}>
-                <Text fontWeight="medium" color={getThemeColor('dark')}>
-                  {availableTickets > 0 ? 'Tickets Available' : 'Sold Out'}
-                </Text>
-                <Text fontSize="sm" color={getThemeColor('gray700')}>
-                  {availableTickets > 0
-                    ? `${availableTickets.toLocaleString()} of ${competition.maxTickets.toLocaleString()} tickets remaining`
-                    : 'All tickets have been sold for this competition'
-                  }
-                </Text>
-              </VStack>
-            </Alert>
+                  <Divider borderColor={getThemeColor('primaryDark')} />
 
-            {availableTickets > 0 && (
-              <>
-                {/* Quantity Selector */}
-                <FormControl>
-                  <FormLabel>
-                    <Flex justify="space-between" align="center" w="full">
-                      <HStack spacing={2}>
-                        <Text color={getThemeColor('white')}>Number of Tickets</Text>
-                        <Badge colorScheme="green" variant="solid" fontSize="md" px={2}>
-                          {quantity}
-                        </Badge>
-                      </HStack>
-                      <Badge variant="outline" color={getThemeColor('primary')} borderColor={getThemeColor('primary')}>
-                        Max: {Math.min(availableTickets, 10)}
-                      </Badge>
-                    </Flex>
-                  </FormLabel>
-                  <Box pt={6} pb={2}>
-                    <Slider
-                      value={quantity}
-                      onChange={handleQuantityChange}
-                      min={1}
-                      max={Math.min(availableTickets, 10)}
-                      step={1}
-                      colorScheme="purple"
-                    >
-                      <SliderMark value={1} mt={3} ml={-2} fontSize="sm" color={getThemeColor('gray300')}>
-                        1
-                      </SliderMark>
-                      <SliderMark value={Math.min(availableTickets, 10)} mt={3} ml={-2} fontSize="sm" color={getThemeColor('gray300')}>
-                        {Math.min(availableTickets, 10)}
-                      </SliderMark>
-                      {Math.min(availableTickets, 10) > 5 && (
-                        <SliderMark value={Math.ceil(Math.min(availableTickets, 10) / 2)} mt={3} ml={-2} fontSize="sm" color={getThemeColor('gray300')}>
-                          {Math.ceil(Math.min(availableTickets, 10) / 2)}
-                        </SliderMark>
-                      )}
-                      <SliderTrack bg={getThemeColor('light')}>
-                        <SliderFilledTrack bg={getThemeColor('primary')} />
-                      </SliderTrack>
-                      <SliderThumb boxSize={6} bg={getThemeColor('primary')} border="2px" borderColor={getThemeColor('white')}>
-                        <Box color={getThemeColor('white')} fontSize="xs" fontWeight="bold">
-                          {quantity}
-                        </Box>
-                      </SliderThumb>
-                    </Slider>
-                  </Box>
-                </FormControl>
+                  <HStack justify="space-between" w="full">
+                    <Text fontSize="lg" fontWeight="bold" color={getThemeColor('white')}>
+                      Total
+                    </Text>
+                    <Text fontSize="2xl" fontWeight="bold" color={getThemeColor('accent')}>
+                      £{totalCost.toFixed(2)}
+                    </Text>
+                  </HStack>
+                </VStack>
+              </Box>
 
-                {/* Price Breakdown */}
-                <Box bg={getThemeColor('light')} p={4} borderRadius="md" border="1px" borderColor={getThemeColor('secondary')}>
-                  <VStack spacing={3}>
-                    <Flex justify="space-between" w="full" align="center">
-                      <HStack spacing={2}>
-                        <Icon as={FaCalculator} boxSize={4} color={getThemeColor('primary')} />
-                        <Text fontWeight="medium" color={getThemeColor('dark')}>Price Breakdown</Text>
-                      </HStack>
-                    </Flex>
-
-                    <VStack spacing={2} w="full">
-                      <Flex justify="space-between" w="full">
-                        <Text fontSize="sm" color={getThemeColor('gray700')}>
-                          Ticket Price:
-                        </Text>
-                        <Text fontSize="sm" fontWeight="medium" color={getThemeColor('dark')}>
-                          {formatPrice(ticketPrice)}
-                        </Text>
-                      </Flex>
-
-                      <Flex justify="space-between" w="full">
-                        <Text fontSize="sm" color={getThemeColor('gray700')}>
-                          Quantity:
-                        </Text>
-                        <Text fontSize="sm" fontWeight="medium" color={getThemeColor('dark')}>
-                          {quantity}
-                        </Text>
-                      </Flex>
-
-                      <Divider borderColor={getThemeColor('secondary')} />
-
-                      <Flex justify="space-between" w="full">
-                        <Text fontWeight="bold" color={getThemeColor('accent')}>
-                          Total Cost:
-                        </Text>
-                        <Text fontWeight="bold" fontSize="lg" color={getThemeColor('accent')}>
-                          {formatPrice(totalCost)}
-                        </Text>
-                      </Flex>
-                    </VStack>
-                  </VStack>
-                </Box>
-
-                {/* Draw Date */}
+              {/* Instant Win Info */}
+              {competition.prizes?.some(p => p.type === 'INSTANT_WIN') && (
                 <Alert
                   status="info"
-                  variant="left-accent"
-                  borderRadius="md"
-                  bg={getThemeColor('light')}
-                  borderColor={getThemeColor('secondary')}
-                  color={getThemeColor('dark')}
+                  bg={getThemeColor('primaryDark')}
+                  color={getThemeColor('white')}
+                  borderRadius="lg"
+                  border="1px"
+                  borderColor={getThemeColor('primary')}
                 >
-                  <AlertIcon color={getThemeColor('secondary')} />
-                  <VStack align="start" spacing={1}>
-                    <Text fontWeight="medium" fontSize="sm" color={getThemeColor('dark')}>
-                      Draw Date: {new Date(competition.drawDate).toLocaleDateString('en-GB', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </Text>
-                  </VStack>
+                  <AlertIcon color={getThemeColor('accent')} />
+                  <Text fontSize="sm">
+                    This competition includes instant win prizes! You'll find out immediately after purchase.
+                  </Text>
                 </Alert>
+              )}
 
-                {error && (
-                  <Alert
-                    status="error"
-                    borderRadius="md"
-                    bg={getThemeColor('light')}
-                    borderColor={getThemeColor('error')}
-                    color={getThemeColor('dark')}
-                    variant="left-accent"
-                  >
-                    <AlertIcon color={getThemeColor('error')} />
-                    <Text color={getThemeColor('dark')}>{error}</Text>
-                  </Alert>
-                )}
-              </>
-            )}
-          </VStack>
-        </ModalBody>
+              {/* Error Message */}
+              {error && (
+                <Alert
+                  status="error"
+                  bg={getThemeColor('dark')}
+                  color={getThemeColor('error')}
+                  borderRadius="lg"
+                >
+                  <AlertIcon />
+                  {error}
+                </Alert>
+              )}
+            </VStack>
+          </ModalBody>
 
-        <ModalFooter>
-          <HStack spacing={3}>
-            <Button
-              variant="ghost"
-              onClick={handleClose}
-              isDisabled={isLoading}
-              color={getThemeColor('gray300')}
-              _hover={{ bg: getThemeColor('secondaryDark'), color: getThemeColor('white') }}
-            >
-              Cancel
-            </Button>
-            {availableTickets > 0 && (
+          <ModalFooter borderTop="1px" borderColor={getThemeColor('primaryDark')}>
+            <HStack spacing={3}>
               <Button
-                bg={getThemeColor('success')}
-                color={getThemeColor('white')}
-                _hover={{ bg: getThemeColor('primaryDark'), transform: "translateY(-1px)" }}
-                _active={{ bg: getThemeColor('primaryDark') }}
+                variant="ghost"
+                onClick={onClose}
+                isDisabled={isLoading}
+                color={getThemeColor('gray300')}
+                _hover={{ bg: getThemeColor('dark') }}
+              >
+                Cancel
+              </Button>
+              <Button
+                bg={getThemeColor('accent')}
+                color={getThemeColor('dark')}
+                _hover={{ bg: getThemeColor('accentDark') }}
+                leftIcon={isLoading ? <Spinner size="sm" /> : <Icon as={FaPoundSign} />}
                 onClick={handlePurchase}
                 isLoading={isLoading}
                 loadingText="Processing..."
-                leftIcon={isLoading ? <Spinner size="sm" /> : <Icon as={FaPoundSign} />}
-                size="lg"
+                size="md"
                 fontWeight="bold"
-                shadow="md"
               >
-                Purchase {quantity} Ticket{quantity > 1 ? 's' : ''} - {formatPrice(totalCost)}
+                Confirm Purchase - £{totalCost.toFixed(2)}
               </Button>
-            )}
-          </HStack>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+            </HStack>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
-    {/* Instant Win Spinner Modal */}
-    <InstantWinSpinner
-      isOpen={showInstantWinSpinner}
-      onClose={() => {
-        // Don't mark as revealed if user escapes - let them stay in unrevealed state
-        setShowInstantWinSpinner(false);
-        setPurchasedTickets([]);
-      }}
-      tickets={purchasedTickets}
-      onComplete={handleInstantWinComplete}
-      onTicketRevealed={handleTicketRevealed}
-    />
-  </>
+      {/* Instant Win Spinner Modal */}
+      <InstantWinSpinner
+        isOpen={showInstantWinSpinner}
+        onClose={handleInstantWinComplete}
+        tickets={purchasedTickets}
+        onComplete={handleInstantWinComplete}
+        onTicketRevealed={handleTicketRevealed}
+      />
+    </>
   );
 }
