@@ -913,45 +913,6 @@ export default function Home() {
             </Card>
           )}
 
-          {/* Features Section */}
-          <Card w="full" shadow="xl" bg={getThemeColor('secondary')} border="1px" borderColor={getThemeColor('secondaryLight')}>
-            <CardBody p={8}>
-              <VStack spacing={8}>
-                <Heading size="xl" textAlign="center" color={getThemeColor('white')}>
-                  Why Choose Jackson Jackpot?
-                </Heading>
-                <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8} w="full">
-                  <VStack spacing={4} textAlign="center">
-                    <Circle size="16" bg={getThemeColor('primary')} color={getThemeColor('white')}>
-                      <Icon as={FaTrophy} boxSize={8} />
-                    </Circle>
-                    <Heading size="md" color={getThemeColor('white')}>Amazing Prizes</Heading>
-                    <Text color={getThemeColor('gray300')}>
-                      Win holidays, cash, cars, and more incredible prizes
-                    </Text>
-                  </VStack>
-                  <VStack spacing={4} textAlign="center">
-                    <Circle size="16" bg={getThemeColor('accent')} color={getThemeColor('dark')}>
-                      <Icon as={FaHeart} boxSize={8} />
-                    </Circle>
-                    <Heading size="md" color={getThemeColor('white')}>Support Charities</Heading>
-                    <Text color={getThemeColor('gray300')}>
-                      Every ticket supports verified charitable causes
-                    </Text>
-                  </VStack>
-                  <VStack spacing={4} textAlign="center">
-                    <Circle size="16" bg={getThemeColor('primaryLight')} color={getThemeColor('dark')}>
-                      <Icon as={FaShieldAlt} boxSize={8} />
-                    </Circle>
-                    <Heading size="md" color={getThemeColor('white')}>100% Transparent</Heading>
-                    <Text color={getThemeColor('gray300')}>
-                      Fair draws, verified charities, secure payments
-                    </Text>
-                  </VStack>
-                </SimpleGrid>
-              </VStack>
-            </CardBody>
-          </Card>
         </VStack>
       </Container>
 
