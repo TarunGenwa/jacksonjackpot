@@ -341,7 +341,7 @@ export default function Home() {
                           {/* Image with Badge */}
                           <Box position="relative">
                             {competitions[selectedCompetitionIndex].imageUrl ? (
-                              <Box borderRadius="lg" overflow="hidden" border="2px" borderColor={getThemeColor('primary')}>
+                              <Box borderRadius="lg" overflow="hidden" border="2px" borderColor={getThemeColor('primary')} bg={getThemeColor('dark')}>
                                 <Image
                                   src={competitions[selectedCompetitionIndex].imageUrl}
                                   alt={competitions[selectedCompetitionIndex].title}
@@ -424,7 +424,7 @@ export default function Home() {
                           {/* Image with Badge */}
                           <Box position="relative">
                             {competitions[selectedCompetitionIndex].imageUrl ? (
-                              <Box borderRadius="lg" overflow="hidden" border="2px" borderColor={getThemeColor('primary')}>
+                              <Box borderRadius="lg" overflow="hidden" border="2px" borderColor={getThemeColor('primary')} bg={getThemeColor('dark')}>
                                 <Image
                                   src={competitions[selectedCompetitionIndex].imageUrl}
                                   alt={competitions[selectedCompetitionIndex].title}
