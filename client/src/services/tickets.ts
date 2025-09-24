@@ -3,7 +3,7 @@ import apiClient from '@/lib/api';
 export interface PurchaseTicketRequest {
   competitionId: string;
   quantity: number;
-  paymentMethod?: string;
+  paymentMethodId?: string;
 }
 
 export interface PurchaseTicketResponse {

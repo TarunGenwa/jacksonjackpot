@@ -92,6 +92,10 @@ export default function TicketPurchaseModal({
         paymentMethodId: 'wallet' // Using wallet as payment method
       };
 
+      console.log('Purchase request:', request);
+      console.log('Competition status:', competition.status);
+      console.log('Competition details:', competition);
+
       const response = await ticketsService.purchaseTickets(request);
 
       // Update wallet balance

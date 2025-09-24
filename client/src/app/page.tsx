@@ -87,8 +87,9 @@ export default function Home() {
     const fetchCompetitions = async () => {
       try {
         setLoading(true);
-        const allCompetitions = await competitionsService.getAll();
-        setCompetitions(allCompetitions);
+        // Fetch only active competitions that are available for ticket purchases
+        const activeCompetitions = await competitionsService.getActive();
+        setCompetitions(activeCompetitions);
         setError(null);
       } catch (err) {
         console.error('Failed to fetch competitions:', err);
@@ -205,9 +206,6 @@ export default function Home() {
                 <VStack spacing={6} align="stretch">
                   {/* Competition Selector */}
                   <Box>
-                    <Text fontSize="sm" fontWeight="semibold" color={getThemeColor('gray300')} mb={3}>
-                      SELECT A COMPETITION
-                    </Text>
 
                     {/* Mobile View - Button */}
                     {isMobile ? (
@@ -990,8 +988,8 @@ export default function Home() {
             console.log('Purchase successful');
             // Refresh competition data to show updated ticket count
             try {
-              const allCompetitions = await competitionsService.getAll();
-              setCompetitions(allCompetitions);
+              const activeCompetitions = await competitionsService.getActive();
+              setCompetitions(activeCompetitions);
             } catch (err) {
               console.error('Failed to refresh competitions:', err);
             }
