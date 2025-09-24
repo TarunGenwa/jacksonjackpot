@@ -39,7 +39,7 @@ interface TicketReveal {
   isSpinning: boolean;
   revealedPrize: InstantPrize | null;
   prizes: InstantPrize[];
-  spinnerRef: React.RefObject<HTMLDivElement>;
+  spinnerRef: React.RefObject<HTMLDivElement | null>;
 }
 
 interface InstantWinSpinnerProps {

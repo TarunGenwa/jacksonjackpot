@@ -113,7 +113,7 @@ export default function TicketPurchaseModal({
       const response = await ticketsService.purchaseTickets(request);
 
       // Update wallet balance
-      await updateBalance();
+      updateBalance(response.wallet.newBalance);
 
       // Prepare tickets for instant win spinner
       const ticketsWithInstantWin = response.tickets.map((ticket: PurchaseResponseTicket) => ({
