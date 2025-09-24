@@ -74,6 +74,7 @@ export default function Home() {
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isDrawerOpen, onOpen: onDrawerOpen, onClose: onDrawerClose } = useDisclosure();
+  const { isOpen: isDetailsDrawerOpen, onOpen: onDetailsDrawerOpen, onClose: onDetailsDrawerClose } = useDisclosure();
   const [competitions, setCompetitions] = useState<Competition[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -196,7 +197,7 @@ export default function Home() {
   }
 
   return (
-    <Box minH="100vh" bg={getThemeColor('dark')} py={12}>
+    <Box minH="100vh" bg={getThemeColor('dark')} py={12} pb={{ base: 32, lg: 12 }}>
       <Container maxW="container.xl">
         <VStack spacing={12}>
           {/* Competition Details Section */}
@@ -333,10 +334,93 @@ export default function Home() {
 
                   {/* Selected Competition Details */}
                   {competitions[selectedCompetitionIndex] && (
-                    <Grid templateColumns={{ base: '1fr', lg: '1fr 2fr' }} gap={8}>
-                      {/* Competition Image and Title */}
-                      <GridItem>
+                    <>
+                      {/* Mobile Layout */}
+                      <Box display={{ base: 'block', lg: 'none' }}>
                         <VStack spacing={4} align="stretch">
+                          {/* Image with Badge */}
+                          <Box position="relative">
+                            {competitions[selectedCompetitionIndex].imageUrl ? (
+                              <Box borderRadius="lg" overflow="hidden" border="2px" borderColor={getThemeColor('primary')}>
+                                <Image
+                                  src={competitions[selectedCompetitionIndex].imageUrl}
+                                  alt={competitions[selectedCompetitionIndex].title}
+                                  width="100%"
+                                  height="auto"
+                                  objectFit="cover"
+                                />
+                              </Box>
+                            ) : (
+                              <Box
+                                h="250px"
+                                bg={getThemeColor('dark')}
+                                borderRadius="lg"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                border="2px"
+                                borderColor={getThemeColor('primary')}
+                              >
+                                <Icon as={FaTrophy} boxSize={16} color={getThemeColor('accent')} />
+                              </Box>
+                            )}
+
+                            {/* ACTIVE Badge on top left */}
+                            <Badge
+                              position="absolute"
+                              top={4}
+                              left={4}
+                              bg={getThemeColor('accent')}
+                              color={getThemeColor('dark')}
+                              px={3}
+                              py={1}
+                              fontSize="sm"
+                              fontWeight="bold"
+                              borderRadius="md"
+                            >
+                              ACTIVE
+                            </Badge>
+                          </Box>
+
+                          {/* Title and Description below image */}
+                          <Box>
+                            <Heading size="lg" color={getThemeColor('white')} mb={2}>
+                              {competitions[selectedCompetitionIndex].title}
+                            </Heading>
+                            <HStack spacing={2} mb={3}>
+                              <Text color={getThemeColor('gray300')} fontSize="sm">Supporting</Text>
+                              <Text color={getThemeColor('primary')} fontWeight="semibold" fontSize="sm">
+                                {competitions[selectedCompetitionIndex].charity.name}
+                              </Text>
+                              {competitions[selectedCompetitionIndex].charity.isVerified && (
+                                <Badge colorScheme="green" variant="solid" fontSize="xs">✓ Verified</Badge>
+                              )}
+                            </HStack>
+                            <Text color={getThemeColor('gray300')} fontSize="sm" mb={4}>
+                              {competitions[selectedCompetitionIndex].description}
+                            </Text>
+
+                            {/* View Details Button */}
+                            <Button
+                              w="full"
+                              variant="outline"
+                              borderColor={getThemeColor('primary')}
+                              color={getThemeColor('primary')}
+                              _hover={{ bg: getThemeColor('primaryDark'), color: 'white' }}
+                              onClick={onDetailsDrawerOpen}
+                              mb={4}
+                            >
+                              View Competition Details
+                            </Button>
+                          </Box>
+                        </VStack>
+                      </Box>
+
+                      {/* Desktop Layout */}
+                      <Grid templateColumns={{ base: '1fr', lg: '1fr 2fr' }} gap={8} display={{ base: 'none', lg: 'grid' }}>
+                        {/* Competition Image and Title */}
+                        <GridItem>
+                          <VStack spacing={4} align="stretch">
                           {/* Image with Badge */}
                           <Box position="relative">
                             {competitions[selectedCompetitionIndex].imageUrl ? (
@@ -504,13 +588,79 @@ export default function Home() {
                           >
                             Checkout - £{(ticketQuantity * parseFloat(competitions[selectedCompetitionIndex].ticketPrice)).toFixed(2)}
                           </Button>
-                        </VStack>
-                      </GridItem>
-                    </Grid>
+                          </VStack>
+                        </GridItem>
+                      </Grid>
+                    </>
                   )}
                 </VStack>
               </CardBody>
             </Card>
+          )}
+
+          {/* Mobile Fixed Checkout Button */}
+          {competitions.length > 0 && competitions[selectedCompetitionIndex] && (
+            <Box
+              display={{ base: 'block', lg: 'none' }}
+              position="fixed"
+              bottom={0}
+              left={0}
+              right={0}
+              bg={getThemeColor('secondary')}
+              p={4}
+              borderTop="2px"
+              borderColor={getThemeColor('primary')}
+              zIndex={1000}
+            >
+              {/* Ticket Quantity Selector - Mobile */}
+              <HStack justify="space-between" align="center" mb={3}>
+                <VStack align="start" spacing={0}>
+                  <Text fontSize="xs" color={getThemeColor('gray300')}>Tickets</Text>
+                  <HStack>
+                    <NumberInput
+                      value={ticketQuantity}
+                      onChange={(_, value) => setTicketQuantity(value)}
+                      min={1}
+                      max={100}
+                      size="sm"
+                      w="80px"
+                    >
+                      <NumberInputField
+                        bg={getThemeColor('dark')}
+                        color={getThemeColor('white')}
+                        borderColor={getThemeColor('primary')}
+                        _hover={{ borderColor: getThemeColor('primaryLight') }}
+                        _focus={{ borderColor: getThemeColor('primary'), boxShadow: 'none' }}
+                      />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper color={getThemeColor('primary')} />
+                        <NumberDecrementStepper color={getThemeColor('primary')} />
+                      </NumberInputStepper>
+                    </NumberInput>
+                  </HStack>
+                </VStack>
+                <VStack align="end" spacing={0}>
+                  <Text fontSize="xs" color={getThemeColor('gray300')}>Total</Text>
+                  <Text fontSize="lg" fontWeight="bold" color={getThemeColor('accent')}>
+                    £{(ticketQuantity * parseFloat(competitions[selectedCompetitionIndex].ticketPrice)).toFixed(2)}
+                  </Text>
+                </VStack>
+              </HStack>
+
+              {/* Checkout Button */}
+              <Button
+                size="lg"
+                bg={getThemeColor('accent')}
+                color={getThemeColor('dark')}
+                _hover={{ bg: getThemeColor('accentDark') }}
+                leftIcon={<Icon as={FaTicketAlt} />}
+                fontWeight="bold"
+                onClick={handlePurchaseClick}
+                w="full"
+              >
+                Checkout - £{(ticketQuantity * parseFloat(competitions[selectedCompetitionIndex].ticketPrice)).toFixed(2)}
+              </Button>
+            </Box>
           )}
 
           {/* Tabbed Content Section - Prizes, Tickets, Details */}
@@ -976,6 +1126,102 @@ export default function Home() {
 
         </VStack>
       </Container>
+
+      {/* Mobile Details Drawer */}
+      {competitions.length > 0 && competitions[selectedCompetitionIndex] && (
+        <Drawer
+          isOpen={isDetailsDrawerOpen}
+          placement="bottom"
+          onClose={onDetailsDrawerClose}
+          size="full"
+        >
+          <DrawerOverlay />
+          <DrawerContent bg={getThemeColor('secondary')} maxH="90vh">
+            <DrawerCloseButton color={getThemeColor('white')} />
+            <DrawerHeader borderBottomWidth="1px" borderColor={getThemeColor('primaryDark')} color={getThemeColor('white')}>
+              Competition Details
+            </DrawerHeader>
+
+            <DrawerBody p={4} overflowY="auto">
+              <VStack spacing={6} align="stretch">
+                {/* Ticket Info */}
+                <Box bg={getThemeColor('dark')} p={6} borderRadius="lg">
+                  <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+                    <GridItem>
+                      <VStack align="start">
+                        <Text fontSize="sm" color={getThemeColor('gray500')}>Ticket Price</Text>
+                        <Text fontSize="2xl" fontWeight="bold" color={getThemeColor('accent')}>
+                          £{competitions[selectedCompetitionIndex].ticketPrice}
+                        </Text>
+                      </VStack>
+                    </GridItem>
+                    <GridItem>
+                      <VStack align="start">
+                        <Text fontSize="sm" color={getThemeColor('gray500')}>Draw Date</Text>
+                        <Text fontSize="lg" fontWeight="semibold" color={getThemeColor('white')}>
+                          {new Date(competitions[selectedCompetitionIndex].drawDate).toLocaleDateString('en-GB', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric'
+                          })}
+                        </Text>
+                      </VStack>
+                    </GridItem>
+                  </Grid>
+                </Box>
+
+                {/* Progress */}
+                <Box>
+                  <HStack justify="space-between" mb={2}>
+                    <Text color={getThemeColor('white')} fontWeight="semibold">
+                      Tickets Sold
+                    </Text>
+                    <Text color={getThemeColor('gray300')}>
+                      {competitions[selectedCompetitionIndex].ticketsSold} / {competitions[selectedCompetitionIndex].maxTickets}
+                    </Text>
+                  </HStack>
+                  <Progress
+                    value={(competitions[selectedCompetitionIndex].ticketsSold / competitions[selectedCompetitionIndex].maxTickets) * 100}
+                    size="lg"
+                    colorScheme="cyan"
+                    bg={getThemeColor('dark')}
+                    borderRadius="full"
+                  />
+                  <Text fontSize="sm" color={getThemeColor('gray500')} mt={1}>
+                    {Math.round((competitions[selectedCompetitionIndex].ticketsSold / competitions[selectedCompetitionIndex].maxTickets) * 100)}% sold
+                  </Text>
+                </Box>
+
+                {/* Prize Summary */}
+                {competitions[selectedCompetitionIndex].prizes && competitions[selectedCompetitionIndex].prizes.length > 0 && (
+                  <Box bg={getThemeColor('dark')} p={4} borderRadius="lg">
+                    <Text fontSize="lg" fontWeight="bold" color={getThemeColor('white')} mb={3}>
+                      Prizes Available
+                    </Text>
+                    <VStack spacing={2} align="stretch">
+                      {competitions[selectedCompetitionIndex].prizes.slice(0, 3).map((prize, idx) => (
+                        <HStack key={idx} justify="space-between">
+                          <Text fontSize="sm" color={getThemeColor('gray300')}>
+                            {prize.name}
+                          </Text>
+                          <Badge colorScheme="yellow" variant="solid">
+                            £{(prize.value / 100).toFixed(0)}
+                          </Badge>
+                        </HStack>
+                      ))}
+                      {competitions[selectedCompetitionIndex].prizes.length > 3 && (
+                        <Text fontSize="xs" color={getThemeColor('gray500')} textAlign="center">
+                          +{competitions[selectedCompetitionIndex].prizes.length - 3} more prizes
+                        </Text>
+                      )}
+                    </VStack>
+                  </Box>
+                )}
+              </VStack>
+            </DrawerBody>
+          </DrawerContent>
+        </Drawer>
+      )}
 
       {/* Purchase Modal */}
       {competitions.length > 0 && competitions[selectedCompetitionIndex] && (
