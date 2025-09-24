@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -25,7 +25,6 @@ import {
   Flex,
   Icon,
   Circle,
-  Select,
   Badge,
   Progress,
   Divider,
@@ -45,9 +44,17 @@ import {
   AccordionIcon,
   List,
   ListItem,
-  ListIcon
+  ListIcon,
+  IconButton,
+  Drawer,
+  DrawerBody,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+  useBreakpointValue
 } from '@chakra-ui/react';
-import { CheckCircleIcon } from '@chakra-ui/icons';
+import { CheckCircleIcon, ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { FaTrophy, FaHeart, FaShieldAlt, FaInfoCircle, FaUsers, FaGift, FaChartLine, FaPoundSign, FaTicketAlt, FaQuestionCircle } from 'react-icons/fa';
 import CompetitionCard from '@/components/CompetitionCard';
 import { Competition } from '@/types/api';
@@ -61,18 +68,21 @@ export default function Home() {
   const { user } = useAuth();
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isDrawerOpen, onOpen: onDrawerOpen, onClose: onDrawerClose } = useDisclosure();
   const [competitions, setCompetitions] = useState<Competition[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCompetitionIndex, setSelectedCompetitionIndex] = useState(0);
   const [showAllTickets, setShowAllTickets] = useState<Record<string, boolean>>({});
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   useEffect(() => {
     const fetchCompetitions = async () => {
       try {
         setLoading(true);
-        const activeCompetitions = await competitionsService.getActive();
-        setCompetitions(activeCompetitions);
+        const allCompetitions = await competitionsService.getAll();
+        setCompetitions(allCompetitions);
         setError(null);
       } catch (err) {
         console.error('Failed to fetch competitions:', err);
@@ -85,12 +95,36 @@ export default function Home() {
     fetchCompetitions();
   }, []);
 
+  const scrollCompetitions = (direction: 'left' | 'right') => {
+    if (!scrollContainerRef.current) return;
+
+    const scrollAmount = 300;
+    const currentScroll = scrollContainerRef.current.scrollLeft;
+
+    if (direction === 'left') {
+      scrollContainerRef.current.scrollTo({
+        left: currentScroll - scrollAmount,
+        behavior: 'smooth'
+      });
+    } else {
+      scrollContainerRef.current.scrollTo({
+        left: currentScroll + scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   const handlePurchaseClick = () => {
     if (!user) {
       router.push('/login');
       return;
     }
     onOpen();
+  };
+
+  const handleCompetitionSelect = (index: number) => {
+    setSelectedCompetitionIndex(index);
+    onDrawerClose();
   };
 
   const toggleShowAllTickets = (prizeId: string) => {
@@ -165,25 +199,130 @@ export default function Home() {
                 <VStack spacing={6} align="stretch">
                   {/* Competition Selector */}
                   <Box>
-                    <Text fontSize="sm" fontWeight="semibold" color={getThemeColor('gray300')} mb={2}>
+                    <Text fontSize="sm" fontWeight="semibold" color={getThemeColor('gray300')} mb={3}>
                       SELECT A COMPETITION
                     </Text>
-                    <Select
-                      value={selectedCompetitionIndex}
-                      onChange={(e) => setSelectedCompetitionIndex(Number(e.target.value))}
-                      bg={getThemeColor('dark')}
-                      color={getThemeColor('white')}
-                      borderColor={getThemeColor('primary')}
-                      _hover={{ borderColor: getThemeColor('primaryLight') }}
-                      _focus={{ borderColor: getThemeColor('primary'), boxShadow: `0 0 0 1px ${getThemeColor('primary')}` }}
-                      size="lg"
-                    >
-                      {competitions.map((comp, index) => (
-                        <option key={comp.id} value={index} style={{ background: '#1f3044' }}>
-                          {comp.title} - {comp.charity.name}
-                        </option>
-                      ))}
-                    </Select>
+
+                    {/* Mobile View - Button */}
+                    {isMobile ? (
+                      <Button
+                        w="full"
+                        size="lg"
+                        bg={getThemeColor('dark')}
+                        color={getThemeColor('white')}
+                        border="2px"
+                        borderColor={getThemeColor('primary')}
+                        _hover={{ bg: getThemeColor('primaryDark') }}
+                        onClick={onDrawerOpen}
+                        leftIcon={<Icon as={FaTrophy} />}
+                      >
+                        {competitions[selectedCompetitionIndex]?.title || 'Select Competition'}
+                      </Button>
+                    ) : (
+                      /* Desktop View - Horizontal Tiles */
+                      <HStack spacing={2} position="relative">
+                        <IconButton
+                          aria-label="Scroll left"
+                          icon={<ChevronLeftIcon boxSize={6} />}
+                          size="sm"
+                          borderRadius="full"
+                          bg={getThemeColor('primary')}
+                          color="white"
+                          _hover={{ bg: getThemeColor('primaryDark') }}
+                          onClick={() => scrollCompetitions('left')}
+                        />
+
+                        <Box
+                          ref={scrollContainerRef}
+                          overflowX="auto"
+                          flex={1}
+                          css={{
+                            '&::-webkit-scrollbar': {
+                              display: 'none',
+                            },
+                            scrollbarWidth: 'none',
+                            msOverflowStyle: 'none',
+                          }}
+                        >
+                          <HStack spacing={3} pb={2}>
+                            {competitions.map((comp, index) => (
+                              <VStack
+                          key={comp.id}
+                          spacing={2}
+                          p={2}
+                          borderRadius="lg"
+                          border="2px"
+                          borderColor={selectedCompetitionIndex === index ? getThemeColor('primary') : getThemeColor('gray700')}
+                          bg={selectedCompetitionIndex === index ? getThemeColor('dark') : getThemeColor('secondary')}
+                          minW="140px"
+                          cursor="pointer"
+                          onClick={() => setSelectedCompetitionIndex(index)}
+                          transition="all 0.2s"
+                          position="relative"
+                          zIndex={selectedCompetitionIndex === index ? 2 : 1}
+                          _hover={{
+                            transform: 'scale(1.05)',
+                            borderColor: selectedCompetitionIndex === index ? getThemeColor('primary') : getThemeColor('primaryLight'),
+                            zIndex: 3
+                          }}
+                        >
+                            <Box
+                              w="120px"
+                              h="80px"
+                              borderRadius="md"
+                              overflow="hidden"
+                              bg={getThemeColor('dark')}
+                              display="flex"
+                              alignItems="center"
+                              justifyContent="center"
+                            >
+                              {comp.imageUrl ? (
+                                <Image
+                                  src={comp.imageUrl}
+                                  alt={comp.title}
+                                  width="100%"
+                                  height="100%"
+                                  objectFit="cover"
+                                />
+                              ) : (
+                                <Icon as={FaTrophy} boxSize={8} color={getThemeColor('accent')} />
+                              )}
+                            </Box>
+                            <VStack spacing={0} align="center">
+                              <Text
+                                fontSize="xs"
+                                fontWeight="semibold"
+                                color={selectedCompetitionIndex === index ? getThemeColor('white') : getThemeColor('gray300')}
+                                textAlign="center"
+                                noOfLines={1}
+                              >
+                                {comp.title}
+                              </Text>
+                              <Text
+                                fontSize="xs"
+                                color={selectedCompetitionIndex === index ? getThemeColor('primary') : getThemeColor('gray500')}
+                                noOfLines={1}
+                              >
+                                {comp.charity.name}
+                              </Text>
+                            </VStack>
+                          </VStack>
+                            ))}
+                          </HStack>
+                        </Box>
+
+                        <IconButton
+                          aria-label="Scroll right"
+                          icon={<ChevronRightIcon boxSize={6} />}
+                          size="sm"
+                          borderRadius="full"
+                          bg={getThemeColor('primary')}
+                          color="white"
+                          _hover={{ bg: getThemeColor('primaryDark') }}
+                          onClick={() => scrollCompetitions('right')}
+                        />
+                      </HStack>
+                    )}
                   </Box>
 
                   <Divider borderColor={getThemeColor('primaryDark')} />
@@ -852,8 +991,8 @@ export default function Home() {
             console.log('Purchase successful');
             // Refresh competition data to show updated ticket count
             try {
-              const activeCompetitions = await competitionsService.getActive();
-              setCompetitions(activeCompetitions);
+              const allCompetitions = await competitionsService.getAll();
+              setCompetitions(allCompetitions);
             } catch (err) {
               console.error('Failed to refresh competitions:', err);
             }
@@ -861,6 +1000,100 @@ export default function Home() {
           }}
         />
       )}
+
+      {/* Mobile Competition Drawer */}
+      <Drawer
+        isOpen={isDrawerOpen}
+        placement="bottom"
+        onClose={onDrawerClose}
+        size="full"
+      >
+        <DrawerOverlay />
+        <DrawerContent bg={getThemeColor('secondary')} maxH="100vh">
+          <DrawerCloseButton color={getThemeColor('white')} />
+          <DrawerHeader borderBottomWidth="1px" borderColor={getThemeColor('primaryDark')} color={getThemeColor('white')}>
+            Select Competition
+          </DrawerHeader>
+
+          <DrawerBody p={4} overflowY="auto">
+            <VStack spacing={3} align="stretch">
+              {competitions.map((comp, index) => (
+                <Box
+                  key={comp.id}
+                  cursor="pointer"
+                  onClick={() => handleCompetitionSelect(index)}
+                  p={4}
+                  borderRadius="lg"
+                  border="2px"
+                  borderColor={selectedCompetitionIndex === index ? getThemeColor('primary') : getThemeColor('dark')}
+                  bg={selectedCompetitionIndex === index ? getThemeColor('dark') : getThemeColor('secondaryLight')}
+                  transition="all 0.2s"
+                  _hover={{
+                    borderColor: getThemeColor('primary'),
+                    bg: getThemeColor('dark')
+                  }}
+                >
+                  <HStack spacing={4} align="center">
+                    <Box
+                      w="80px"
+                      h="80px"
+                      borderRadius="md"
+                      overflow="hidden"
+                      bg={getThemeColor('dark')}
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      flexShrink={0}
+                    >
+                      {comp.imageUrl ? (
+                        <Image
+                          src={comp.imageUrl}
+                          alt={comp.title}
+                          width="100%"
+                          height="100%"
+                          objectFit="cover"
+                        />
+                      ) : (
+                        <Icon as={FaTrophy} boxSize={8} color={getThemeColor('accent')} />
+                      )}
+                    </Box>
+
+                    <VStack align="start" flex={1} spacing={1}>
+                      <Text
+                        fontWeight="semibold"
+                        fontSize="lg"
+                        color={getThemeColor('white')}
+                      >
+                        {comp.title}
+                      </Text>
+                      <Text
+                        fontSize="sm"
+                        color={getThemeColor('primary')}
+                      >
+                        {comp.charity.name}
+                      </Text>
+                      <HStack spacing={2}>
+                        <Badge colorScheme="cyan" variant="solid">
+                          £{comp.ticketPrice}
+                        </Badge>
+                        <Badge colorScheme="purple" variant="subtle">
+                          {comp.ticketsSold}/{comp.maxTickets} sold
+                        </Badge>
+                      </HStack>
+                    </VStack>
+
+                    {selectedCompetitionIndex === index && (
+                      <Circle size="8" bg={getThemeColor('primary')} color="white">
+                        <CheckCircleIcon boxSize={4} />
+                      </Circle>
+                    )}
+                  </HStack>
+                </Box>
+              ))}
+            </VStack>
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
     </Box>
   );
 }
