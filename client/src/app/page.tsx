@@ -317,31 +317,19 @@ export default function Home() {
                             </Text>
                           </Box>
 
-                          {/* Action Buttons */}
-                          <HStack spacing={4}>
-                            <Button
-                              size="lg"
-                              bg={getThemeColor('accent')}
-                              color={getThemeColor('dark')}
-                              _hover={{ bg: getThemeColor('accentDark') }}
-                              leftIcon={<Icon as={FaTicketAlt} />}
-                              fontWeight="bold"
-                              onClick={handlePurchaseClick}
-                            >
-                              Buy Tickets Now
-                            </Button>
-                            <Link href={`/competitions/${competitions[selectedCompetitionIndex].id}`}>
-                              <Button
-                                size="lg"
-                                variant="outline"
-                                borderColor={getThemeColor('primary')}
-                                color={getThemeColor('primary')}
-                                _hover={{ bg: getThemeColor('primaryDark'), color: getThemeColor('white') }}
-                              >
-                                Full Details
-                              </Button>
-                            </Link>
-                          </HStack>
+                          {/* Action Button */}
+                          <Button
+                            size="lg"
+                            bg={getThemeColor('accent')}
+                            color={getThemeColor('dark')}
+                            _hover={{ bg: getThemeColor('accentDark') }}
+                            leftIcon={<Icon as={FaTicketAlt} />}
+                            fontWeight="bold"
+                            onClick={handlePurchaseClick}
+                            w="full"
+                          >
+                            Buy Tickets Now
+                          </Button>
                         </VStack>
                       </GridItem>
                     </Grid>
