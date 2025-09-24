@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   Box,
@@ -18,11 +17,6 @@ import {
   Alert,
   AlertIcon,
   Center,
-  Stat,
-  StatLabel,
-  StatNumber,
-  StatHelpText,
-  Flex,
   Icon,
   Circle,
   Badge,
@@ -60,8 +54,7 @@ import {
   NumberDecrementStepper
 } from '@chakra-ui/react';
 import { CheckCircleIcon, ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
-import { FaTrophy, FaHeart, FaShieldAlt, FaInfoCircle, FaUsers, FaGift, FaChartLine, FaPoundSign, FaTicketAlt, FaQuestionCircle, FaList } from 'react-icons/fa';
-import CompetitionCard from '@/components/CompetitionCard';
+import { FaTrophy, FaHeart, FaInfoCircle, FaGift, FaTicketAlt, FaQuestionCircle, FaList } from 'react-icons/fa';
 import { Competition } from '@/types/api';
 import { competitionsService } from '@/services/competitions';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -79,7 +72,6 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCompetitionIndex, setSelectedCompetitionIndex] = useState(0);
-  const [showAllTickets, setShowAllTickets] = useState<Record<string, boolean>>({});
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isMobile = useBreakpointValue({ base: true, md: false });
   const [ticketQuantity, setTicketQuantity] = useState(1);
@@ -136,12 +128,6 @@ export default function Home() {
     onDrawerClose();
   };
 
-  const toggleShowAllTickets = (prizeId: string) => {
-    setShowAllTickets(prev => ({
-      ...prev,
-      [prizeId]: !prev[prizeId]
-    }));
-  };
 
   const formatPrice = (price: string) => {
     return `£${parseFloat(price).toFixed(2)}`;
@@ -888,7 +874,7 @@ export default function Home() {
                                         <AccordionIcon color={getThemeColor("primary")} />
                                       </AccordionButton>
                                       <AccordionPanel pb={3} bg={getThemeColor('secondary')} borderBottomRadius="md" color={getThemeColor('gray300')} border="1px" borderColor={getThemeColor('primary')} borderTop="none" fontSize="sm">
-                                        Simply click the "Buy Tickets Now" button above, select how many tickets you'd like, and complete your purchase securely.
+                                        Simply click the &quot;Buy Tickets Now&quot; button above, select how many tickets you&apos;d like, and complete your purchase securely.
                                       </AccordionPanel>
                                     </AccordionItem>
 
