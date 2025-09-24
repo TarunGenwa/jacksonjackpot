@@ -60,7 +60,7 @@ import {
   NumberDecrementStepper
 } from '@chakra-ui/react';
 import { CheckCircleIcon, ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
-import { FaTrophy, FaHeart, FaShieldAlt, FaInfoCircle, FaUsers, FaGift, FaChartLine, FaPoundSign, FaTicketAlt, FaQuestionCircle } from 'react-icons/fa';
+import { FaTrophy, FaHeart, FaShieldAlt, FaInfoCircle, FaUsers, FaGift, FaChartLine, FaPoundSign, FaTicketAlt, FaQuestionCircle, FaList } from 'react-icons/fa';
 import CompetitionCard from '@/components/CompetitionCard';
 import { Competition } from '@/types/api';
 import { competitionsService } from '@/services/competitions';
@@ -83,6 +83,7 @@ export default function Home() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isMobile = useBreakpointValue({ base: true, md: false });
   const [ticketQuantity, setTicketQuantity] = useState(1);
+  const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
   useEffect(() => {
     const fetchCompetitions = async () => {
@@ -488,107 +489,604 @@ export default function Home() {
 
                       {/* Competition Info */}
                       <GridItem>
-                        <VStack spacing={6} align="stretch">
-                          {/* Ticket Info */}
-                          <Box bg={getThemeColor('dark')} p={6} borderRadius="lg">
-                            <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-                              <GridItem>
-                                <VStack align="start">
-                                  <Text fontSize="sm" color={getThemeColor('gray500')}>Ticket Price</Text>
-                                  <Text fontSize="2xl" fontWeight="bold" color={getThemeColor('accent')}>
-                                    £{competitions[selectedCompetitionIndex].ticketPrice}
-                                  </Text>
-                                </VStack>
-                              </GridItem>
-                              <GridItem>
-                                <VStack align="start">
-                                  <Text fontSize="sm" color={getThemeColor('gray500')}>Draw Date</Text>
-                                  <Text fontSize="lg" fontWeight="semibold" color={getThemeColor('white')}>
-                                    {new Date(competitions[selectedCompetitionIndex].drawDate).toLocaleDateString('en-GB', {
-                                      day: 'numeric',
-                                      month: 'short',
-                                      year: 'numeric'
-                                    })}
-                                  </Text>
-                                </VStack>
-                              </GridItem>
-                            </Grid>
-                          </Box>
+                        <HStack spacing={4} align="start">
+                          <VStack spacing={6} align="stretch" flex={1}>
+                            {/* Tabbed Content - Checkout, Prizes, Tickets, Details, FAQ */}
+                            <Box bg={getThemeColor('dark')} borderRadius="lg">
+                              <Tabs variant="unstyled" index={selectedTabIndex} orientation="vertical">
+                                {/* Hidden TabList for functionality */}
+                                <TabList display="none">
+                                  <Tab></Tab>
+                                  <Tab></Tab>
+                                  <Tab></Tab>
+                                  <Tab></Tab>
+                                  <Tab></Tab>
+                                </TabList>
 
-                          {/* Progress */}
-                          <Box>
-                            <HStack justify="space-between" mb={2}>
-                              <Text color={getThemeColor('white')} fontWeight="semibold">
-                                Tickets Sold
-                              </Text>
-                              <Text color={getThemeColor('gray300')}>
-                                {competitions[selectedCompetitionIndex].ticketsSold} / {competitions[selectedCompetitionIndex].maxTickets}
-                              </Text>
-                            </HStack>
-                            <Progress
-                              value={(competitions[selectedCompetitionIndex].ticketsSold / competitions[selectedCompetitionIndex].maxTickets) * 100}
-                              size="lg"
-                              colorScheme="cyan"
-                              bg={getThemeColor('dark')}
-                              borderRadius="full"
-                            />
-                            <Text fontSize="sm" color={getThemeColor('gray500')} mt={1}>
-                              {Math.round((competitions[selectedCompetitionIndex].ticketsSold / competitions[selectedCompetitionIndex].maxTickets) * 100)}% sold
-                            </Text>
-                          </Box>
+                                {/* Content Area - Full Width */}
+                                <Box p={4}>
+                                  <TabPanels>
+                                {/* Checkout Tab */}
+                                <TabPanel px={0}>
+                                  <VStack spacing={4} align="stretch">
+                                    {/* Ticket Info */}
+                                    <Box bg={getThemeColor('secondary')} p={4} borderRadius="md">
+                                      <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+                                        <GridItem>
+                                          <VStack align="start">
+                                            <Text fontSize="sm" color={getThemeColor('gray500')}>Ticket Price</Text>
+                                            <Text fontSize="2xl" fontWeight="bold" color={getThemeColor('accent')}>
+                                              £{competitions[selectedCompetitionIndex].ticketPrice}
+                                            </Text>
+                                          </VStack>
+                                        </GridItem>
+                                        <GridItem>
+                                          <VStack align="start">
+                                            <Text fontSize="sm" color={getThemeColor('gray500')}>Draw Date</Text>
+                                            <Text fontSize="lg" fontWeight="semibold" color={getThemeColor('white')}>
+                                              {new Date(competitions[selectedCompetitionIndex].drawDate).toLocaleDateString('en-GB', {
+                                                day: 'numeric',
+                                                month: 'short',
+                                                year: 'numeric'
+                                              })}
+                                            </Text>
+                                          </VStack>
+                                        </GridItem>
+                                      </Grid>
+                                    </Box>
 
-                          {/* Ticket Quantity Selector */}
-                          <Box bg={getThemeColor('dark')} p={4} borderRadius="lg">
-                            <HStack justify="space-between" align="center">
-                              <VStack align="start" spacing={1}>
-                                <Text fontSize="sm" color={getThemeColor('gray300')}>Number of Tickets</Text>
-                                <HStack>
-                                  <NumberInput
-                                    value={ticketQuantity}
-                                    onChange={(_, value) => setTicketQuantity(value)}
-                                    min={1}
-                                    max={100}
-                                    size="md"
-                                    w="120px"
-                                  >
-                                    <NumberInputField
-                                      bg={getThemeColor('secondary')}
-                                      color={getThemeColor('white')}
-                                      borderColor={getThemeColor('primary')}
-                                      _hover={{ borderColor: getThemeColor('primaryLight') }}
-                                      _focus={{ borderColor: getThemeColor('primary'), boxShadow: 'none' }}
-                                    />
-                                    <NumberInputStepper>
-                                      <NumberIncrementStepper color={getThemeColor('primary')} />
-                                      <NumberDecrementStepper color={getThemeColor('primary')} />
-                                    </NumberInputStepper>
-                                  </NumberInput>
-                                  <Text color={getThemeColor('gray300')}>tickets</Text>
-                                </HStack>
-                              </VStack>
-                              <VStack align="end" spacing={1}>
-                                <Text fontSize="sm" color={getThemeColor('gray300')}>Total Price</Text>
-                                <Text fontSize="2xl" fontWeight="bold" color={getThemeColor('accent')}>
-                                  £{(ticketQuantity * parseFloat(competitions[selectedCompetitionIndex].ticketPrice)).toFixed(2)}
-                                </Text>
-                              </VStack>
-                            </HStack>
-                          </Box>
+                                    {/* Progress */}
+                                    <Box>
+                                      <HStack justify="space-between" mb={2}>
+                                        <Text color={getThemeColor('white')} fontWeight="semibold" fontSize="sm">
+                                          Tickets Sold
+                                        </Text>
+                                        <Text color={getThemeColor('gray300')} fontSize="sm">
+                                          {competitions[selectedCompetitionIndex].ticketsSold} / {competitions[selectedCompetitionIndex].maxTickets}
+                                        </Text>
+                                      </HStack>
+                                      <Progress
+                                        value={(competitions[selectedCompetitionIndex].ticketsSold / competitions[selectedCompetitionIndex].maxTickets) * 100}
+                                        size="lg"
+                                        colorScheme="cyan"
+                                        bg={getThemeColor('secondary')}
+                                        borderRadius="full"
+                                      />
+                                      <Text fontSize="xs" color={getThemeColor('gray500')} mt={1}>
+                                        {Math.round((competitions[selectedCompetitionIndex].ticketsSold / competitions[selectedCompetitionIndex].maxTickets) * 100)}% sold
+                                      </Text>
+                                    </Box>
 
-                          {/* Action Button */}
-                          <Button
-                            size="lg"
-                            bg={getThemeColor('accent')}
-                            color={getThemeColor('dark')}
-                            _hover={{ bg: getThemeColor('accentDark') }}
-                            leftIcon={<Icon as={FaTicketAlt} />}
-                            fontWeight="bold"
-                            onClick={handlePurchaseClick}
-                            w="full"
-                          >
-                            Checkout - £{(ticketQuantity * parseFloat(competitions[selectedCompetitionIndex].ticketPrice)).toFixed(2)}
-                          </Button>
+                                    {/* Ticket Quantity Selector */}
+                                    <Box bg={getThemeColor('secondary')} p={4} borderRadius="md">
+                                      <HStack justify="space-between" align="center">
+                                        <VStack align="start" spacing={1}>
+                                          <Text fontSize="sm" color={getThemeColor('gray300')}>Number of Tickets</Text>
+                                          <HStack>
+                                            <NumberInput
+                                              value={ticketQuantity}
+                                              onChange={(_, value) => setTicketQuantity(value)}
+                                              min={1}
+                                              max={100}
+                                              size="md"
+                                              w="120px"
+                                            >
+                                              <NumberInputField
+                                                bg={getThemeColor('dark')}
+                                                color={getThemeColor('white')}
+                                                borderColor={getThemeColor('primary')}
+                                                _hover={{ borderColor: getThemeColor('primaryLight') }}
+                                                _focus={{ borderColor: getThemeColor('primary'), boxShadow: 'none' }}
+                                              />
+                                              <NumberInputStepper>
+                                                <NumberIncrementStepper color={getThemeColor('primary')} />
+                                                <NumberDecrementStepper color={getThemeColor('primary')} />
+                                              </NumberInputStepper>
+                                            </NumberInput>
+                                            <Text color={getThemeColor('gray300')}>tickets</Text>
+                                          </HStack>
+                                        </VStack>
+                                        <VStack align="end" spacing={1}>
+                                          <Text fontSize="sm" color={getThemeColor('gray300')}>Total Price</Text>
+                                          <Text fontSize="2xl" fontWeight="bold" color={getThemeColor('accent')}>
+                                            £{(ticketQuantity * parseFloat(competitions[selectedCompetitionIndex].ticketPrice)).toFixed(2)}
+                                          </Text>
+                                        </VStack>
+                                      </HStack>
+                                    </Box>
+
+                                    {/* Action Button */}
+                                    <Button
+                                      size="lg"
+                                      bg={getThemeColor('accent')}
+                                      color={getThemeColor('dark')}
+                                      _hover={{ bg: getThemeColor('accentDark') }}
+                                      leftIcon={<Icon as={FaTicketAlt} />}
+                                      fontWeight="bold"
+                                      onClick={handlePurchaseClick}
+                                      w="full"
+                                    >
+                                      Checkout - £{(ticketQuantity * parseFloat(competitions[selectedCompetitionIndex].ticketPrice)).toFixed(2)}
+                                    </Button>
+                                  </VStack>
+                                </TabPanel>
+
+                                {/* Prizes Tab */}
+                                <TabPanel px={0}>
+                                  <VStack spacing={4} align="stretch">
+                                    {competitions[selectedCompetitionIndex].prizes && competitions[selectedCompetitionIndex].prizes.length > 0 ? (
+                                      <>
+                                        <HStack justify="space-between" w="full" bg={getThemeColor('secondary')} p={3} borderRadius="md" border="1px" borderColor={getThemeColor("primary")}>
+                                          <VStack align="start" spacing={1}>
+                                            <Text color={getThemeColor("primary")} fontSize="xs" fontWeight="semibold">Total Prizes</Text>
+                                            <Text color={getThemeColor('white')} fontWeight="bold" fontSize="md">
+                                              {competitions[selectedCompetitionIndex].prizes.length} prizes
+                                            </Text>
+                                          </VStack>
+                                          <VStack align="end" spacing={1}>
+                                            <Text color={getThemeColor("accent")} fontSize="xs" fontWeight="semibold">Combined Value</Text>
+                                            <Text color={getThemeColor("accent")} fontWeight="bold" fontSize="md">
+                                              £{(competitions[selectedCompetitionIndex].prizes.reduce((sum, p) => sum + ((p.value / 100) * p.quantity), 0)).toFixed(2)}
+                                            </Text>
+                                          </VStack>
+                                        </HStack>
+
+                                        {/* Draw Prizes Section */}
+                                        {competitions[selectedCompetitionIndex].prizes.filter(p => p.type === 'DRAW').length > 0 && (
+                                          <VStack spacing={2} align="stretch">
+                                            <Text color={getThemeColor("primary")} fontWeight="bold" fontSize="sm">
+                                              🏆 Main Draw Prize
+                                            </Text>
+                                            {competitions[selectedCompetitionIndex].prizes.filter(p => p.type === 'DRAW').map((prize) => (
+                                              <Box
+                                                key={prize.id}
+                                                bg={getThemeColor('secondary')}
+                                                p={3}
+                                                borderRadius="md"
+                                                border="1px"
+                                                borderColor={getThemeColor("primary")}
+                                                position="relative"
+                                              >
+                                                <Badge
+                                                  position="absolute"
+                                                  top={2}
+                                                  right={2}
+                                                  colorScheme="purple"
+                                                  variant="solid"
+                                                  fontSize="xs"
+                                                >
+                                                  DRAW PRIZE
+                                                </Badge>
+                                                <HStack align="start" spacing={3}>
+                                                  <Box
+                                                    bg={getThemeColor("primary")}
+                                                    color={getThemeColor('white')}
+                                                    borderRadius="md"
+                                                    w="35px"
+                                                    h="35px"
+                                                    display="flex"
+                                                    alignItems="center"
+                                                    justifyContent="center"
+                                                    fontWeight="bold"
+                                                    fontSize="sm"
+                                                  >
+                                                    <Icon as={FaTrophy} />
+                                                  </Box>
+                                                  <VStack align="start" flex={1} spacing={1}>
+                                                    <Text color={getThemeColor('white')} fontWeight="bold" fontSize="sm">
+                                                      {prize.name}
+                                                    </Text>
+                                                    {prize.description && (
+                                                      <Text color={getThemeColor('gray300')} fontSize="xs" noOfLines={2}>
+                                                        {prize.description}
+                                                      </Text>
+                                                    )}
+                                                    <Text color={getThemeColor("accent")} fontWeight="bold" fontSize="lg">
+                                                      £{(prize.value / 100).toFixed(2)}
+                                                    </Text>
+                                                  </VStack>
+                                                </HStack>
+                                              </Box>
+                                            ))}
+                                          </VStack>
+                                        )}
+
+                                        {/* Instant Win Prizes Section */}
+                                        {competitions[selectedCompetitionIndex].prizes.filter(p => p.type === 'INSTANT_WIN').length > 0 && (
+                                          <VStack spacing={2} align="stretch">
+                                            <Text color={getThemeColor("accent")} fontWeight="bold" fontSize="sm">
+                                              ⚡ Instant Win Prizes
+                                            </Text>
+                                            <SimpleGrid columns={1} spacing={2}>
+                                              {competitions[selectedCompetitionIndex].prizes.filter(p => p.type === 'INSTANT_WIN').slice(0, 3).map((prize) => (
+                                                <Box
+                                                  key={prize.id}
+                                                  bg={getThemeColor('secondary')}
+                                                  p={3}
+                                                  borderRadius="md"
+                                                  border="1px"
+                                                  borderColor={getThemeColor("accent")}
+                                                >
+                                                  <HStack justify="space-between">
+                                                    <VStack align="start" spacing={0}>
+                                                      <Text color={getThemeColor('white')} fontWeight="semibold" fontSize="sm">
+                                                        {prize.name}
+                                                      </Text>
+                                                      <Text color={getThemeColor("accent")} fontWeight="bold" fontSize="md">
+                                                        £{(prize.value / 100).toFixed(2)}
+                                                      </Text>
+                                                    </VStack>
+                                                    {prize.quantity > 1 && (
+                                                      <Badge colorScheme="purple" variant="subtle" fontSize="xs">
+                                                        {prize.quantity} available
+                                                      </Badge>
+                                                    )}
+                                                  </HStack>
+                                                </Box>
+                                              ))}
+                                              {competitions[selectedCompetitionIndex].prizes.filter(p => p.type === 'INSTANT_WIN').length > 3 && (
+                                                <Text fontSize="xs" color={getThemeColor('gray500')} textAlign="center">
+                                                  +{competitions[selectedCompetitionIndex].prizes.filter(p => p.type === 'INSTANT_WIN').length - 3} more instant win prizes
+                                                </Text>
+                                              )}
+                                            </SimpleGrid>
+                                          </VStack>
+                                        )}
+                                      </>
+                                    ) : (
+                                      <Box
+                                        bg={getThemeColor('secondary')}
+                                        p={6}
+                                        borderRadius="md"
+                                        textAlign="center"
+                                      >
+                                        <Icon as={FaTrophy} color={getThemeColor('gray500')} boxSize={8} mb={2} />
+                                        <Text color={getThemeColor('gray500')} fontSize="sm">Prize details will be announced soon!</Text>
+                                      </Box>
+                                    )}
+                                  </VStack>
+                                </TabPanel>
+
+                                {/* Tickets Tab */}
+                                <TabPanel px={0}>
+                                  <VStack spacing={4} align="stretch">
+                                    <Box bg={getThemeColor('secondary')} p={3} borderRadius="md" border="1px" borderColor={getThemeColor("primary")}>
+                                      <HStack justify="space-between" w="full">
+                                        <VStack align="start" spacing={1}>
+                                          <Text color={getThemeColor("primary")} fontSize="xs" fontWeight="semibold">Total Tickets</Text>
+                                          <Text color={getThemeColor('white')} fontWeight="bold" fontSize="md">
+                                            {competitions[selectedCompetitionIndex].maxTickets} tickets
+                                          </Text>
+                                        </VStack>
+                                        <VStack align="end" spacing={1}>
+                                          <Text color={getThemeColor("accent")} fontSize="xs" fontWeight="semibold">Tickets Sold</Text>
+                                          <Text color={getThemeColor("accent")} fontWeight="bold" fontSize="md">
+                                            {competitions[selectedCompetitionIndex].ticketsSold}
+                                          </Text>
+                                        </VStack>
+                                      </HStack>
+                                    </Box>
+
+                                    <Text color={getThemeColor('gray300')} fontSize="sm">
+                                      Ticket numbers are assigned sequentially as they are purchased. Winners are selected randomly after all tickets are sold.
+                                    </Text>
+
+                                    <Box bg={getThemeColor('secondary')} p={3} borderRadius="md" border="1px" borderColor={getThemeColor("primary")}>
+                                      <VStack spacing={2}>
+                                        <Text color={getThemeColor("primary")} fontWeight="semibold" fontSize="sm" textAlign="center">
+                                          🔒 Fairness & Transparency
+                                        </Text>
+                                        <Text color={getThemeColor('gray300')} fontSize="xs" textAlign="center">
+                                          All winning ticket numbers are determined using cryptographically secure random number generation.
+                                        </Text>
+                                      </VStack>
+                                    </Box>
+                                  </VStack>
+                                </TabPanel>
+
+                                {/* Details Tab */}
+                                <TabPanel px={0}>
+                                  <VStack spacing={3} align="stretch">
+                                    <Box bg={getThemeColor('secondary')} p={4} borderRadius="md">
+                                      <Heading size="sm" color={getThemeColor('white')} mb={3}>Competition Details</Heading>
+                                      <List spacing={2}>
+                                        <ListItem color={getThemeColor('gray300')} fontSize="sm">
+                                          <HStack>
+                                            <ListIcon as={CheckCircleIcon} color={getThemeColor("accent")} />
+                                            <Text>Entry Price: <Text as="span" fontWeight="bold" color={getThemeColor("accent")}>{formatPrice(competitions[selectedCompetitionIndex].ticketPrice)}</Text> per ticket</Text>
+                                          </HStack>
+                                        </ListItem>
+                                        <ListItem color={getThemeColor('gray300')} fontSize="sm">
+                                          <HStack>
+                                            <ListIcon as={CheckCircleIcon} color={getThemeColor("accent")} />
+                                            <Text>Maximum Tickets: <Text as="span" fontWeight="bold" color={getThemeColor('white')}>{competitions[selectedCompetitionIndex].maxTickets}</Text></Text>
+                                          </HStack>
+                                        </ListItem>
+                                        <ListItem color={getThemeColor('gray300')} fontSize="sm">
+                                          <HStack>
+                                            <ListIcon as={CheckCircleIcon} color={getThemeColor("accent")} />
+                                            <Text>Draw Date: <Text as="span" fontWeight="bold" color={getThemeColor("accent")}>{formatDate(competitions[selectedCompetitionIndex].drawDate)}</Text></Text>
+                                          </HStack>
+                                        </ListItem>
+                                        <ListItem color={getThemeColor('gray300')} fontSize="sm">
+                                          <HStack>
+                                            <ListIcon as={CheckCircleIcon} color={getThemeColor("accent")} />
+                                            <Text>Competition Type: <Badge colorScheme="purple" ml={2} fontSize="xs">{competitions[selectedCompetitionIndex].type}</Badge></Text>
+                                          </HStack>
+                                        </ListItem>
+                                      </List>
+                                    </Box>
+
+                                    <Box bg={getThemeColor('secondary')} p={4} borderRadius="md">
+                                      <Heading size="sm" color={getThemeColor('white')} mb={3}>How It Works</Heading>
+                                      <List spacing={2}>
+                                        <ListItem color={getThemeColor('gray300')} fontSize="sm">
+                                          <HStack align="start">
+                                            <Text color={getThemeColor("primary")} fontWeight="bold">1.</Text>
+                                            <Text>Purchase your tickets for just {formatPrice(competitions[selectedCompetitionIndex].ticketPrice)} each</Text>
+                                          </HStack>
+                                        </ListItem>
+                                        <ListItem color={getThemeColor('gray300')} fontSize="sm">
+                                          <HStack align="start">
+                                            <Text color={getThemeColor("primary")} fontWeight="bold">2.</Text>
+                                            <Text>Each ticket gives you a chance to win amazing prizes</Text>
+                                          </HStack>
+                                        </ListItem>
+                                        <ListItem color={getThemeColor('gray300')} fontSize="sm">
+                                          <HStack align="start">
+                                            <Text color={getThemeColor("primary")} fontWeight="bold">3.</Text>
+                                            <Text>Winners are drawn randomly on {new Date(competitions[selectedCompetitionIndex].drawDate).toLocaleDateString('en-GB')}</Text>
+                                          </HStack>
+                                        </ListItem>
+                                        <ListItem color={getThemeColor('gray300')} fontSize="sm">
+                                          <HStack align="start">
+                                            <Text color={getThemeColor("primary")} fontWeight="bold">4.</Text>
+                                            <Text>20% of proceeds support {competitions[selectedCompetitionIndex].charity.name}</Text>
+                                          </HStack>
+                                        </ListItem>
+                                      </List>
+                                    </Box>
+
+                                    <Box bg={getThemeColor('secondary')} p={4} borderRadius="md">
+                                      <Heading size="sm" color={getThemeColor('white')} mb={3}>About {competitions[selectedCompetitionIndex].charity.name}</Heading>
+                                      <Text color={getThemeColor('gray300')} mb={3} fontSize="sm">
+                                        {competitions[selectedCompetitionIndex].charity.description || 'This verified charity is making a real difference in our community. Your participation directly supports their important work.'}
+                                      </Text>
+                                      {competitions[selectedCompetitionIndex].charity.website && (
+                                        <Button
+                                          as="a"
+                                          href={competitions[selectedCompetitionIndex].charity.website}
+                                          target="_blank"
+                                          size="sm"
+                                          variant="outline"
+                                          colorScheme="pink"
+                                          leftIcon={<Icon as={FaHeart} />}
+                                        >
+                                          Learn More About This Charity
+                                        </Button>
+                                      )}
+                                    </Box>
+                                  </VStack>
+                                </TabPanel>
+
+                                {/* FAQ Tab */}
+                                <TabPanel px={0}>
+                                  <Accordion allowToggle>
+                                    <AccordionItem border="none" mb={2}>
+                                      <AccordionButton
+                                        bg={getThemeColor('secondary')}
+                                        borderRadius="md"
+                                        _hover={{ bg: getThemeColor('secondaryDark') }}
+                                        _expanded={{ bg: getThemeColor('secondaryDark'), borderBottomRadius: 0 }}
+                                        border="1px"
+                                        borderColor={getThemeColor('primary')}
+                                        fontSize="sm"
+                                      >
+                                        <Box flex="1" textAlign="left" color={getThemeColor('white')} fontWeight="semibold">
+                                          How do I purchase tickets?
+                                        </Box>
+                                        <AccordionIcon color={getThemeColor("primary")} />
+                                      </AccordionButton>
+                                      <AccordionPanel pb={3} bg={getThemeColor('secondary')} borderBottomRadius="md" color={getThemeColor('gray300')} border="1px" borderColor={getThemeColor('primary')} borderTop="none" fontSize="sm">
+                                        Simply click the "Buy Tickets Now" button above, select how many tickets you'd like, and complete your purchase securely.
+                                      </AccordionPanel>
+                                    </AccordionItem>
+
+                                    <AccordionItem border="none" mb={2}>
+                                      <AccordionButton
+                                        bg={getThemeColor('secondary')}
+                                        borderRadius="md"
+                                        _hover={{ bg: getThemeColor('secondaryDark') }}
+                                        _expanded={{ bg: getThemeColor('secondaryDark'), borderBottomRadius: 0 }}
+                                        border="1px"
+                                        borderColor={getThemeColor('primary')}
+                                        fontSize="sm"
+                                      >
+                                        <Box flex="1" textAlign="left" color={getThemeColor('white')} fontWeight="semibold">
+                                          When will the draw take place?
+                                        </Box>
+                                        <AccordionIcon color={getThemeColor("primary")} />
+                                      </AccordionButton>
+                                      <AccordionPanel pb={3} bg={getThemeColor('secondary')} borderBottomRadius="md" color={getThemeColor('gray300')} border="1px" borderColor={getThemeColor('primary')} borderTop="none" fontSize="sm">
+                                        The draw will take place on {formatDate(competitions[selectedCompetitionIndex].drawDate)}. Winners will be notified via email immediately after the draw.
+                                      </AccordionPanel>
+                                    </AccordionItem>
+
+                                    <AccordionItem border="none" mb={2}>
+                                      <AccordionButton
+                                        bg={getThemeColor('secondary')}
+                                        borderRadius="md"
+                                        _hover={{ bg: getThemeColor('secondaryDark') }}
+                                        _expanded={{ bg: getThemeColor('secondaryDark'), borderBottomRadius: 0 }}
+                                        border="1px"
+                                        borderColor={getThemeColor('primary')}
+                                        fontSize="sm"
+                                      >
+                                        <Box flex="1" textAlign="left" color={getThemeColor('white')} fontWeight="semibold">
+                                          How are winners selected?
+                                        </Box>
+                                        <AccordionIcon color={getThemeColor("primary")} />
+                                      </AccordionButton>
+                                      <AccordionPanel pb={3} bg={getThemeColor('secondary')} borderBottomRadius="md" color={getThemeColor('gray300')} border="1px" borderColor={getThemeColor('primary')} borderTop="none" fontSize="sm">
+                                        Winners are selected using a certified random number generator to ensure complete fairness.
+                                      </AccordionPanel>
+                                    </AccordionItem>
+
+                                    <AccordionItem border="none">
+                                      <AccordionButton
+                                        bg={getThemeColor('secondary')}
+                                        borderRadius="md"
+                                        _hover={{ bg: getThemeColor('secondaryDark') }}
+                                        _expanded={{ bg: getThemeColor('secondaryDark'), borderBottomRadius: 0 }}
+                                        border="1px"
+                                        borderColor={getThemeColor('primary')}
+                                        fontSize="sm"
+                                      >
+                                        <Box flex="1" textAlign="left" color={getThemeColor('white')} fontWeight="semibold">
+                                          Where does the money go?
+                                        </Box>
+                                        <AccordionIcon color={getThemeColor("primary")} />
+                                      </AccordionButton>
+                                      <AccordionPanel pb={3} bg={getThemeColor('secondary')} borderBottomRadius="md" color={getThemeColor('gray300')} border="1px" borderColor={getThemeColor('primary')} borderTop="none" fontSize="sm">
+                                        20% of the proceeds from ticket sales go directly to {competitions[selectedCompetitionIndex].charity.name}, with the remainder covering operational costs and platform fees.
+                                      </AccordionPanel>
+                                    </AccordionItem>
+                                  </Accordion>
+                                </TabPanel>
+                                </TabPanels>
+                                </Box>
+                              </Tabs>
+                            </Box>
                           </VStack>
+
+                          {/* Tab Icons - Right Aligned at Competition Card Level */}
+                          <Box
+                            bg={getThemeColor('secondary')}
+                            borderRadius="md"
+                            p={2}
+                            border="1px"
+                            borderColor={getThemeColor('gray700')}
+                            alignSelf="start"
+                          >
+                            <VStack spacing={2}>
+                              <Box
+                                as="button"
+                                onClick={() => setSelectedTabIndex(0)}
+                                bg={selectedTabIndex === 0 ? getThemeColor('primary') : 'transparent'}
+                                color={selectedTabIndex === 0 ? "white" : getThemeColor('gray300')}
+                                _hover={{
+                                  bg: selectedTabIndex === 0 ? getThemeColor('primary') : getThemeColor('primaryLight'),
+                                  color: "white",
+                                }}
+                                borderRadius="md"
+                                p={2}
+                                w="40px"
+                                h="40px"
+                                minW="40px"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                border="1px"
+                                borderColor={selectedTabIndex === 0 ? getThemeColor('primary') : getThemeColor('gray600')}
+                                transition="all 0.2s"
+                              >
+                                <Icon as={FaTicketAlt} boxSize={4} />
+                              </Box>
+                              <Box
+                                as="button"
+                                onClick={() => setSelectedTabIndex(1)}
+                                bg={selectedTabIndex === 1 ? getThemeColor('primary') : 'transparent'}
+                                color={selectedTabIndex === 1 ? "white" : getThemeColor('gray300')}
+                                _hover={{
+                                  bg: selectedTabIndex === 1 ? getThemeColor('primary') : getThemeColor('primaryLight'),
+                                  color: "white",
+                                }}
+                                borderRadius="md"
+                                p={2}
+                                w="40px"
+                                h="40px"
+                                minW="40px"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                border="1px"
+                                borderColor={selectedTabIndex === 1 ? getThemeColor('primary') : getThemeColor('gray600')}
+                                transition="all 0.2s"
+                              >
+                                <Icon as={FaGift} boxSize={4} />
+                              </Box>
+                              <Box
+                                as="button"
+                                onClick={() => setSelectedTabIndex(2)}
+                                bg={selectedTabIndex === 2 ? getThemeColor('primary') : 'transparent'}
+                                color={selectedTabIndex === 2 ? "white" : getThemeColor('gray300')}
+                                _hover={{
+                                  bg: selectedTabIndex === 2 ? getThemeColor('primary') : getThemeColor('primaryLight'),
+                                  color: "white",
+                                }}
+                                borderRadius="md"
+                                p={2}
+                                w="40px"
+                                h="40px"
+                                minW="40px"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                border="1px"
+                                borderColor={selectedTabIndex === 2 ? getThemeColor('primary') : getThemeColor('gray600')}
+                                transition="all 0.2s"
+                              >
+                                <Icon as={FaList} boxSize={4} />
+                              </Box>
+                              <Box
+                                as="button"
+                                onClick={() => setSelectedTabIndex(3)}
+                                bg={selectedTabIndex === 3 ? getThemeColor('primary') : 'transparent'}
+                                color={selectedTabIndex === 3 ? "white" : getThemeColor('gray300')}
+                                _hover={{
+                                  bg: selectedTabIndex === 3 ? getThemeColor('primary') : getThemeColor('primaryLight'),
+                                  color: "white",
+                                }}
+                                borderRadius="md"
+                                p={2}
+                                w="40px"
+                                h="40px"
+                                minW="40px"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                border="1px"
+                                borderColor={selectedTabIndex === 3 ? getThemeColor('primary') : getThemeColor('gray600')}
+                                transition="all 0.2s"
+                              >
+                                <Icon as={FaInfoCircle} boxSize={4} />
+                              </Box>
+                              <Box
+                                as="button"
+                                onClick={() => setSelectedTabIndex(4)}
+                                bg={selectedTabIndex === 4 ? getThemeColor('primary') : 'transparent'}
+                                color={selectedTabIndex === 4 ? "white" : getThemeColor('gray300')}
+                                _hover={{
+                                  bg: selectedTabIndex === 4 ? getThemeColor('primary') : getThemeColor('primaryLight'),
+                                  color: "white",
+                                }}
+                                borderRadius="md"
+                                p={2}
+                                w="40px"
+                                h="40px"
+                                minW="40px"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                border="1px"
+                                borderColor={selectedTabIndex === 4 ? getThemeColor('primary') : getThemeColor('gray600')}
+                                transition="all 0.2s"
+                              >
+                                <Icon as={FaQuestionCircle} boxSize={4} />
+                              </Box>
+                            </VStack>
+                          </Box>
+                        </HStack>
                         </GridItem>
                       </Grid>
                     </>
@@ -663,466 +1161,6 @@ export default function Home() {
             </Box>
           )}
 
-          {/* Tabbed Content Section - Prizes, Tickets, Details */}
-          {competitions.length > 0 && competitions[selectedCompetitionIndex] && (
-            <Card w="full" shadow="xl" bg={getThemeColor('secondary')} border="1px" borderColor={getThemeColor('secondaryLight')}>
-              <CardBody p={8}>
-                <Tabs variant="soft-rounded" colorScheme="purple" defaultIndex={0}>
-                  <TabList mb={4} overflowX="auto" flexWrap="wrap">
-                    <Tab
-                      _selected={{
-                        bg: getThemeColor('primary'),
-                        color: "white",
-                      }}
-                      color={getThemeColor('gray300')}
-                      mr={2}
-                      mb={2}
-                    >
-                      <Icon as={FaGift} mr={2} />
-                      Prizes
-                    </Tab>
-                    <Tab
-                      _selected={{
-                        bg: getThemeColor('primary'),
-                        color: "white",
-                      }}
-                      color={getThemeColor('gray300')}
-                      mr={2}
-                      mb={2}
-                    >
-                      <Icon as={FaTicketAlt} mr={2} />
-                      Tickets
-                    </Tab>
-                    <Tab
-                      _selected={{
-                        bg: getThemeColor('primary'),
-                        color: "white",
-                      }}
-                      color={getThemeColor('gray300')}
-                      mr={2}
-                      mb={2}
-                    >
-                      <Icon as={FaInfoCircle} mr={2} />
-                      Details
-                    </Tab>
-                    <Tab
-                      _selected={{
-                        bg: getThemeColor('primary'),
-                        color: "white",
-                      }}
-                      color={getThemeColor('gray300')}
-                      mr={2}
-                      mb={2}
-                    >
-                      <Icon as={FaQuestionCircle} mr={2} />
-                      FAQ
-                    </Tab>
-                  </TabList>
-
-                  <TabPanels>
-                    {/* Prizes Tab */}
-                    <TabPanel px={0}>
-                      <VStack spacing={6} align="stretch">
-                        {competitions[selectedCompetitionIndex].prizes && competitions[selectedCompetitionIndex].prizes.length > 0 ? (
-                          <>
-                            <HStack justify="space-between" w="full" bg={getThemeColor('dark')} p={4} borderRadius="lg" border="1px" borderColor={getThemeColor("primary")}>
-                              <VStack align="start" spacing={1}>
-                                <Text color={getThemeColor("primary")} fontSize="sm" fontWeight="semibold">Total Prizes</Text>
-                                <Text color={getThemeColor('white')} fontWeight="bold" fontSize="xl">
-                                  {competitions[selectedCompetitionIndex].prizes.length} prizes
-                                </Text>
-                              </VStack>
-                              <VStack align="end" spacing={1}>
-                                <Text color={getThemeColor("accent")} fontSize="sm" fontWeight="semibold">Combined Value</Text>
-                                <Text color={getThemeColor("accent")} fontWeight="bold" fontSize="xl">
-                                  £{(competitions[selectedCompetitionIndex].prizes.reduce((sum, p) => sum + ((p.value / 100) * p.quantity), 0)).toFixed(2)}
-                                </Text>
-                              </VStack>
-                            </HStack>
-
-                            <Text color={getThemeColor('gray300')} mb={2}>
-                              This competition features {competitions[selectedCompetitionIndex].prizes.filter(p => p.type === 'DRAW').length > 0 ? 'a main draw prize' : 'no draw prize'} and {competitions[selectedCompetitionIndex].prizes.filter(p => p.type === 'INSTANT_WIN').length} instant win prizes!
-                            </Text>
-
-                            {/* Draw Prizes Section */}
-                            {competitions[selectedCompetitionIndex].prizes.filter(p => p.type === 'DRAW').length > 0 && (
-                              <VStack spacing={3} align="stretch">
-                                <Text color={getThemeColor("primary")} fontWeight="bold" fontSize="lg">
-                                  🏆 Main Draw Prize
-                                </Text>
-                                {competitions[selectedCompetitionIndex].prizes.filter(p => p.type === 'DRAW').map((prize) => (
-                                  <Box
-                                    key={prize.id}
-                                    bg={getThemeColor('dark')}
-                                    p={6}
-                                    borderRadius="lg"
-                                    border="2px"
-                                    borderColor={getThemeColor("primary")}
-                                    position="relative"
-                                  >
-                                    <Badge
-                                      position="absolute"
-                                      top={3}
-                                      right={3}
-                                      colorScheme="purple"
-                                      variant="solid"
-                                    >
-                                      DRAW PRIZE
-                                    </Badge>
-                                    <HStack align="start" spacing={4}>
-                                      <Box
-                                        bg={getThemeColor("primary")}
-                                        color={getThemeColor('white')}
-                                        borderRadius="md"
-                                        w="50px"
-                                        h="50px"
-                                        display="flex"
-                                        alignItems="center"
-                                        justifyContent="center"
-                                        fontWeight="bold"
-                                        fontSize="xl"
-                                      >
-                                        <Icon as={FaTrophy} />
-                                      </Box>
-                                      <VStack align="start" flex={1} spacing={2}>
-                                        <Text color={getThemeColor('white')} fontWeight="bold" fontSize="xl">
-                                          {prize.name}
-                                        </Text>
-                                        {prize.description && (
-                                          <Text color={getThemeColor('gray300')} fontSize="md">
-                                            {prize.description}
-                                          </Text>
-                                        )}
-                                        <Text color={getThemeColor("accent")} fontWeight="bold" fontSize="2xl">
-                                          £{(prize.value / 100).toFixed(2)}
-                                        </Text>
-                                      </VStack>
-                                    </HStack>
-                                  </Box>
-                                ))}
-                              </VStack>
-                            )}
-
-                            {/* Instant Win Prizes Section */}
-                            {competitions[selectedCompetitionIndex].prizes.filter(p => p.type === 'INSTANT_WIN').length > 0 && (
-                              <VStack spacing={3} align="stretch">
-                                <Text color={getThemeColor("accent")} fontWeight="bold" fontSize="lg">
-                                  ⚡ Instant Win Prizes
-                                </Text>
-                                <SimpleGrid columns={{ base: 1, md: 2 }} spacing={3}>
-                                  {competitions[selectedCompetitionIndex].prizes.filter(p => p.type === 'INSTANT_WIN').map((prize) => (
-                                    <Box
-                                      key={prize.id}
-                                      bg={getThemeColor('dark')}
-                                      p={4}
-                                      borderRadius="lg"
-                                      border="1px"
-                                      borderColor={getThemeColor("accent")}
-                                    >
-                                      <Badge
-                                        position="absolute"
-                                        colorScheme="pink"
-                                        variant="solid"
-                                      >
-                                        INSTANT WIN
-                                      </Badge>
-                                      <VStack align="start" spacing={2} mt={6}>
-                                        <Text color={getThemeColor('white')} fontWeight="semibold">
-                                          {prize.name}
-                                        </Text>
-                                        <Text color={getThemeColor("accent")} fontWeight="bold" fontSize="lg">
-                                          £{(prize.value / 100).toFixed(2)}
-                                        </Text>
-                                        {prize.quantity > 1 && (
-                                          <Badge colorScheme="purple" variant="subtle">
-                                            {prize.quantity} available
-                                          </Badge>
-                                        )}
-                                      </VStack>
-                                    </Box>
-                                  ))}
-                                </SimpleGrid>
-                              </VStack>
-                            )}
-                          </>
-                        ) : (
-                          <Box
-                            bg={getThemeColor('dark')}
-                            p={8}
-                            borderRadius="lg"
-                            textAlign="center"
-                          >
-                            <Icon as={FaTrophy} color={getThemeColor('gray500')} boxSize={12} mb={3} />
-                            <Text color={getThemeColor('gray500')}>Prize details will be announced soon!</Text>
-                          </Box>
-                        )}
-                      </VStack>
-                    </TabPanel>
-
-                    {/* Tickets Tab */}
-                    <TabPanel px={0}>
-                      <VStack spacing={6} align="stretch">
-                        <Box bg={getThemeColor('dark')} p={4} borderRadius="lg" border="1px" borderColor={getThemeColor("primary")}>
-                          <HStack justify="space-between" w="full">
-                            <VStack align="start" spacing={1}>
-                              <Text color={getThemeColor("primary")} fontSize="sm" fontWeight="semibold">Total Tickets</Text>
-                              <Text color={getThemeColor('white')} fontWeight="bold" fontSize="xl">
-                                {competitions[selectedCompetitionIndex].maxTickets} tickets
-                              </Text>
-                            </VStack>
-                            <VStack align="end" spacing={1}>
-                              <Text color={getThemeColor("accent")} fontSize="sm" fontWeight="semibold">Tickets Sold</Text>
-                              <Text color={getThemeColor("accent")} fontWeight="bold" fontSize="xl">
-                                {competitions[selectedCompetitionIndex].ticketsSold}
-                              </Text>
-                            </VStack>
-                          </HStack>
-                        </Box>
-
-                        <Text color={getThemeColor('gray300')} mb={2}>
-                          Ticket numbers are assigned sequentially as they are purchased. Winners are selected randomly after all tickets are sold.
-                        </Text>
-
-                        <Box bg={getThemeColor('dark')} p={4} borderRadius="lg" border="1px" borderColor={getThemeColor("primary")}>
-                          <VStack spacing={2}>
-                            <Text color={getThemeColor("primary")} fontWeight="semibold" fontSize="sm" textAlign="center">
-                              🔒 Fairness & Transparency
-                            </Text>
-                            <Text color={getThemeColor('gray300')} fontSize="sm" textAlign="center">
-                              All winning ticket numbers are determined using cryptographically secure random number generation.
-                            </Text>
-                          </VStack>
-                        </Box>
-                      </VStack>
-                    </TabPanel>
-
-                    {/* Details Tab */}
-                    <TabPanel px={0}>
-                      <VStack spacing={4} align="stretch">
-                        <Box bg={getThemeColor('dark')} p={5} borderRadius="lg">
-                          <Heading size="md" color={getThemeColor('white')} mb={4}>Competition Details</Heading>
-                          <List spacing={3}>
-                            <ListItem color={getThemeColor('gray300')}>
-                              <HStack>
-                                <ListIcon as={CheckCircleIcon} color={getThemeColor("accent")} />
-                                <Text>Entry Price: <Text as="span" fontWeight="bold" color={getThemeColor("accent")}>{formatPrice(competitions[selectedCompetitionIndex].ticketPrice)}</Text> per ticket</Text>
-                              </HStack>
-                            </ListItem>
-                            <ListItem color={getThemeColor('gray300')}>
-                              <HStack>
-                                <ListIcon as={CheckCircleIcon} color={getThemeColor("accent")} />
-                                <Text>Maximum Tickets: <Text as="span" fontWeight="bold" color={getThemeColor('white')}>{competitions[selectedCompetitionIndex].maxTickets}</Text></Text>
-                              </HStack>
-                            </ListItem>
-                            <ListItem color={getThemeColor('gray300')}>
-                              <HStack>
-                                <ListIcon as={CheckCircleIcon} color={getThemeColor("accent")} />
-                                <Text>Draw Date: <Text as="span" fontWeight="bold" color={getThemeColor("accent")}>{formatDate(competitions[selectedCompetitionIndex].drawDate)}</Text></Text>
-                              </HStack>
-                            </ListItem>
-                            <ListItem color={getThemeColor('gray300')}>
-                              <HStack>
-                                <ListIcon as={CheckCircleIcon} color={getThemeColor("accent")} />
-                                <Text>Competition Type: <Badge colorScheme="purple" ml={2}>{competitions[selectedCompetitionIndex].type}</Badge></Text>
-                              </HStack>
-                            </ListItem>
-                          </List>
-                        </Box>
-
-                        <Box bg={getThemeColor('dark')} p={5} borderRadius="lg">
-                          <Heading size="md" color={getThemeColor('white')} mb={4}>How It Works</Heading>
-                          <List spacing={3}>
-                            <ListItem color={getThemeColor('gray300')}>
-                              <HStack align="start">
-                                <Text color={getThemeColor("primary")} fontWeight="bold">1.</Text>
-                                <Text>Purchase your tickets for just {formatPrice(competitions[selectedCompetitionIndex].ticketPrice)} each</Text>
-                              </HStack>
-                            </ListItem>
-                            <ListItem color={getThemeColor('gray300')}>
-                              <HStack align="start">
-                                <Text color={getThemeColor("primary")} fontWeight="bold">2.</Text>
-                                <Text>Each ticket gives you a chance to win amazing prizes</Text>
-                              </HStack>
-                            </ListItem>
-                            <ListItem color={getThemeColor('gray300')}>
-                              <HStack align="start">
-                                <Text color={getThemeColor("primary")} fontWeight="bold">3.</Text>
-                                <Text>Winners are drawn randomly on {new Date(competitions[selectedCompetitionIndex].drawDate).toLocaleDateString('en-GB')}</Text>
-                              </HStack>
-                            </ListItem>
-                            <ListItem color={getThemeColor('gray300')}>
-                              <HStack align="start">
-                                <Text color={getThemeColor("primary")} fontWeight="bold">4.</Text>
-                                <Text>20% of proceeds support {competitions[selectedCompetitionIndex].charity.name}</Text>
-                              </HStack>
-                            </ListItem>
-                          </List>
-                        </Box>
-
-                        <Box bg={getThemeColor('dark')} p={5} borderRadius="lg">
-                          <Heading size="md" color={getThemeColor('white')} mb={4}>About {competitions[selectedCompetitionIndex].charity.name}</Heading>
-                          <Text color={getThemeColor('gray300')} mb={3}>
-                            {competitions[selectedCompetitionIndex].charity.description || 'This verified charity is making a real difference in our community. Your participation directly supports their important work.'}
-                          </Text>
-                          {competitions[selectedCompetitionIndex].charity.website && (
-                            <Button
-                              as="a"
-                              href={competitions[selectedCompetitionIndex].charity.website}
-                              target="_blank"
-                              size="sm"
-                              variant="outline"
-                              colorScheme="pink"
-                              leftIcon={<Icon as={FaHeart} />}
-                            >
-                              Learn More About This Charity
-                            </Button>
-                          )}
-                        </Box>
-                      </VStack>
-                    </TabPanel>
-
-                    {/* FAQ Tab */}
-                    <TabPanel px={0}>
-                      <Accordion allowToggle>
-                        <AccordionItem border="none" mb={3}>
-                          <AccordionButton
-                            bg={getThemeColor('dark')}
-                            borderRadius="lg"
-                            _hover={{ bg: getThemeColor('secondaryDark') }}
-                            _expanded={{ bg: getThemeColor('secondaryDark'), borderBottomRadius: 0 }}
-                            border="1px"
-                            borderColor={getThemeColor('primary')}
-                          >
-                            <Box flex="1" textAlign="left" color={getThemeColor('white')} fontWeight="semibold">
-                              How do I purchase tickets?
-                            </Box>
-                            <AccordionIcon color={getThemeColor("primary")} />
-                          </AccordionButton>
-                          <AccordionPanel pb={4} bg={getThemeColor('dark')} borderBottomRadius="lg" color={getThemeColor('gray300')} border="1px" borderColor={getThemeColor('primary')} borderTop="none">
-                            Simply click the "Buy Tickets Now" button above, select how many tickets you'd like, and complete your purchase securely. You'll receive an email confirmation with your ticket numbers.
-                          </AccordionPanel>
-                        </AccordionItem>
-
-                        <AccordionItem border="none" mb={3}>
-                          <AccordionButton
-                            bg={getThemeColor('dark')}
-                            borderRadius="lg"
-                            _hover={{ bg: getThemeColor('secondaryDark') }}
-                            _expanded={{ bg: getThemeColor('secondaryDark'), borderBottomRadius: 0 }}
-                            border="1px"
-                            borderColor={getThemeColor('primary')}
-                          >
-                            <Box flex="1" textAlign="left" color={getThemeColor('white')} fontWeight="semibold">
-                              When will the draw take place?
-                            </Box>
-                            <AccordionIcon color={getThemeColor("primary")} />
-                          </AccordionButton>
-                          <AccordionPanel pb={4} bg={getThemeColor('dark')} borderBottomRadius="lg" color={getThemeColor('gray300')} border="1px" borderColor={getThemeColor('primary')} borderTop="none">
-                            The draw will take place on {formatDate(competitions[selectedCompetitionIndex].drawDate)}. Winners will be selected randomly and notified via email immediately after the draw.
-                          </AccordionPanel>
-                        </AccordionItem>
-
-                        <AccordionItem border="none" mb={3}>
-                          <AccordionButton
-                            bg={getThemeColor('dark')}
-                            borderRadius="lg"
-                            _hover={{ bg: getThemeColor('secondaryDark') }}
-                            _expanded={{ bg: getThemeColor('secondaryDark'), borderBottomRadius: 0 }}
-                            border="1px"
-                            borderColor={getThemeColor('primary')}
-                          >
-                            <Box flex="1" textAlign="left" color={getThemeColor('white')} fontWeight="semibold">
-                              How are winners selected?
-                            </Box>
-                            <AccordionIcon color={getThemeColor("primary")} />
-                          </AccordionButton>
-                          <AccordionPanel pb={4} bg={getThemeColor('dark')} borderBottomRadius="lg" color={getThemeColor('gray300')} border="1px" borderColor={getThemeColor('primary')} borderTop="none">
-                            Winners are selected using a certified random number generator to ensure complete fairness. Each ticket has an equal chance of winning, regardless of when it was purchased.
-                          </AccordionPanel>
-                        </AccordionItem>
-
-                        <AccordionItem border="none" mb={3}>
-                          <AccordionButton
-                            bg={getThemeColor('dark')}
-                            borderRadius="lg"
-                            _hover={{ bg: getThemeColor('secondaryDark') }}
-                            _expanded={{ bg: getThemeColor('secondaryDark'), borderBottomRadius: 0 }}
-                            border="1px"
-                            borderColor={getThemeColor('primary')}
-                          >
-                            <Box flex="1" textAlign="left" color={getThemeColor('white')} fontWeight="semibold">
-                              Where does the money go?
-                            </Box>
-                            <AccordionIcon color={getThemeColor("primary")} />
-                          </AccordionButton>
-                          <AccordionPanel pb={4} bg={getThemeColor('dark')} borderBottomRadius="lg" color={getThemeColor('gray300')} border="1px" borderColor={getThemeColor('primary')} borderTop="none">
-                            20% of the proceeds from ticket sales go directly to {competitions[selectedCompetitionIndex].charity.name}, with the remainder covering operational costs and platform fees.
-                          </AccordionPanel>
-                        </AccordionItem>
-
-                        <AccordionItem border="none" mb={3}>
-                          <AccordionButton
-                            bg={getThemeColor('dark')}
-                            borderRadius="lg"
-                            _hover={{ bg: getThemeColor('secondaryDark') }}
-                            _expanded={{ bg: getThemeColor('secondaryDark'), borderBottomRadius: 0 }}
-                            border="1px"
-                            borderColor={getThemeColor('primary')}
-                          >
-                            <Box flex="1" textAlign="left" color={getThemeColor('white')} fontWeight="semibold">
-                              Is there a limit on tickets I can buy?
-                            </Box>
-                            <AccordionIcon color={getThemeColor("primary")} />
-                          </AccordionButton>
-                          <AccordionPanel pb={4} bg={getThemeColor('dark')} borderBottomRadius="lg" color={getThemeColor('gray300')} border="1px" borderColor={getThemeColor('primary')} borderTop="none">
-                            You can purchase as many tickets as you like, up to the maximum available. More tickets mean more chances to win! However, please gamble responsibly.
-                          </AccordionPanel>
-                        </AccordionItem>
-
-                        <AccordionItem border="none" mb={3}>
-                          <AccordionButton
-                            bg={getThemeColor('dark')}
-                            borderRadius="lg"
-                            _hover={{ bg: getThemeColor('secondaryDark') }}
-                            _expanded={{ bg: getThemeColor('secondaryDark'), borderBottomRadius: 0 }}
-                            border="1px"
-                            borderColor={getThemeColor('primary')}
-                          >
-                            <Box flex="1" textAlign="left" color={getThemeColor('white')} fontWeight="semibold">
-                              How will I know if I've won?
-                            </Box>
-                            <AccordionIcon color={getThemeColor("primary")} />
-                          </AccordionButton>
-                          <AccordionPanel pb={4} bg={getThemeColor('dark')} borderBottomRadius="lg" color={getThemeColor('gray300')} border="1px" borderColor={getThemeColor('primary')} borderTop="none">
-                            Winners are notified via email and SMS (if provided) immediately after the draw. You can also check your account dashboard to see if any of your tickets have won.
-                          </AccordionPanel>
-                        </AccordionItem>
-
-                        <AccordionItem border="none">
-                          <AccordionButton
-                            bg={getThemeColor('dark')}
-                            borderRadius="lg"
-                            _hover={{ bg: getThemeColor('secondaryDark') }}
-                            _expanded={{ bg: getThemeColor('secondaryDark'), borderBottomRadius: 0 }}
-                            border="1px"
-                            borderColor={getThemeColor('primary')}
-                          >
-                            <Box flex="1" textAlign="left" color={getThemeColor('white')} fontWeight="semibold">
-                              Can I get a refund?
-                            </Box>
-                            <AccordionIcon color={getThemeColor("primary")} />
-                          </AccordionButton>
-                          <AccordionPanel pb={4} bg={getThemeColor('dark')} borderBottomRadius="lg" color={getThemeColor('gray300')} border="1px" borderColor={getThemeColor('primary')} borderTop="none">
-                            As per our terms and conditions, all ticket sales are final and non-refundable. This ensures fairness for all participants and maximizes the charity's fundraising.
-                          </AccordionPanel>
-                        </AccordionItem>
-                      </Accordion>
-                    </TabPanel>
-                  </TabPanels>
-                </Tabs>
-              </CardBody>
-            </Card>
-          )}
 
         </VStack>
       </Container>
