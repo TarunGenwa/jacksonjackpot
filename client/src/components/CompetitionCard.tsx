@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import {
   Box,
@@ -15,7 +14,7 @@ import {
   Flex,
   Icon,
 } from '@chakra-ui/react';
-import { FaClock, FaTicketAlt, FaTrophy, FaGift, FaBolt, FaCalendarDay, FaCircle } from 'react-icons/fa';
+import { FaTrophy, FaGift, FaBolt, FaCalendarDay, FaCircle } from 'react-icons/fa';
 import { Competition } from '@/types/api';
 import { useTheme } from '@/contexts/ThemeContext';
 
@@ -28,7 +27,6 @@ interface CompetitionCardProps {
 }
 
 export default function CompetitionCard({ competition }: CompetitionCardProps) {
-  const router = useRouter();
   const { getThemeColor } = useTheme();
   const [localCompetition, setLocalCompetition] = useState(competition);
 
@@ -40,30 +38,14 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
     return `£${parseFloat(price).toFixed(2)}`;
   };
 
-  const formatPrizePool = (price: string) => {
-    const amount = parseFloat(price);
-    return `£${amount % 1 === 0 ? amount.toString() : amount.toFixed(2)}`;
-  };
 
   const getProgressPercentage = () => {
     if (localCompetition.maxTickets === 0) return 0;
     return Math.round((localCompetition.ticketsSold / localCompetition.maxTickets) * 100);
   };
 
-  const getPrizePool = () => {
-    return formatPrizePool(localCompetition.totalPrizeValue);
-  };
 
 
-  const handleCardClick = () => {
-    // Navigation to individual competition pages removed
-    // Cards are now display-only
-  };
-
-  const handleViewDetailsClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click
-    // Navigation to individual competition pages removed
-  };
 
   const getStatusColor = (status: string) => {
     const statusMap: Record<string, string> = {
@@ -76,7 +58,7 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
   };
 
   const getCategoryInfo = (category?: string) => {
-    const categoryMap: Record<string, { icon: any; color: string }> = {
+    const categoryMap: Record<string, { icon: React.ComponentType; color: string }> = {
       'Mystery Box': { icon: FaGift, color: getThemeColor('primary') },
       'Instant Win': { icon: FaBolt, color: getThemeColor('warning') },
       'Daily Free': { icon: FaCalendarDay, color: getThemeColor('success') },

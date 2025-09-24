@@ -158,7 +158,7 @@ class AdminApiService {
         body: JSON.stringify(data),
       }
     );
-    return this.handleResponse(response);
+    return this.handleResponse<{ id: string }>(response);
   }
 
   async updateCompetition(id: string, data: CompetitionUpdateData) {

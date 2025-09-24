@@ -23,7 +23,7 @@ import {
   useToast,
   Spinner
 } from '@chakra-ui/react';
-import { FaTicketAlt, FaPoundSign, FaCheckCircle } from 'react-icons/fa';
+import { FaPoundSign, FaCheckCircle } from 'react-icons/fa';
 import { Competition } from '@/types/api';
 import { ticketsService, PurchaseTicketRequest } from '@/services/tickets';
 import { useAuth } from '@/contexts/AuthContext';
@@ -32,6 +32,20 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useUnrevealedTickets } from '@/contexts/UnrevealedTicketsContext';
 
 interface TicketWithInstantWin {
+  ticketNumber: string;
+  instantWin?: {
+    prize?: {
+      name: string;
+      value: number;
+      description?: string;
+    };
+  };
+  competitionId?: string;
+  competitionTitle?: string;
+  purchaseDate?: string;
+}
+
+interface PurchaseResponseTicket {
   ticketNumber: string;
   instantWin?: {
     prize?: {
@@ -59,7 +73,7 @@ export default function TicketPurchaseModal({
 }: TicketPurchaseModalProps) {
   const { user } = useAuth();
   const { updateBalance } = useWallet();
-  const { getColor, getSemanticColor, getThemeColor } = useTheme();
+  const { getThemeColor } = useTheme();
   const { addUnrevealedTickets, markTicketsAsRevealed } = useUnrevealedTickets();
   const toast = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -102,7 +116,7 @@ export default function TicketPurchaseModal({
       await updateBalance();
 
       // Prepare tickets for instant win spinner
-      const ticketsWithInstantWin = response.tickets.map((ticket: any) => ({
+      const ticketsWithInstantWin = response.tickets.map((ticket: PurchaseResponseTicket) => ({
         ticketNumber: ticket.ticketNumber,
         instantWin: ticket.instantWin,
         competitionId: competition.id,
@@ -113,7 +127,7 @@ export default function TicketPurchaseModal({
       setPurchasedTickets(ticketsWithInstantWin);
 
       // Add tickets with instant win potential to unrevealed tickets
-      const instantWinTickets = ticketsWithInstantWin.filter((t: any) => t.instantWin);
+      const instantWinTickets = ticketsWithInstantWin.filter((t: TicketWithInstantWin) => t.instantWin);
       if (instantWinTickets.length > 0) {
         addUnrevealedTickets(instantWinTickets);
       }
@@ -135,12 +149,13 @@ export default function TicketPurchaseModal({
       } else {
         onClose();
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Purchase failed:', err);
-      setError(err.response?.data?.message || 'Failed to purchase tickets. Please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to purchase tickets. Please try again.';
+      setError(errorMessage);
       toast({
         title: 'Purchase failed',
-        description: err.response?.data?.message || 'Failed to purchase tickets. Please try again.',
+        description: errorMessage,
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -229,7 +244,7 @@ export default function TicketPurchaseModal({
                 >
                   <AlertIcon color={getThemeColor('accent')} />
                   <Text fontSize="sm">
-                    This competition includes instant win prizes! You'll find out immediately after purchase.
+                    This competition includes instant win prizes! You&apos;ll find out immediately after purchase.
                   </Text>
                 </Alert>
               )}

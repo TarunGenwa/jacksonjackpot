@@ -36,7 +36,7 @@ interface Charity {
 export default function CharitiesManagement() {
   const [charities, setCharities] = useState<Charity[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [verifiedFilter, setVerifiedFilter] = useState<string>('');
   const [activeFilter, setActiveFilter] = useState<string>('');

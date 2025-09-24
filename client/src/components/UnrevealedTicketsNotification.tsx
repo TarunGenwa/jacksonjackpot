@@ -1,30 +1,11 @@
 'use client';
 
-import {
-  Box,
-  Alert,
-  AlertIcon,
-  AlertTitle,
-  AlertDescription,
-  Button,
-  VStack,
-  HStack,
-  Text,
-  Badge,
-  useDisclosure,
-  Collapse,
-  Icon,
-  Flex
-} from '@chakra-ui/react';
-import { FaTicketAlt, FaEye, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { useUnrevealedTickets } from '@/contexts/UnrevealedTicketsContext';
-import { useTheme } from '@/contexts/ThemeContext';
 import { useState, useEffect } from 'react';
 import InstantWinSpinner from './InstantWinSpinner';
 
 export default function UnrevealedTicketsNotification() {
   const { unrevealedTickets, markTicketsAsRevealed, hasUnrevealedTickets } = useUnrevealedTickets();
-  const { getThemeColor } = useTheme();
   const [showSpinner, setShowSpinner] = useState(false);
   const [hasAutoShown, setHasAutoShown] = useState(false);
 

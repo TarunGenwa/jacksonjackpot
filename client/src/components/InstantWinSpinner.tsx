@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   VStack,
@@ -17,9 +17,7 @@ import {
   Badge,
   Flex,
   useToast,
-  Center,
-  SimpleGrid,
-  Divider
+  Center
 } from '@chakra-ui/react';
 import { keyframes } from '@emotion/react';
 import { FaTrophy, FaGift, FaCoins, FaStar } from 'react-icons/fa';
@@ -67,10 +65,6 @@ const pulseGlow = keyframes`
   100% { box-shadow: 0 0 10px rgba(252, 163, 17, 0.3); }
 `;
 
-const spinAnimation = keyframes`
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-1800px); }
-`;
 
 export default function InstantWinSpinner({
   isOpen,
@@ -79,7 +73,7 @@ export default function InstantWinSpinner({
   onComplete,
   onTicketRevealed
 }: InstantWinSpinnerProps) {
-  const { getColor, getThemeColor } = useTheme();
+  const { getThemeColor } = useTheme();
   const toast = useToast();
   const [ticketReveals, setTicketReveals] = useState<TicketReveal[]>([]);
   const [isRevealing, setIsRevealing] = useState(false);
@@ -272,7 +266,7 @@ export default function InstantWinSpinner({
 
             {/* Ticket Grid */}
             <VStack spacing={2} w="full">
-              {ticketReveals.map((ticketReveal, index) => (
+              {ticketReveals.map((ticketReveal) => (
                 <Box key={ticketReveal.ticketNumber} w="full">
                   <HStack spacing={2} mb={1}>
                     <Badge variant="outline" colorScheme="cyan" fontSize="xs">
@@ -399,14 +393,14 @@ export default function InstantWinSpinner({
                   <>
                     <Icon as={FaStar} boxSize={12} color={getThemeColor('gray500')} mb={2} />
                     <Text fontSize="lg" color={getThemeColor('gray300')}>
-                      No instant wins this time, but you're still in the main draw!
+                      No instant wins this time, but you&apos;re still in the main draw!
                     </Text>
                   </>
                 ) : (
                   <>
                     <Icon as={FaTrophy} boxSize={12} color={getThemeColor('warning')} mb={2} />
                     <Text fontSize="lg" color={getThemeColor('white')}>
-                      Plus you're entered in the main draw!
+                      Plus you&apos;re entered in the main draw!
                     </Text>
                   </>
                 )}
