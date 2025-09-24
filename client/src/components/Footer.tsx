@@ -68,11 +68,6 @@ export default function Footer() {
                 Quick Links
               </Heading>
               <VStack align={{ base: "center", md: "start" }} spacing={2}>
-                <Link href="/competitions">
-                  <Text fontSize="sm" _hover={{ color: 'blue.400', textDecoration: 'underline' }}>
-                    Browse Competitions
-                  </Text>
-                </Link>
                 <Link href="/charities">
                   <Text fontSize="sm" _hover={{ color: 'blue.400', textDecoration: 'underline' }}>
                     Our Charities

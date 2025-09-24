@@ -121,13 +121,11 @@ export default function Header() {
                       >
                         <HStack spacing={1}>
                           <FaPoundSign size={10} />
-                          <Text>
-                            {walletLoading ? (
-                              <Spinner size="xs" />
-                            ) : (
-                              walletBalance ? formatBalance(walletBalance) : '£0.00'
-                            )}
-                          </Text>
+                          {walletLoading ? (
+                            <Spinner size="xs" />
+                          ) : (
+                            <Text>{walletBalance ? formatBalance(walletBalance) : '£0.00'}</Text>
+                          )}
                         </HStack>
                       </Badge>
                     </Link>

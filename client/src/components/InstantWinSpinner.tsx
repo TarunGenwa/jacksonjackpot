@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Box,
   VStack,
@@ -17,7 +17,9 @@ import {
   Badge,
   Flex,
   useToast,
-  Center
+  Center,
+  SimpleGrid,
+  Divider
 } from '@chakra-ui/react';
 import { keyframes } from '@emotion/react';
 import { FaTrophy, FaGift, FaCoins, FaStar } from 'react-icons/fa';
@@ -32,6 +34,14 @@ interface InstantPrize {
   color: string;
   isWin: boolean;
   description?: string;
+}
+
+interface TicketReveal {
+  ticketNumber: string;
+  isSpinning: boolean;
+  revealedPrize: InstantPrize | null;
+  prizes: InstantPrize[];
+  spinnerRef: React.RefObject<HTMLDivElement>;
 }
 
 interface InstantWinSpinnerProps {
@@ -52,9 +62,14 @@ interface InstantWinSpinnerProps {
 }
 
 const pulseGlow = keyframes`
-  0% { box-shadow: 0 0 20px rgba(252, 163, 17, 0.3); }
-  50% { box-shadow: 0 0 40px rgba(252, 163, 17, 0.6); }
-  100% { box-shadow: 0 0 20px rgba(252, 163, 17, 0.3); }
+  0% { box-shadow: 0 0 10px rgba(252, 163, 17, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(252, 163, 17, 0.6); }
+  100% { box-shadow: 0 0 10px rgba(252, 163, 17, 0.3); }
+`;
+
+const spinAnimation = keyframes`
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-1800px); }
 `;
 
 export default function InstantWinSpinner({
@@ -66,24 +81,38 @@ export default function InstantWinSpinner({
 }: InstantWinSpinnerProps) {
   const { getColor, getThemeColor } = useTheme();
   const toast = useToast();
-  const [currentTicketIndex, setCurrentTicketIndex] = useState(0);
-  const [isSpinning, setIsSpinning] = useState(false);
-  const [revealedPrize, setRevealedPrize] = useState<InstantPrize | null>(null);
+  const [ticketReveals, setTicketReveals] = useState<TicketReveal[]>([]);
+  const [isRevealing, setIsRevealing] = useState(false);
   const [allRevealed, setAllRevealed] = useState(false);
-  const spinnerRef = useRef<HTMLDivElement>(null);
+  const [totalWins, setTotalWins] = useState(0);
+  const [totalValue, setTotalValue] = useState(0);
 
-  const generatePrizePool = (hasWin: boolean): InstantPrize[] => {
+  // Initialize ticket reveals
+  useEffect(() => {
+    if (tickets.length > 0 && ticketReveals.length === 0) {
+      const reveals = tickets.map(ticket => ({
+        ticketNumber: ticket.ticketNumber,
+        isSpinning: false,
+        revealedPrize: null,
+        prizes: generatePrizePool(!!ticket.instantWin?.prize, ticket),
+        spinnerRef: React.createRef<HTMLDivElement>()
+      }));
+      setTicketReveals(reveals);
+    }
+  }, [tickets]);
+
+  const generatePrizePool = (hasWin: boolean, ticket: typeof tickets[0]): InstantPrize[] => {
     const commonPrizes: InstantPrize[] = [
-      { id: '1', name: 'Better Luck Next Time', value: 0, icon: FaStar, color: getThemeColor('gray500'), isWin: false },
+      { id: '1', name: 'Better Luck', value: 0, icon: FaStar, color: getThemeColor('gray500'), isWin: false },
       { id: '2', name: 'Try Again', value: 0, icon: FaStar, color: getThemeColor('gray500'), isWin: false },
-      { id: '3', name: 'Almost There', value: 0, icon: FaStar, color: getThemeColor('gray500'), isWin: false },
+      { id: '3', name: 'Almost', value: 0, icon: FaStar, color: getThemeColor('gray500'), isWin: false },
       { id: '4', name: 'Keep Playing', value: 0, icon: FaStar, color: getThemeColor('gray500'), isWin: false },
     ];
 
     let winningPrize: InstantPrize | null = null;
 
-    if (hasWin && tickets[currentTicketIndex]?.instantWin?.prize) {
-      const prize = tickets[currentTicketIndex].instantWin.prize;
+    if (hasWin && ticket?.instantWin?.prize) {
+      const prize = ticket.instantWin.prize;
       winningPrize = {
         id: 'win',
         name: prize.name,
@@ -107,75 +136,89 @@ export default function InstantWinSpinner({
     return prizes;
   };
 
-  const handleSpin = () => {
-    if (isSpinning) return;
+  const handleRevealAll = () => {
+    if (isRevealing) return;
 
-    const currentTicket = tickets[currentTicketIndex];
-    const hasWin = !!currentTicket?.instantWin?.prize;
-    const prizes = generatePrizePool(hasWin);
+    setIsRevealing(true);
+    let wins = 0;
+    let value = 0;
 
-    setIsSpinning(true);
-
-    if (spinnerRef.current) {
-      const targetPosition = -1800; // Center position for the 10th item
-      const duration = 3000 + Math.random() * 1000;
-
-      spinnerRef.current.style.transition = `transform ${duration}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
-      spinnerRef.current.style.transform = `translateX(${targetPosition}px)`;
-
+    // Start all spinners with slight delays
+    ticketReveals.forEach((ticketReveal, index) => {
       setTimeout(() => {
-        setRevealedPrize(prizes[10]);
-        setIsSpinning(false);
+        const spinnerRef = ticketReveal.spinnerRef.current;
+        if (spinnerRef) {
+          const targetPosition = -900; // Adjusted for smaller size
+          const duration = 2500 + Math.random() * 500;
 
-        // Mark this ticket as revealed in the context
-        onTicketRevealed?.(currentTicket.ticketNumber);
+          spinnerRef.style.transition = `transform ${duration}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
+          spinnerRef.style.transform = `translateX(${targetPosition}px)`;
 
-        if (hasWin) {
-          toast({
-            title: '🎉 Congratulations!',
-            description: `You won: ${prizes[10].name}`,
-            status: 'success',
-            duration: 5000,
-            isClosable: true,
-            position: 'top'
-          });
+          setTimeout(() => {
+            const prize = ticketReveal.prizes[10];
+            setTicketReveals(prev => {
+              const updated = [...prev];
+              updated[index] = {
+                ...updated[index],
+                revealedPrize: prize,
+                isSpinning: false
+              };
+              return updated;
+            });
+
+            // Track wins
+            if (prize.isWin) {
+              wins++;
+              value += prize.value;
+              onTicketRevealed?.(ticketReveal.ticketNumber);
+            }
+
+            // Check if all are revealed
+            if (index === ticketReveals.length - 1) {
+              setTimeout(() => {
+                setIsRevealing(false);
+                setAllRevealed(true);
+                setTotalWins(wins);
+                setTotalValue(value);
+
+                if (wins > 0) {
+                  toast({
+                    title: '🎉 Congratulations!',
+                    description: `You won ${wins} instant prize${wins > 1 ? 's' : ''} worth £${value}!`,
+                    status: 'success',
+                    duration: 5000,
+                    isClosable: true,
+                    position: 'top'
+                  });
+                }
+              }, 500);
+            }
+          }, duration);
         }
-      }, duration);
-    }
-  };
-
-  const handleNextTicket = () => {
-    if (currentTicketIndex < tickets.length - 1) {
-      setCurrentTicketIndex(currentTicketIndex + 1);
-      setRevealedPrize(null);
-      if (spinnerRef.current) {
-        spinnerRef.current.style.transition = 'none';
-        spinnerRef.current.style.transform = 'translateX(0)';
-      }
-    } else {
-      setAllRevealed(true);
-      onComplete?.();
-    }
+      }, index * 100); // Stagger starts by 100ms
+    });
   };
 
   const handleCloseModal = () => {
-    if (!isSpinning) {
+    if (!isRevealing) {
+      // Call onComplete when closing after all reveals are done
+      if (allRevealed) {
+        onComplete?.();
+      }
       onClose();
-      setCurrentTicketIndex(0);
-      setRevealedPrize(null);
+      setTicketReveals([]);
       setAllRevealed(false);
+      setTotalWins(0);
+      setTotalValue(0);
     }
   };
-
-  const currentTicket = tickets[currentTicketIndex];
-  const prizes = generatePrizePool(!!currentTicket?.instantWin?.prize);
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={handleCloseModal}
-      size="4xl"
-      closeOnOverlayClick={!isSpinning}
+      size="6xl"
+      closeOnOverlayClick={!isRevealing}
       isCentered
     >
       <ModalOverlay bg="blackAlpha.700" backdropFilter="blur(8px)" />
@@ -185,175 +228,188 @@ export default function InstantWinSpinner({
         borderColor={getThemeColor('primary')}
         color={getThemeColor('white')}
         shadow="2xl"
-        maxW="900px"
+        maxW="1200px"
       >
         <ModalHeader borderBottom="1px" borderColor={getThemeColor('secondary')}>
           <VStack spacing={2} align="center">
             <Text fontSize="2xl" fontWeight="bold" color={getThemeColor('accent')}>
               Instant Prize Reveal
             </Text>
-            <HStack spacing={3}>
-              <Badge bg={getThemeColor('primary')} color={getThemeColor('white')} variant="solid" fontSize="md" px={3} py={1}>
-                Ticket: {currentTicket?.ticketNumber}
-              </Badge>
-              <Badge borderColor={getThemeColor('secondary')} color={getThemeColor('secondary')} variant="outline" fontSize="sm">
-                {currentTicketIndex + 1} of {tickets.length}
-              </Badge>
-            </HStack>
+            <Badge bg={getThemeColor('primary')} color={getThemeColor('white')} variant="solid" fontSize="md" px={3} py={1}>
+              {tickets.length} Ticket{tickets.length > 1 ? 's' : ''}
+            </Badge>
           </VStack>
         </ModalHeader>
 
-        <ModalBody py={8}>
-          <VStack spacing={6}>
-            {!allRevealed ? (
-              <>
-                <Text
-                  fontSize="lg"
-                  textAlign="center"
-                  color={getThemeColor('gray300')}
-                  fontWeight="medium"
-                >
-                  {!revealedPrize
-                    ? 'Spin to reveal if you\'ve won an instant prize!'
-                    : revealedPrize.isWin
-                      ? '🎊 WINNER! 🎊'
-                      : 'Better luck with the main draw!'}
+        <ModalBody py={6} maxH="70vh" overflowY="auto">
+          <VStack spacing={4}>
+            {!allRevealed && (
+              <Text
+                fontSize="lg"
+                textAlign="center"
+                color={getThemeColor('gray300')}
+                fontWeight="medium"
+                mb={2}
+              >
+                All your tickets will spin simultaneously to reveal instant prizes!
+              </Text>
+            )}
+
+            {allRevealed && totalWins > 0 && (
+              <Box
+                w="full"
+                p={4}
+                bg={getThemeColor('warning')}
+                borderRadius="lg"
+                textAlign="center"
+                animation={`${pulseGlow} 2s infinite`}
+              >
+                <Text fontSize="xl" fontWeight="bold" color={getThemeColor('dark')}>
+                  🎊 {totalWins} WINNING TICKET{totalWins > 1 ? 'S' : ''}! Total: £{totalValue} 🎊
                 </Text>
+              </Box>
+            )}
 
-                <Box
-                  position="relative"
-                  w="full"
-                  h="200px"
-                  overflow="hidden"
-                  borderRadius="lg"
-                  border="3px solid"
-                  borderColor={revealedPrize?.isWin ? getThemeColor('warning') : getThemeColor('primary')}
-                  bg={getThemeColor('light')}
-                  animation={revealedPrize?.isWin ? `${pulseGlow} 2s infinite` : undefined}
-                >
-                  <Center
-                    position="absolute"
-                    left="50%"
-                    top="0"
-                    h="full"
-                    w="2px"
-                    bg={getThemeColor('error')}
-                    zIndex={2}
-                    transform="translateX(-50%)"
-                  >
-                    <Box
-                      position="absolute"
-                      top="-10px"
-                      w="0"
-                      h="0"
-                      borderLeft="10px solid transparent"
-                      borderRight="10px solid transparent"
-                      borderTop={`15px solid ${getThemeColor('error')}`}
-                    />
-                    <Box
-                      position="absolute"
-                      bottom="-10px"
-                      w="0"
-                      h="0"
-                      borderLeft="10px solid transparent"
-                      borderRight="10px solid transparent"
-                      borderBottom={`15px solid ${getThemeColor('error')}`}
-                    />
-                  </Center>
-
-                  <HStack
-                    ref={spinnerRef}
-                    position="absolute"
-                    h="full"
-                    spacing={4}
-                    px={4}
-                    align="center"
-                    style={{ transform: 'translateX(0)' }}
-                  >
-                    {prizes.map((prize) => (
-                      <Flex
-                        key={prize.id}
-                        direction="column"
-                        align="center"
-                        justify="center"
-                        minW="150px"
-                        h="150px"
-                        bg={prize.isWin ? getThemeColor('warning') : getThemeColor('light')}
-                        borderRadius="lg"
-                        border="2px solid"
-                        borderColor={prize.isWin ? getThemeColor('accent') : getThemeColor('secondary')}
-                        p={4}
-                        position="relative"
-                        _hover={{ transform: isSpinning ? 'none' : 'scale(1.05)' }}
-                        transition="transform 0.2s"
-                      >
-                        <Icon as={prize.icon} boxSize={10} color={prize.color} mb={2} />
-                        <Text
-                          fontSize="sm"
-                          fontWeight="bold"
-                          textAlign="center"
-                          color={prize.isWin ? getThemeColor('white') : getThemeColor('dark')}
-                        >
-                          {prize.name}
-                        </Text>
-                        {prize.value > 0 && (
-                          <Badge
-                            bg={getThemeColor('success')}
-                            color={getThemeColor('white')}
-                            variant="solid"
-                            mt={2}
-                            fontSize="md"
-                          >
-                            £{prize.value}
-                          </Badge>
-                        )}
-                      </Flex>
-                    ))}
+            {/* Ticket Grid */}
+            <VStack spacing={2} w="full">
+              {ticketReveals.map((ticketReveal, index) => (
+                <Box key={ticketReveal.ticketNumber} w="full">
+                  <HStack spacing={2} mb={1}>
+                    <Badge variant="outline" colorScheme="cyan" fontSize="xs">
+                      #{ticketReveal.ticketNumber}
+                    </Badge>
                   </HStack>
-                </Box>
 
-                {revealedPrize && (
                   <Box
-                    p={6}
-                    bg={revealedPrize.isWin ? getThemeColor('warning') : getThemeColor('light')}
-                    borderRadius="lg"
-                    border="2px solid"
-                    borderColor={revealedPrize.isWin ? getThemeColor('accent') : getThemeColor('secondary')}
+                    position="relative"
                     w="full"
-                    textAlign="center"
+                    h="80px"
+                    overflow="hidden"
+                    borderRadius="md"
+                    border="2px solid"
+                    borderColor={ticketReveal.revealedPrize?.isWin ? getThemeColor('warning') : getThemeColor('secondary')}
+                    bg={getThemeColor('light')}
+                    animation={ticketReveal.revealedPrize?.isWin ? `${pulseGlow} 2s infinite` : undefined}
                   >
-                    <VStack spacing={3}>
-                      <Icon
-                        as={revealedPrize.icon}
-                        boxSize={16}
-                        color={revealedPrize.color}
+                    {/* Center indicator */}
+                    <Center
+                      position="absolute"
+                      left="50%"
+                      top="0"
+                      h="full"
+                      w="1px"
+                      bg={getThemeColor('error')}
+                      zIndex={2}
+                      transform="translateX(-50%)"
+                    >
+                      <Box
+                        position="absolute"
+                        top="-6px"
+                        w="0"
+                        h="0"
+                        borderLeft="6px solid transparent"
+                        borderRight="6px solid transparent"
+                        borderTop={`8px solid ${getThemeColor('error')}`}
                       />
-                      <Text fontSize="xl" fontWeight="bold" color={getThemeColor('white')}>
-                        {revealedPrize.name}
-                      </Text>
-                      {revealedPrize.value > 0 && (
-                        <Text fontSize="3xl" fontWeight="bold" color={getThemeColor('success')}>
-                          £{revealedPrize.value}
+                      <Box
+                        position="absolute"
+                        bottom="-6px"
+                        w="0"
+                        h="0"
+                        borderLeft="6px solid transparent"
+                        borderRight="6px solid transparent"
+                        borderBottom={`8px solid ${getThemeColor('error')}`}
+                      />
+                    </Center>
+
+                    {/* Prize spinner */}
+                    <HStack
+                      ref={ticketReveal.spinnerRef}
+                      position="absolute"
+                      h="full"
+                      spacing={2}
+                      px={2}
+                      align="center"
+                      style={{ transform: 'translateX(0)' }}
+                    >
+                      {ticketReveal.prizes.map((prize) => (
+                        <Flex
+                          key={prize.id}
+                          direction="column"
+                          align="center"
+                          justify="center"
+                          minW="80px"
+                          h="60px"
+                          bg={prize.isWin ? getThemeColor('warning') : getThemeColor('secondary')}
+                          borderRadius="md"
+                          border="1px solid"
+                          borderColor={prize.isWin ? getThemeColor('accent') : getThemeColor('dark')}
+                          p={2}
+                        >
+                          <Icon as={prize.icon} boxSize={5} color={prize.color} mb={1} />
+                          <Text
+                            fontSize="xs"
+                            fontWeight="bold"
+                            textAlign="center"
+                            color={prize.isWin ? getThemeColor('dark') : getThemeColor('gray300')}
+                            noOfLines={1}
+                          >
+                            {prize.name}
+                          </Text>
+                          {prize.value > 0 && (
+                            <Badge
+                              bg={getThemeColor('success')}
+                              color={getThemeColor('white')}
+                              variant="solid"
+                              fontSize="xs"
+                              mt={1}
+                            >
+                              £{prize.value}
+                            </Badge>
+                          )}
+                        </Flex>
+                      ))}
+                    </HStack>
+
+                    {/* Result overlay */}
+                    {ticketReveal.revealedPrize && (
+                      <Center
+                        position="absolute"
+                        right={2}
+                        top="50%"
+                        transform="translateY(-50%)"
+                        bg={ticketReveal.revealedPrize.isWin ? getThemeColor('success') : getThemeColor('gray700')}
+                        borderRadius="md"
+                        px={3}
+                        py={1}
+                      >
+                        <Text fontSize="sm" fontWeight="bold" color="white">
+                          {ticketReveal.revealedPrize.isWin ? `WON £${ticketReveal.revealedPrize.value}!` : 'No Win'}
                         </Text>
-                      )}
-                      {revealedPrize.description && (
-                        <Text fontSize="md" color={getThemeColor('gray300')}>
-                          {revealedPrize.description}
-                        </Text>
-                      )}
-                    </VStack>
+                      </Center>
+                    )}
                   </Box>
+                </Box>
+              ))}
+            </VStack>
+
+            {allRevealed && (
+              <Box textAlign="center" pt={4}>
+                {totalWins === 0 ? (
+                  <>
+                    <Icon as={FaStar} boxSize={12} color={getThemeColor('gray500')} mb={2} />
+                    <Text fontSize="lg" color={getThemeColor('gray300')}>
+                      No instant wins this time, but you're still in the main draw!
+                    </Text>
+                  </>
+                ) : (
+                  <>
+                    <Icon as={FaTrophy} boxSize={12} color={getThemeColor('warning')} mb={2} />
+                    <Text fontSize="lg" color={getThemeColor('white')}>
+                      Plus you're entered in the main draw!
+                    </Text>
+                  </>
                 )}
-              </>
-            ) : (
-              <Box textAlign="center" py={8}>
-                <Icon as={FaTrophy} boxSize={20} color={getThemeColor('warning')} mb={4} />
-                <Text fontSize="2xl" fontWeight="bold" mb={2} color={getThemeColor('white')}>
-                  All Tickets Revealed!
-                </Text>
-                <Text fontSize="lg" color={getThemeColor('gray300')}>
-                  Good luck in the main draw!
-                </Text>
               </Box>
             )}
           </VStack>
@@ -361,50 +417,30 @@ export default function InstantWinSpinner({
 
         <ModalFooter borderTop="1px" borderColor={getThemeColor('secondary')}>
           <HStack spacing={3}>
-            {!allRevealed && (
-              <>
-                {!revealedPrize && (
-                  <Button
-                    size="lg"
-                    bg={getThemeColor('success')}
-                    color={getThemeColor('white')}
-                    _hover={{ bg: getThemeColor('primaryDark'), transform: 'translateY(-2px)' }}
-                    _active={{ bg: getThemeColor('primaryDark') }}
-                    onClick={handleSpin}
-                    isLoading={isSpinning}
-                    loadingText="Spinning..."
-                    leftIcon={<Icon as={FaGift} />}
-                    shadow="lg"
-                    fontWeight="bold"
-                    px={8}
-                  >
-                    Spin to Reveal
-                  </Button>
-                )}
-                {revealedPrize && currentTicketIndex < tickets.length - 1 && (
-                  <Button
-                    size="lg"
-                    bg={getThemeColor('primary')}
-                    color={getThemeColor('white')}
-                    _hover={{ bg: getThemeColor('primaryDark') }}
-                    onClick={handleNextTicket}
-                    rightIcon={<Text>→</Text>}
-                  >
-                    Next Ticket ({currentTicketIndex + 2}/{tickets.length})
-                  </Button>
-                )}
-                {revealedPrize && currentTicketIndex === tickets.length - 1 && (
-                  <Button
-                    size="lg"
-                    bg={getThemeColor('success')}
-                    color={getThemeColor('white')}
-                    _hover={{ bg: getThemeColor('primaryDark') }}
-                    onClick={handleCloseModal}
-                  >
-                    Complete
-                  </Button>
-                )}
-              </>
+            {!allRevealed && !isRevealing && (
+              <Button
+                size="lg"
+                bg={getThemeColor('success')}
+                color={getThemeColor('white')}
+                _hover={{ bg: getThemeColor('primaryDark'), transform: 'translateY(-2px)' }}
+                _active={{ bg: getThemeColor('primaryDark') }}
+                onClick={handleRevealAll}
+                leftIcon={<Icon as={FaGift} />}
+                shadow="lg"
+                fontWeight="bold"
+                px={8}
+              >
+                Reveal All Tickets
+              </Button>
+            )}
+            {isRevealing && (
+              <Button
+                size="lg"
+                isLoading
+                loadingText="Revealing..."
+                bg={getThemeColor('primary')}
+                color={getThemeColor('white')}
+              />
             )}
             {allRevealed && (
               <Button
@@ -414,7 +450,7 @@ export default function InstantWinSpinner({
                 _hover={{ bg: getThemeColor('primaryDark') }}
                 onClick={handleCloseModal}
               >
-                Close
+                Continue
               </Button>
             )}
           </HStack>

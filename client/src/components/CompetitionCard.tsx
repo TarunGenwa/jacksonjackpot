@@ -56,12 +56,13 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
 
 
   const handleCardClick = () => {
-    router.push(`/competitions/${localCompetition.id}`);
+    // Navigation to individual competition pages removed
+    // Cards are now display-only
   };
 
   const handleViewDetailsClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click
-    router.push(`/competitions/${localCompetition.id}`);
+    // Navigation to individual competition pages removed
   };
 
   const getStatusColor = (status: string) => {
@@ -91,11 +92,8 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
     <Card
       w="full"
       shadow="xl"
-      _hover={{ shadow: "2xl", transform: "translateY(-2px)", borderColor: getThemeColor('primaryLight') }}
       transition="all 0.3s"
       overflow="hidden"
-      cursor="pointer"
-      onClick={handleCardClick}
       bg={getThemeColor('dark')}
       borderRadius="lg"
       border="1px"
@@ -235,7 +233,6 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
               }}
               variant="solid"
               w="full"
-              onClick={handleViewDetailsClick}
               fontSize="xs"
               h="32px"
               fontWeight="semibold"
