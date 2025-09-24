@@ -492,8 +492,8 @@ export default function Home() {
                         <HStack spacing={4} align="start">
                           <VStack spacing={6} align="stretch" flex={1}>
                             {/* Tabbed Content - Checkout, Prizes, Tickets, Details, FAQ */}
-                            <Box bg={getThemeColor('dark')} borderRadius="lg">
-                              <Tabs variant="unstyled" index={selectedTabIndex} orientation="vertical">
+                            <Box bg={getThemeColor('dark')} borderRadius="lg" w="full">
+                              <Tabs variant="unstyled" index={selectedTabIndex} orientation="vertical" w="full">
                                 {/* Hidden TabList for functionality */}
                                 <TabList display="none">
                                   <Tab></Tab>
@@ -504,13 +504,13 @@ export default function Home() {
                                 </TabList>
 
                                 {/* Content Area - Full Width */}
-                                <Box p={4}>
-                                  <TabPanels>
+                                <Box p={4} w="full">
+                                  <TabPanels w="full">
                                 {/* Checkout Tab */}
-                                <TabPanel px={0}>
-                                  <VStack spacing={4} align="stretch">
+                                <TabPanel px={0} w="full">
+                                  <VStack spacing={4} align="stretch" w="full">
                                     {/* Ticket Info */}
-                                    <Box bg={getThemeColor('secondary')} p={4} borderRadius="md">
+                                    <Box className='w-full' bg={getThemeColor('secondary')} p={4} borderRadius="md">
                                       <Grid templateColumns="repeat(2, 1fr)" gap={4}>
                                         <GridItem>
                                           <VStack align="start">
@@ -612,7 +612,7 @@ export default function Home() {
                                 </TabPanel>
 
                                 {/* Prizes Tab */}
-                                <TabPanel px={0}>
+                                <TabPanel px={0} w="full">
                                   <VStack spacing={4} align="stretch">
                                     {competitions[selectedCompetitionIndex].prizes && competitions[selectedCompetitionIndex].prizes.length > 0 ? (
                                       <>
@@ -748,7 +748,7 @@ export default function Home() {
                                 </TabPanel>
 
                                 {/* Tickets Tab */}
-                                <TabPanel px={0}>
+                                <TabPanel px={0} w="full">
                                   <VStack spacing={4} align="stretch">
                                     <Box bg={getThemeColor('secondary')} p={3} borderRadius="md" border="1px" borderColor={getThemeColor("primary")}>
                                       <HStack justify="space-between" w="full">
@@ -785,7 +785,7 @@ export default function Home() {
                                 </TabPanel>
 
                                 {/* Details Tab */}
-                                <TabPanel px={0}>
+                                <TabPanel px={0} w="full">
                                   <VStack spacing={3} align="stretch">
                                     <Box bg={getThemeColor('secondary')} p={4} borderRadius="md">
                                       <Heading size="sm" color={getThemeColor('white')} mb={3}>Competition Details</Heading>
@@ -870,7 +870,7 @@ export default function Home() {
                                 </TabPanel>
 
                                 {/* FAQ Tab */}
-                                <TabPanel px={0}>
+                                <TabPanel px={0} w="full">
                                   <Accordion allowToggle>
                                     <AccordionItem border="none" mb={2}>
                                       <AccordionButton
